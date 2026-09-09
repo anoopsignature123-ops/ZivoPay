@@ -4,43 +4,51 @@ namespace App\Services\Incomes;
 
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\IncomeCapService;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Class MatchingIncomeService
  *
- * BUSINESS INCOME RULE 4: MATCHING INCOME (5%) (PDF Presentation Slide 16)
+ * INCOME RULE 3: MATCHING INCOME (10%) (Dex Trade PDF Slide 12 & 17)
  * -------------------------------------------------------------------------
  * Description:
- * Team matching commission earned on matched business volume generated within
- * member network legs.
- *
- * Rules & Percentages:
- * - Matching Commission Rate: 5.00% on matched business volume.
- * - Business Volume Ratio: 50:50 ratio between Power Leg Business and Remaining Business Volume.
- * - Daily Capping: Maximum daily matching income = 5X of User's Active Package Amount.
- *
- * Calculation & Limits:
- * 1. Evaluates Power Leg (highest performing leg) volume vs Weaker Legs total volume.
- * 2. Matched Volume = min(PowerLegVolume, WeakerLegsVolume).
- * 3. Raw Matching Income = MatchedVolume * 0.05.
- * 4. Applied Capping = min(RawMatchingIncome, UserActivePackageAmount * 5).
- * 5. Credited to 'earning_wallet' with transaction type 'matching_income'.
+ * 10% Binary Matching Income on matched business volume between Left and Right legs.
+ * Requirement: Must have at least 1 direct referral on Left Leg and 1 on Right Leg.
+ * Note: 10% of Sponsor Matching Income is deducted and distributed as Upline Matching Income.
+ * Subject to 8X Working Income Cap limit.
  */
 class MatchingIncomeService
 {
-    /**
-     * Matching Income Percentage (5%).
-     */
-    public const MATCHING_PERCENTAGE = 5.0;
+    public const MATCHING_PERCENTAGE = 10.0;
+
+    public function __construct(
+        protected IncomeCapService $capService
+    ) {}
 
     /**
-     * Process Matching Income calculation and credit for a member.
-     *
-     * @param  User  $user  Target user being evaluated.
-     * @param  float  $powerLegVolume  Business volume in power leg ($).
-     * @param  float  $weakerLegVolume  Business volume in remaining team legs ($).
-     * @return float Amount of matching income credited after 5X capping ($).
+     * Check if user meets the 1:1 matching requirement (1 active direct on left, 1 active direct on right).
+     */
+    public function meetsMatchingRequirement(User $user): bool
+    {
+        $directs = User::where('sponsor_code', $user->referral_code)->where('status', 'active')->get();
+
+        $leftCount = $directs->where('position', 'left')->count();
+        $rightCount = $directs->where('position', 'right')->count();
+
+        // If positions are not explicitly assigned, check leftChild and rightChild
+        if ($leftCount == 0 || $rightCount == 0) {
+            $hasLeft = $user->leftChild() && $user->leftChild()->status === 'active';
+            $hasRight = $user->rightChild() && $user->rightChild()->status === 'active';
+
+            return $hasLeft && $hasRight;
+        }
+
+        return $leftCount >= 1 && $rightCount >= 1;
+    }
+
+    /**
+     * Process Matching Income for a user.
      */
     public function processUserMatching(User $user, float $powerLegVolume, float $weakerLegVolume): float
     {
@@ -48,47 +56,52 @@ class MatchingIncomeService
             return 0.00;
         }
 
-        // Matched Volume is min of Power Leg and Weaker Leg
+        if (! $this->meetsMatchingRequirement($user)) {
+            return 0.00;
+        }
+
         $matchedVolume = min($powerLegVolume, $weakerLegVolume);
 
         if ($matchedVolume <= 0) {
             return 0.00;
         }
 
-        $rawIncome = ($matchedVolume * self::MATCHING_PERCENTAGE) / 100;
+        $rawMatching = ($matchedVolume * self::MATCHING_PERCENTAGE) / 100;
+        $totalMatching = $this->capService->checkAndCapWorking($user, $rawMatching);
 
-        // Calculate 5X Package Daily Capping Limit
-        $maxPackageAmount = $user->userPackages()->where('status', 'active')->max('invested_amount') ?? 0;
-        $dailyCappingLimit = $maxPackageAmount * 5;
-
-        // If user has no active package, capped at 0
-        if ($dailyCappingLimit <= 0) {
+        if ($totalMatching <= 0) {
             return 0.00;
         }
 
-        $finalIncome = min($rawIncome, $dailyCappingLimit);
+        // 10% is deducted for Upline Matching Income distribution, 90% credited to user
+        $uplineShare = ($totalMatching * 10.0) / 100;
+        $netMatchingToUser = $totalMatching - $uplineShare;
 
-        if ($finalIncome <= 0) {
-            return 0.00;
-        }
-
-        DB::transaction(function () use ($user, $finalIncome, $matchedVolume) {
-            $user->increment('earning_wallet', $finalIncome);
+        DB::transaction(function () use ($user, $netMatchingToUser, $matchedVolume) {
+            $user->increment('earning_wallet', $netMatchingToUser);
 
             Transaction::create([
                 'user_id' => $user->id,
                 'txn_number' => 'TXN-'.rand(10000000, 99999999),
                 'wallet_type' => 'earning_wallet',
-                'amount' => $finalIncome,
+                'amount' => $netMatchingToUser,
                 'charge' => 0.00,
                 'post_balance' => $user->fresh()->earning_wallet,
                 'trx_type' => '+',
                 'type' => 'matching_income',
-                'description' => 'Received 5% Matching Income of $'.number_format($finalIncome, 2).' on matched volume of $'.number_format($matchedVolume, 2),
+                'description' => 'Received 10% Matching Income (Net $'.number_format($netMatchingToUser, 2).' after 10% Upline pool deduction) on matched volume of $'.number_format($matchedVolume, 2),
                 'status' => 'completed',
             ]);
         });
 
-        return $finalIncome;
+        // Trigger Upline Matching Income Pool Distribution to Direct Referrals
+        if ($uplineShare > 0) {
+            app(UplineMatchingIncomeService::class)->distributeUplineMatchingPool($user, $uplineShare);
+        }
+
+        // Trigger Matching ROI Contract (0.5% daily for 150 days)
+        app(MatchingRoiIncomeService::class)->createContract($user, $totalMatching);
+
+        return $netMatchingToUser;
     }
 }

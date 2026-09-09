@@ -44,6 +44,9 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits', [DepositController::class, 'store'])->name('deposits.store');
         Route::get('deposits/history', [DepositController::class, 'history'])->name('deposits.history');
+        Route::get('deposits/payment/{deposit}', [DepositController::class, 'paymentView'])->name('deposits.payment');
+        Route::get('deposits/{deposit}/check-status', [DepositController::class, 'checkStatus'])->name('deposits.check-status');
+        Route::get('deposits/{deposit}', [DepositController::class, 'show'])->name('deposits.show');
 
         // Earning Wallet Withdrawal Routes (PDF Slide 20: Min $10, 10% Deduction, USDT BEP20)
         Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
@@ -63,12 +66,11 @@ Route::prefix('user')->name('user.')->group(function () {
             Route::get('summary', [IncomeReportController::class, 'summary'])->name('summary');
             Route::get('roi', [IncomeReportController::class, 'roi'])->name('roi');
             Route::get('direct', [IncomeReportController::class, 'direct'])->name('direct');
-            Route::get('bonus', [IncomeReportController::class, 'bonus'])->name('bonus');
-            Route::get('level', [IncomeReportController::class, 'level'])->name('level');
             Route::get('matching', [IncomeReportController::class, 'matching'])->name('matching');
-            Route::get('direct-salary', [IncomeReportController::class, 'directSalary'])->name('direct-salary');
-            Route::get('team-salary', [IncomeReportController::class, 'teamSalary'])->name('team-salary');
-            Route::get('rewards', [IncomeReportController::class, 'reward'])->name('rewards');
+            Route::get('referral-roi', [IncomeReportController::class, 'referralRoi'])->name('referral-roi');
+            Route::get('matching-roi', [IncomeReportController::class, 'matchingRoi'])->name('matching-roi');
+            Route::get('upline-matching', [IncomeReportController::class, 'uplineMatching'])->name('upline-matching');
+            Route::get('salary', [IncomeReportController::class, 'salary'])->name('salary');
         });
 
         // My Network Module Routes

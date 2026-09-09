@@ -7,9 +7,7 @@ use App\Models\Package;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserPackage;
-use App\Services\Incomes\BoosterBonusService;
 use App\Services\Incomes\DirectIncomeService;
-use App\Services\Incomes\LevelIncomeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,17 +17,15 @@ use Illuminate\View\View;
 class PackageController extends Controller
 {
     /**
-     * Display Available NextGen Forex Packages for Purchase.
+     * Display Available Dex Trade Packages for Purchase.
      */
     public function index(): View
     {
         $user = Auth::user();
         $packages = Package::where('status', 'active')->orderBy('id', 'asc')->get();
 
-        // Get user's active non-expired packages grouped/keyed by package_id with total sum & count
         $userActivePackages = UserPackage::where('user_id', $user->id)
             ->where('status', 'active')
-            ->where('expires_at', '>', now())
             ->selectRaw('package_id, SUM(invested_amount) as total_invested, COUNT(id) as active_count, MAX(expires_at) as max_expires_at')
             ->groupBy('package_id')
             ->get()
@@ -48,65 +44,54 @@ class PackageController extends Controller
         ]);
 
         $investedAmount = (float) $request->invested_amount;
+
+        // Enforce Multiple of $10 Rule (Dex Trade PDF Slide 8)
+        if (fmod($investedAmount, 10.0) != 0) {
+            return redirect()->back()->with('error', 'Investment amount must be an exact multiple of $10 (e.g., $10, $20, $30, $100, $500).');
+        }
+
         $user = Auth::user();
 
-        // 1. Auto-detect matching active package tier based on invested amount range
-        $package = Package::where('status', 'active')
-            ->where('min_amount', '<=', $investedAmount)
-            ->where(function ($q) use ($investedAmount) {
-                $q->where('max_amount', '>=', $investedAmount)
-                    ->orWhere('max_amount', '>=', 999999);
-            })
-            ->first();
-
-        if (! $package && $request->filled('package_id')) {
-            $package = Package::where('status', 'active')->find($request->package_id);
-        }
-
+        $package = Package::where('status', 'active')->first();
         if (! $package) {
-            return redirect()->back()->with('error', "No active investment package found matching \${$investedAmount}. Please enter an amount within valid package ranges.");
+            return redirect()->back()->with('error', 'No active investment package is currently available.');
         }
 
-        // 2. Check min / max limits for the matched package
-        if ($investedAmount < $package->min_amount || ($package->max_amount < 999999 && $investedAmount > $package->max_amount)) {
-            return redirect()->back()->with('error', "Investment amount must be between \${$package->min_amount} and \${$package->max_amount} for {$package->name}.");
-        }
-
-        // 3. Check Deposit Wallet Balance
+        // Check Deposit Wallet Balance
         if ((float) $user->deposit_wallet < $investedAmount) {
-            return redirect()->route('user.deposits.index')->with('error', "Insufficient Deposit Wallet Balance (\${$user->deposit_wallet}). Please add funds first to invest \${$investedAmount} in {$package->name}!");
+            return redirect()->route('user.deposits.index')->with('error', "Insufficient Deposit Wallet Balance (\${$user->deposit_wallet}). Please add funds first to invest \${$investedAmount}!");
         }
 
-        // 4. Perform Transaction: Deduct Deposit Wallet, Create UserPackage, Activate User Account
+        // Perform Transaction: Deduct Deposit Wallet, Create UserPackage, Activate User Account
         DB::transaction(function () use ($user, $package, $investedAmount) {
             // Deduct Deposit Wallet
             $user->decrement('deposit_wallet', $investedAmount);
 
-            // Activate User and set activated_at timestamp if not set
+            // Activate User
             $user->update([
                 'status' => 'active',
                 'activated_at' => $user->activated_at ?? now(),
             ]);
 
-            // Calculate ROI amounts
-            $dailyRoiAmount = ($investedAmount * $package->daily_roi) / 100;
-            $totalReturnAmount = $investedAmount * $package->total_return_multiplier; // 2X
+            // Calculate ROI amounts (0.5% Daily, 2X Total Return)
+            $dailyRoiAmount = ($investedAmount * 0.50) / 100;
+            $totalReturnAmount = $investedAmount * 2.00;
 
             $userPackage = UserPackage::create([
                 'user_id' => $user->id,
                 'package_id' => $package->id,
                 'invested_amount' => $investedAmount,
-                'daily_roi' => $package->daily_roi,
+                'daily_roi' => 0.50,
                 'daily_roi_amount' => $dailyRoiAmount,
-                'duration_days' => $package->duration_days,
+                'duration_days' => 400,
                 'total_return_amount' => $totalReturnAmount,
                 'paid_roi_amount' => 0.00,
                 'status' => 'active',
                 'purchased_at' => now(),
-                'expires_at' => now()->addDays($package->duration_days),
+                'expires_at' => now()->addDays(400),
             ]);
 
-            // Log detailed financial transaction for package purchase
+            // Log detailed financial transaction
             Transaction::create([
                 'user_id' => $user->id,
                 'txn_number' => 'TXN-'.rand(10000000, 99999999),
@@ -116,27 +101,16 @@ class PackageController extends Controller
                 'post_balance' => $user->fresh()->deposit_wallet,
                 'trx_type' => '-',
                 'type' => 'package_purchase',
-                'description' => 'Invested $'.number_format($investedAmount, 2)." in {$package->name} via Deposit Wallet",
+                'description' => 'Invested $'.number_format($investedAmount, 2).' in Dex Trade Package via Deposit Wallet',
                 'reference_id' => $userPackage->id,
                 'status' => 'completed',
             ]);
 
-            // Delegate 10% Direct Referral Commission to Dedicated DirectIncomeService
+            // Distribute 10% Direct Referral Commission to Sponsor
             app(DirectIncomeService::class)->distributeDirectCommission($user, $userPackage, $investedAmount);
-
-            // Delegate 10-Tier Level Income to Upline Sponsors
-            app(LevelIncomeService::class)->distributeLevelIncome($user, $investedAmount, 'package_purchase');
-
-            // Evaluate 24-Hour Special Booster Bonus for Sponsor
-            if ($user->sponsor_code) {
-                $sponsor = User::where('referral_code', $user->sponsor_code)->first();
-                if ($sponsor) {
-                    app(BoosterBonusService::class)->evaluateBoosterBonus($sponsor);
-                }
-            }
         });
 
-        return redirect()->route('user.packages.history')->with('success', 'Congratulations! You have successfully invested $'.number_format($investedAmount, 2)." in {$package->name}! Daily ROI activated.");
+        return redirect()->route('user.packages.history')->with('success', 'Congratulations! You have successfully invested $'.number_format($investedAmount, 2).' in Dex Trade! 0.5% Daily ROI activated.');
     }
 
     /**

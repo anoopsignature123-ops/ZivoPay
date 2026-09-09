@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'My Total Income Overview')
+@section('title', 'Dex Trade Income Overview')
 
 @section('content')
 <div class="space-y-6">
@@ -10,12 +10,12 @@
         <div>
             <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-widest mb-1">
                 <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
-                <span>My Incomes & Reports</span>
+                <span>Dex Trade Financial Reports</span>
             </div>
             <h1 class="text-2xl font-black font-heading text-white uppercase tracking-wider">
                 My Income Overview
             </h1>
-            <p class="text-xs text-neutral-400 mt-1">Unified earnings dashboard summarizing your returns across all 8 NextGen Forex income streams</p>
+            <p class="text-xs text-neutral-400 mt-1">Unified earnings dashboard summarizing your returns across all 7 Dex Trade income streams</p>
         </div>
         <div class="px-5 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 shrink-0">
             <span class="text-[10px] font-bold text-amber-400 uppercase block">Grand Total Income Earned</span>
@@ -23,18 +23,18 @@
         </div>
     </div>
 
-    <!-- 8 INCOME SUMMARY KPI TILES -->
+    <!-- 7 INCOME SUMMARY KPI TILES -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <!-- 1. ROI -->
+        <!-- 1. Daily ROI Income -->
         <a href="{{ route('user.reports.roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Daily ROI Yield</span>
-                <i data-lucide="trending-up" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">1. Daily ROI Income</span>
+                <i data-lucide="line-chart" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($roiTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>0.5% - 1.5% Daily Yield</span>
+                <span>0.5% Daily (400 Days)</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
@@ -42,90 +42,77 @@
         <!-- 2. Direct Income -->
         <a href="{{ route('user.reports.direct') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Direct Income (10%)</span>
-                <i data-lucide="user-check" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-sky-400 uppercase tracking-wider">2. Direct Income</span>
+                <i data-lucide="user-plus" class="w-4 h-4 text-sky-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($directTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>10% Flat Referral Share</span>
+                <span>10% Instant Referral Bonus</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
 
-        <!-- 3. Booster Bonus -->
-        <a href="{{ route('user.reports.bonus') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">24H Special Bonus</span>
-                <i data-lucide="gift" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
-            </div>
-            <p class="text-xl font-black text-white font-mono">${{ number_format($bonusTotal, 2) }}</p>
-            <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>5 Directs in 24 Hours</span>
-                <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
-            </p>
-        </a>
-
-        <!-- 4. Level Income -->
-        <a href="{{ route('user.reports.level') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-teal-400 uppercase tracking-wider">Level Income (10 Levels)</span>
-                <i data-lucide="layers" class="w-4 h-4 text-teal-400 group-hover:scale-110 transition"></i>
-            </div>
-            <p class="text-xl font-black text-white font-mono">${{ number_format($levelTotal, 2) }}</p>
-            <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>10-Tier Team Commissions</span>
-                <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
-            </p>
-        </a>
-
-        <!-- 5. Matching Income -->
+        <!-- 3. Matching Income -->
         <a href="{{ route('user.reports.matching') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Matching Income (5%)</span>
-                <i data-lucide="git-merge" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-purple-400 uppercase tracking-wider">3. Matching Income</span>
+                <i data-lucide="git-merge" class="w-4 h-4 text-purple-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($matchingTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>50:50 Power Leg Ratio</span>
+                <span>10% Binary Matching (1:1 Req)</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
 
-        <!-- 6. Direct Salary -->
-        <a href="{{ route('user.reports.direct-salary') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
+        <!-- 4. Referral ROI Income -->
+        <a href="{{ route('user.reports.referral-roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Direct Salary Income</span>
-                <i data-lucide="banknote" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-teal-400 uppercase tracking-wider">4. Referral ROI Income</span>
+                <i data-lucide="repeat" class="w-4 h-4 text-teal-400 group-hover:scale-110 transition"></i>
             </div>
-            <p class="text-xl font-black text-white font-mono">${{ number_format($directSalaryTotal, 2) }}</p>
+            <p class="text-xl font-black text-white font-mono">${{ number_format($referralRoiTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>365 Days Daily Salary</span>
+                <span>0.5% Daily from Directs (150 Days)</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
 
-        <!-- 7. Team Salary -->
-        <a href="{{ route('user.reports.team-salary') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
+        <!-- 5. Matching ROI Income -->
+        <a href="{{ route('user.reports.matching-roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Team Salary Income</span>
-                <i data-lucide="users" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">5. Matching ROI Income</span>
+                <i data-lucide="layers" class="w-4 h-4 text-indigo-400 group-hover:scale-110 transition"></i>
             </div>
-            <p class="text-xl font-black text-white font-mono">${{ number_format($teamSalaryTotal, 2) }}</p>
+            <p class="text-xl font-black text-white font-mono">${{ number_format($matchingRoiTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>12 Months Monthly Salary</span>
+                <span>0.5% Daily of Matching (150 Days)</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
 
-        <!-- 8. Reward Income -->
-        <a href="{{ route('user.reports.rewards') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
+        <!-- 6. Upline Matching Income -->
+        <a href="{{ route('user.reports.upline-matching') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Reward Income (10%)</span>
-                <i data-lucide="trophy" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+                <span class="text-[10px] font-extrabold text-rose-400 uppercase tracking-wider">6. Upline Matching Income</span>
+                <i data-lucide="share-2" class="w-4 h-4 text-rose-400 group-hover:scale-110 transition"></i>
             </div>
-            <p class="text-xl font-black text-white font-mono">${{ number_format($rewardTotal, 2) }}</p>
+            <p class="text-xl font-black text-white font-mono">${{ number_format($uplineMatchingTotal, 2) }}</p>
             <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>10% Milestone Rewards</span>
+                <span>10% Sponsor Pool Shared</span>
+                <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
+            </p>
+        </a>
+
+        <!-- 7. Salary Income -->
+        <a href="{{ route('user.reports.salary') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-extrabold text-orange-400 uppercase tracking-wider">7. Salary Income</span>
+                <i data-lucide="award" class="w-4 h-4 text-orange-400 group-hover:scale-110 transition"></i>
+            </div>
+            <p class="text-xl font-black text-white font-mono">${{ number_format($salaryTotal, 2) }}</p>
+            <p class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
+                <span>17 Milestone Ranks</span>
                 <span class="text-amber-400 group-hover:underline">View History &rarr;</span>
             </p>
         </a>
@@ -135,7 +122,7 @@
     <!-- RECENT INCOME PAYOUT AUDIT LOG -->
     <div class="bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30 space-y-4">
         <div class="flex items-center justify-between border-b border-amber-500/20 pb-3">
-            <h3 class="text-sm font-black text-white uppercase tracking-wider">My Recent Income Transactions</h3>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider">Recent Income Transactions</h3>
             <span class="text-xs text-amber-400 font-mono">Live Earnings Log</span>
         </div>
 

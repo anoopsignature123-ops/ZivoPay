@@ -4,55 +4,38 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserPackage;
-use App\Services\Incomes\BoosterBonusService;
 use App\Services\Incomes\DirectIncomeService;
-use App\Services\Incomes\DirectSalaryService;
-use App\Services\Incomes\LevelIncomeService;
 use App\Services\Incomes\MatchingIncomeService;
-use App\Services\Incomes\RewardIncomeService;
+use App\Services\Incomes\MatchingRoiIncomeService;
+use App\Services\Incomes\ReferralRoiIncomeService;
 use App\Services\Incomes\RoiIncomeService;
-use App\Services\Incomes\TeamSalaryService;
+use App\Services\Incomes\SalaryIncomeService;
+use App\Services\Incomes\UplineMatchingIncomeService;
 
 /**
  * Class IncomeEngineService
  *
- * MASTER FINANCIAL INCOME ENGINE (NextGen Forex Business Plan Architecture)
- * -------------------------------------------------------------------------
- * Description:
- * Central orchestrator service that encapsulates all 8 business income logic
- * services, ensuring strict separation of concerns, maintainability, and clean
- * financial execution.
- *
- * Encapsulated Income Services:
- * 1. RoiIncomeService       - 0.5% - 1.5% Daily ROI Yield (200 Days / 2X Cap)
- * 2. DirectIncomeService    - 10% Flat Direct Referral Commission
- * 3. BoosterBonusService    - 24 Hours Special Booster Bonus ($50 / $250 / $500)
- * 4. LevelIncomeService     - 10-Tier Level Commission (20% down to 1%)
- * 5. MatchingIncomeService  - 5% Team Matching Commission (50:50 Power/Weaker Ratio)
- * 6. DirectSalaryService    - 365 Days Direct Business Salary ($1/day to $1,000/day)
- * 7. TeamSalaryService      - 15-Day Cycle Team Salary ($75/cycle for 12 Months)
- * 8. RewardIncomeService    - 10% Team Business Milestone Rewards ($100 to $5 Lacs)
+ * MASTER FINANCIAL INCOME ENGINE (Dex Trade Official 7-Income Business Architecture)
+ * ----------------------------------------------------------------------------------
+ * 1. RoiIncomeService            - 0.5% Daily ROI Yield (400 Days / 2X Non-Working Cap)
+ * 2. DirectIncomeService         - 10% Direct Referral Commission (8X Working Cap)
+ * 3. MatchingIncomeService       - 10% Binary Matching Commission (1:1 Direct Req / 8X Working Cap)
+ * 4. ReferralRoiIncomeService    - 0.5% Daily of Direct Members Investment (150 Days / 8X Working Cap)
+ * 5. MatchingRoiIncomeService    - 0.5% Daily of Matching Bonus (150 Days / 8X Working Cap)
+ * 6. UplineMatchingIncomeService - 10% Shared Sponsor Matching Pool Distribution (8X Working Cap)
+ * 7. SalaryIncomeService         - 17-Level Milestone Salary Plan (8X Working Cap)
  */
 class IncomeEngineService
 {
     public function __construct(
         public RoiIncomeService $roiService,
         public DirectIncomeService $directService,
-        public BoosterBonusService $boosterService,
-        public LevelIncomeService $levelService,
         public MatchingIncomeService $matchingService,
-        public DirectSalaryService $directSalaryService,
-        public TeamSalaryService $teamSalaryService,
-        public RewardIncomeService $rewardService
+        public ReferralRoiIncomeService $referralRoiService,
+        public MatchingRoiIncomeService $matchingRoiService,
+        public UplineMatchingIncomeService $uplineMatchingService,
+        public SalaryIncomeService $salaryService
     ) {}
-
-    /**
-     * Trigger Level Income (10 Levels) for a downline.
-     */
-    public function triggerLevelIncome(User $downline, float $baseAmount, string $sourceType = 'roi'): float
-    {
-        return $this->levelService->distributeLevelIncome($downline, $baseAmount, $sourceType);
-    }
 
     /**
      * Trigger 10% Direct Commission upon package purchase.
@@ -63,7 +46,7 @@ class IncomeEngineService
     }
 
     /**
-     * Run system-wide daily ROI yield distribution.
+     * Run system-wide daily ROI yield distribution (0.5% for 400 days).
      */
     public function runDailyRoiDistribution(): array
     {
@@ -71,15 +54,23 @@ class IncomeEngineService
     }
 
     /**
-     * Evaluate 24-hour booster bonus for a sponsor.
+     * Run system-wide daily Referral ROI distribution (0.5% for 150 days).
      */
-    public function checkBoosterBonus(User $user): float
+    public function runDailyReferralRoiDistribution(): array
     {
-        return $this->boosterService->evaluateBoosterBonus($user);
+        return $this->referralRoiService->processAllReferralRoi();
     }
 
     /**
-     * Process 5% matching income for a member.
+     * Run system-wide daily Matching ROI contract payouts (0.5% for 150 days).
+     */
+    public function runDailyMatchingRoiDistribution(): array
+    {
+        return $this->matchingRoiService->processAllMatchingRoi();
+    }
+
+    /**
+     * Process 10% binary matching income for a member.
      */
     public function calculateMatching(User $user, float $powerLeg, float $weakerLeg): float
     {
@@ -87,26 +78,26 @@ class IncomeEngineService
     }
 
     /**
-     * Process daily direct salary income.
+     * Process 17-Level Salary Income payouts for a member.
      */
-    public function processDirectSalary(User $user): float
+    public function processSalary(User $user): float
     {
-        return $this->directSalaryService->processUserDirectSalary($user);
+        return $this->salaryService->processUserSalaryPayout($user);
     }
 
     /**
-     * Process 15-day team salary cycle payout.
+     * Run all system-wide daily income distributions.
      */
-    public function processTeamSalary(User $user, float $matchingBusiness): float
+    public function runAllDailyIncomes(): array
     {
-        return $this->teamSalaryService->processUserTeamSalary($user, $matchingBusiness);
-    }
+        $roiResult = $this->runDailyRoiDistribution();
+        $referralRoiResult = $this->runDailyReferralRoiDistribution();
+        $matchingRoiResult = $this->runDailyMatchingRoiDistribution();
 
-    /**
-     * Evaluate team business reward milestones.
-     */
-    public function checkRewardMilestones(User $user, float $teamBusiness): float
-    {
-        return $this->rewardService->evaluateRewardMilestones($user, $teamBusiness);
+        return [
+            'daily_roi' => $roiResult,
+            'referral_roi' => $referralRoiResult,
+            'matching_roi' => $matchingRoiResult,
+        ];
     }
 }

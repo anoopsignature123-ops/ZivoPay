@@ -232,13 +232,94 @@ class User extends Authenticatable
         return $this->role_id === 1 || ($this->role && $this->role->slug === 'admin');
     }
 
+    public function matchingRoiContracts(): HasMany
+    {
+        return $this->hasMany(UserMatchingRoiContract::class);
+    }
+
+    public function salaries(): HasMany
+    {
+        return $this->hasMany(UserSalary::class);
+    }
+
     /**
-     * Generate unique random referral code (e.g., NGF-0967542).
+     * Get Total Active Package Investment Amount.
+     */
+    public function getTotalActiveInvestmentAttribute(): float
+    {
+        return (float) $this->userPackages()->where('status', 'active')->sum('invested_amount');
+    }
+
+    /**
+     * Non-Working Income Cap Limit (2X / 200% of Active Investment).
+     */
+    public function getNonWorkingIncomeCapAttribute(): float
+    {
+        return $this->total_active_investment * 2.00;
+    }
+
+    /**
+     * Working Income Cap Limit (8X / 800% of Active Investment).
+     */
+    public function getWorkingIncomeCapAttribute(): float
+    {
+        return $this->total_active_investment * 8.00;
+    }
+
+    /**
+     * Total Non-Working Income (ROI) Earned.
+     */
+    public function getTotalNonWorkingEarnedAttribute(): float
+    {
+        return (float) $this->transactions()
+            ->where('trx_type', '+')
+            ->where('type', 'daily_roi')
+            ->sum('amount');
+    }
+
+    /**
+     * Total Working Income Earned.
+     */
+    public function getTotalWorkingEarnedAttribute(): float
+    {
+        return (float) $this->transactions()
+            ->where('trx_type', '+')
+            ->whereIn('type', [
+                'direct_commission',
+                'matching_income',
+                'referral_roi',
+                'matching_roi',
+                'upline_matching',
+                'salary_income',
+                'level_income',
+                'booster_bonus',
+            ])
+            ->sum('amount');
+    }
+
+    /**
+     * Remaining Non-Working Income Cap Room.
+     */
+    public function getRemainingNonWorkingCapAttribute(): float
+    {
+        return max(0.00, $this->non_working_income_cap - $this->total_non_working_earned);
+    }
+
+    /**
+     * Remaining Working Income Cap Room.
+     */
+    public function getRemainingWorkingCapAttribute(): float
+    {
+        return max(0.00, $this->working_income_cap - $this->total_working_earned);
+    }
+
+    /**
+     * Generate unique random referral code (e.g., DEX-0967542).
      */
     public static function generateReferralCode(): string
     {
         do {
-            $code = 'NGF-'.str_pad((string) rand(100000, 9999999), 7, '0', STR_PAD_LEFT);
+            $code = 'DEX-'.str_pad((string) rand(100000, 9999999), 7, '0', STR_PAD_LEFT);
         } while (static::where('referral_code', $code)->exists());
 
         return $code;

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deposit;
-use App\Models\Transaction;
+use App\Services\User\DepositService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DepositController extends Controller
@@ -20,63 +20,83 @@ class DepositController extends Controller
     {
         $user = Auth::user();
         $deposits = Deposit::where('user_id', $user->id)->latest()->paginate(10);
-
-        // System USDT BEP20 Official Deposit Wallet Address
-        $usdtWalletAddress = config('app.usdt_wallet', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F');
+        $usdtWalletAddress = config('services.usdt.wallet_address', env('USDT_WALLET_ADDRESS', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'));
 
         return view('user.deposits.index', compact('user', 'deposits', 'usdtWalletAddress'));
     }
 
     /**
-     * Store new Deposit Request from User.
+     * Store new Deposit Request & initialize gateway payment session.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, DepositService $depositService): RedirectResponse
     {
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:10', // Min deposit $10 as per Terms (Slide 20)
-            'payment_gateway' => 'required|string',
-            'txn_hash' => 'required|string|max:255',
-            'proof_image' => 'nullable|image|max:2048',
+        $request->validate([
+            'amount' => ['required', 'numeric', 'min:10', 'max:50000'],
+        ], [
+            'amount.required' => 'Please enter a valid deposit amount.',
+            'amount.numeric' => 'Deposit amount must be a valid number.',
+            'amount.min' => 'Minimum deposit amount is $10.00 USDT.',
+            'amount.max' => 'Maximum single deposit amount is $50,000.00 USDT.',
         ]);
 
-        $proofPath = null;
-        if ($request->hasFile('proof_image')) {
-            $proofPath = $request->file('proof_image')->store('deposits', 'public');
+        $result = $depositService->createCustomFund(Auth::user(), (float) $request->amount, 'USDT (BEP20)');
+
+        if (! $result['success']) {
+            return back()
+                ->withErrors(['amount' => $result['message']])
+                ->withInput()
+                ->with('error', $result['message']);
         }
 
-        $user = Auth::user();
+        return redirect()->route('user.deposits.payment', $result['deposit']->id);
+    }
 
-        DB::transaction(function () use ($user, $validated, $proofPath) {
-            // 1. Create Deposit Record with INSTANT APPROVED status (No Admin Approval Required)
-            $deposit = Deposit::create([
-                'user_id' => $user->id,
-                'amount' => $validated['amount'],
-                'payment_gateway' => $validated['payment_gateway'],
-                'txn_hash' => $validated['txn_hash'],
-                'proof_image' => $proofPath,
-                'status' => 'approved',
-            ]);
+    /**
+     * Display payment checkout page & trigger instant verify check.
+     */
+    public function show(Deposit $deposit, DepositService $depositService): View|RedirectResponse
+    {
+        abort_if($deposit->user_id !== Auth::id(), 403);
 
-            // 2. Increment User Deposit Wallet INSTANTLY
-            $user->increment('deposit_wallet', $validated['amount']);
+        if ($deposit->status === 'approved') {
+            return redirect()->route('user.deposits.history')->with('success', 'Payment already verified & credited.');
+        }
 
-            // 3. Create Financial Audit Transaction Record
-            Transaction::create([
-                'user_id' => $user->id,
-                'txn_number' => 'TXN-'.rand(10000000, 99999999),
-                'wallet_type' => 'deposit_wallet',
-                'amount' => $validated['amount'],
-                'charge' => 0.00,
-                'post_balance' => $user->fresh()->deposit_wallet,
-                'trx_type' => '+',
-                'type' => 'deposit',
-                'description' => 'Deposit of $'.number_format($validated['amount'], 2)." via {$validated['payment_gateway']} (Ref: {$deposit->deposit_ref})",
-                'reference_id' => $deposit->id,
-                'status' => 'completed',
-            ]);
-        });
+        $depositService->verifyAndProcessDeposit($deposit);
+        $deposit->refresh();
 
-        return redirect()->route('user.deposits.history')->with('success', 'Congratulations! $'.number_format($validated['amount'], 2).' has been instantly credited to your Deposit Wallet!');
+        return view('user.deposits.payment', compact('deposit'));
+    }
+
+    /**
+     * Dedicated payment checkout view.
+     */
+    public function paymentView(Deposit $deposit): View
+    {
+        abort_unless($deposit->user_id === Auth::id(), 403);
+
+        return view('user.deposits.payment', compact('deposit'));
+    }
+
+    /**
+     * AJAX Live Polling Check Status Endpoint.
+     */
+    public function checkStatus(Deposit $deposit, DepositService $depositService): JsonResponse
+    {
+        abort_unless($deposit->user_id === Auth::id(), 403);
+
+        if ($deposit->status === 'approved') {
+            return response()->json(['status' => 'success', 'message' => 'Payment confirmed!']);
+        }
+
+        $isPaid = $depositService->verifyAndProcessDeposit($deposit);
+        $deposit->refresh();
+
+        if ($deposit->status === 'approved' || $isPaid) {
+            return response()->json(['status' => 'success', 'message' => 'Payment confirmed successfully!']);
+        }
+
+        return response()->json(['status' => 'pending', 'message' => 'Waiting for payment confirmation...']);
     }
 
     /**
@@ -105,7 +125,10 @@ class DepositController extends Controller
         }
 
         if ($search) {
-            $query->where('txn_hash', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('txn_hash', 'like', "%{$search}%")
+                    ->orWhere('deposit_ref', 'like', "%{$search}%");
+            });
         }
 
         $deposits = $query->latest()->paginate(15)->withQueryString();

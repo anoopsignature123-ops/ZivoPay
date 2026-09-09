@@ -3,11 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Services\Incomes\DirectSalaryService;
-use App\Services\Incomes\LevelIncomeService;
 use App\Services\Incomes\MatchingIncomeService;
-use App\Services\Incomes\RewardIncomeService;
-use App\Services\Incomes\TeamSalaryService;
+use App\Services\Incomes\SalaryIncomeService;
 use Illuminate\Console\Command;
 
 class IncomeProcessCommand extends Command
@@ -24,16 +21,14 @@ class IncomeProcessCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Process and distribute all NextGen Forex incomes (Matching 5%, Direct Salary, Team Salary, and Milestone Rewards)';
+    protected $description = 'Process and distribute Dex Trade incomes (10% Binary Matching and 17-Level Salary Plan)';
 
     /**
      * Execute the console command.
      */
     public function handle(
         MatchingIncomeService $matchingService,
-        DirectSalaryService $directSalaryService,
-        TeamSalaryService $teamSalaryService,
-        RewardIncomeService $rewardService
+        SalaryIncomeService $salaryService
     ): int {
         $userInput = $this->argument('user');
 
@@ -52,7 +47,7 @@ class IncomeProcessCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->info('Starting Income Processing Cycle for '.$users->count().' user(s)...');
+        $this->info('Starting Dex Trade Income Processing Cycle for '.$users->count().' user(s)...');
 
         $rows = [];
 
@@ -61,36 +56,25 @@ class IncomeProcessCommand extends Command
 
             $powerLeg = (float) ($legStats['power_leg'] ?? 0);
             $weakerLeg = (float) ($legStats['remaining_leg'] ?? 0);
-            $teamBusiness = (float) ($legStats['total_team'] ?? 0);
 
             // Process Incomes
             $matchingPaid = $matchingService->processUserMatching($user, $powerLeg, $weakerLeg);
-            $directSalaryPaid = $directSalaryService->processUserDirectSalary($user);
-            $teamSalaryPaid = $teamSalaryService->processUserTeamSalary($user, $weakerLeg);
-            $rewardPaid = $rewardService->evaluateRewardMilestones($user, $teamBusiness);
-
-            // Process level income for user's active packages / ROI if applicable
-            $levelPaid = 0.00;
-            foreach ($user->userPackages->where('status', 'active') as $pkg) {
-                $levelPaid += app(LevelIncomeService::class)->distributeLevelIncome($user, $pkg->invested_amount, 'package_purchase');
-            }
+            $salaryPaid = $salaryService->processUserSalaryPayout($user);
 
             $rows[] = [
                 'user' => $user->name.' ('.$user->referral_code.')',
                 'matching' => '$'.number_format($matchingPaid, 2),
-                'direct_salary' => '$'.number_format($directSalaryPaid, 2),
-                'team_salary' => '$'.number_format($teamSalaryPaid, 2),
-                'reward' => '$'.number_format($rewardPaid, 2),
+                'salary' => '$'.number_format($salaryPaid, 2),
                 'earning_wallet' => '$'.number_format((float) $user->fresh()->earning_wallet, 2),
             ];
         }
 
         $this->table(
-            ['User / Referral', 'Matching (5%)', 'Direct Salary', 'Team Salary', 'Reward (10%)', 'Earning Wallet'],
+            ['User / Referral', '10% Matching Income', '17-Level Salary Income', 'Earning Wallet'],
             $rows
         );
 
-        $this->info('Income Distribution Cycle Completed Successfully!');
+        $this->info('Dex Trade Income Distribution Cycle Completed Successfully!');
 
         return Command::SUCCESS;
     }

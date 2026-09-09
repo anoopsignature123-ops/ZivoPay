@@ -17,6 +17,8 @@ class Deposit extends Model
         'deposit_ref',
         'amount',
         'payment_gateway',
+        'wallet_address',
+        'gateway_reference',
         'txn_hash',
         'proof_image',
         'status',

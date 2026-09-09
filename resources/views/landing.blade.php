@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
-        content="Next Gen Forex — Smart Digital Income &amp; Growth Platform. Grow Together. Earn Together." />
-    <title>Next Gen Forex | Smart Digital Income &amp; Growth Platform</title>
+        content="Dex Trade — Trade • Invest • Grow. Smarter Trading, Bigger Opportunities, A Stronger Tomorrow." />
+    <title>Dex Trade | Trade • Invest • Grow</title>
     <link rel="icon" type="image/png" href="{{ asset('website/assets/images/logo.png') }}" />
     <link rel="stylesheet" href="{{ asset('website/assets/css/style.css') }}" />
     </head>
