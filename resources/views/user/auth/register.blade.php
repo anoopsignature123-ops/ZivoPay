@@ -64,6 +64,38 @@
                             </div>
                         </div>
 
+                        <!-- Placement Position (Left Leg vs Right Leg) -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-amber-400 uppercase">Binary Position / Leg *</label>
+                                @if(isset($isLockedPosition) && $isLockedPosition)
+                                    <span class="text-[10px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40 uppercase flex items-center gap-1">
+                                        ⚡ Selected via Link ({{ strtoupper($position ?? 'LEFT') }})
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group">
+                                    <input type="radio" name="position" value="left" {{ old('position', $position ?? 'left') === 'left' ? 'checked' : '' }} class="peer hidden">
+                                    <div class="flex items-center gap-2 text-white text-xs font-extrabold uppercase peer-checked:text-amber-300">
+                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center peer-checked:border-amber-400 peer-checked:bg-amber-400">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                        </div>
+                                        <span>Left Leg (Team A)</span>
+                                    </div>
+                                </label>
+                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group">
+                                    <input type="radio" name="position" value="right" {{ old('position', $position ?? 'left') === 'right' ? 'checked' : '' }} class="peer hidden">
+                                    <div class="flex items-center gap-2 text-white text-xs font-extrabold uppercase peer-checked:text-amber-300">
+                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center peer-checked:border-amber-400 peer-checked:bg-amber-400">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                        </div>
+                                        <span>Right Leg (Team B)</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Full Name & Email -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>

@@ -134,26 +134,49 @@
             </div>
         </div>
 
-        <!-- SINGLE OFFICIAL MEMBER REFERRAL LINK CARD -->
-        <div
-            class="p-5 rounded-3xl pdf-package-card flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 relative z-10 shadow-xl">
-            <div class="flex items-center gap-4 overflow-hidden">
-                <div class="w-12 h-12 rounded-2xl pdf-gold-badge flex items-center justify-center font-black shrink-0">
-                    <i data-lucide="link" class="w-6 h-6 text-black"></i>
+        <!-- DUAL OFFICIAL MEMBER REFERRAL LINKS (LEFT & RIGHT BINARY POSITION CARDS IN 1 ROW) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 relative z-10">
+            
+            <!-- LEFT REFERRAL LINK (TEAM A / LEFT POSITION) -->
+            <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 shadow-xl">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center font-black shrink-0">
+                        <i data-lucide="arrow-left-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <span class="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider block">LEFT REFERRAL LINK (TEAM A)</span>
+                        <p class="text-xs text-neutral-200 font-mono font-bold truncate mt-0.5" title="{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}">
+                            {{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}
+                        </p>
+                    </div>
                 </div>
-                <div class="overflow-hidden">
-                    <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider block">YOUR OFFICIAL
-                        DEX TRADE REFERRAL LINK</span>
-                    <p class="text-sm text-neutral-200 font-mono font-bold truncate mt-0.5">
-                        {{ url('/user/register?sponsor=' . $user->referral_code) }}
-                    </p>
-                </div>
+                <button
+                    onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}'); showToast('Copied!', 'Left Leg (Team A) referral link copied.', 'success');"
+                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-black"></i> Copy Left Link
+                </button>
             </div>
-            <button
-                onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $user->referral_code) }}'); showToast('Copied!', 'Referral link copied to clipboard.', 'success');"
-                class="px-6 py-3 rounded-2xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-2 cursor-pointer">
-                <i data-lucide="copy" class="w-4 h-4 text-black"></i> Copy Referral Link
-            </button>
+
+            <!-- RIGHT REFERRAL LINK (TEAM B / RIGHT POSITION) -->
+            <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 shadow-xl">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-black shrink-0">
+                        <i data-lucide="arrow-right-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <span class="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wider block">RIGHT REFERRAL LINK (TEAM B)</span>
+                        <p class="text-xs text-neutral-200 font-mono font-bold truncate mt-0.5" title="{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}">
+                            {{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}
+                        </p>
+                    </div>
+                </div>
+                <button
+                    onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}'); showToast('Copied!', 'Right Leg (Team B) referral link copied.', 'success');"
+                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-black"></i> Copy Right Link
+                </button>
+            </div>
+
         </div>
 
         <!-- 5 MAIN FINANCIAL WALLET & CAPITAL CARDS -->
@@ -282,7 +305,7 @@
                                     <i data-lucide="line-chart" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.roi') }}" class="hover:text-amber-300 transition text-xs font-bold">1. Daily ROI Income</a>
+                                    <a href="{{ route('user.reports.roi') }}" class="hover:text-amber-300 transition text-xs font-bold">Daily ROI Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">0.5% Daily for 400 Days (2X Non-Working Cap)</span>
                                 </div>
                             </td>
@@ -297,7 +320,7 @@
                                     <i data-lucide="user-plus" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.direct') }}" class="hover:text-amber-300 transition text-xs font-bold">2. Direct Income</a>
+                                    <a href="{{ route('user.reports.direct') }}" class="hover:text-amber-300 transition text-xs font-bold">Direct Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">10% Instant Direct Referral Bonus</span>
                                 </div>
                             </td>
@@ -312,7 +335,7 @@
                                     <i data-lucide="git-merge" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.matching') }}" class="hover:text-amber-300 transition text-xs font-bold">3. Matching Income</a>
+                                    <a href="{{ route('user.reports.matching') }}" class="hover:text-amber-300 transition text-xs font-bold">Matching Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">10% Binary Matching Bonus (1:1 Left/Right Requirement)</span>
                                 </div>
                             </td>
@@ -327,7 +350,7 @@
                                     <i data-lucide="repeat" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.referral-roi') }}" class="hover:text-amber-300 transition text-xs font-bold">4. Referral ROI Income</a>
+                                    <a href="{{ route('user.reports.referral-roi') }}" class="hover:text-amber-300 transition text-xs font-bold">Referral ROI Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">0.5% Daily from Direct Members Total Investment (150 Days)</span>
                                 </div>
                             </td>
@@ -342,7 +365,7 @@
                                     <i data-lucide="layers" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.matching-roi') }}" class="hover:text-amber-300 transition text-xs font-bold">5. Matching ROI Income</a>
+                                    <a href="{{ route('user.reports.matching-roi') }}" class="hover:text-amber-300 transition text-xs font-bold">Matching ROI Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">0.5% Daily of Daily Matching Bonus (150 Days)</span>
                                 </div>
                             </td>
@@ -357,7 +380,7 @@
                                     <i data-lucide="share-2" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.upline-matching') }}" class="hover:text-amber-300 transition text-xs font-bold">6. Upline Matching Income</a>
+                                    <a href="{{ route('user.reports.upline-matching') }}" class="hover:text-amber-300 transition text-xs font-bold">Upline Matching Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">10% Sponsor Matching Pool Shared Equally</span>
                                 </div>
                             </td>
@@ -372,7 +395,7 @@
                                     <i data-lucide="award" class="w-3 h-3"></i>
                                 </span>
                                 <div>
-                                    <a href="{{ route('user.reports.salary') }}" class="hover:text-amber-300 transition text-xs font-bold">7. Salary Income</a>
+                                    <a href="{{ route('user.reports.salary') }}" class="hover:text-amber-300 transition text-xs font-bold">Salary Income</a>
                                     <span class="text-[9px] text-neutral-400 font-normal block">17 Milestone Rank Salaries ($50/mo to $12 Lakh/mo over 5–25 Months)</span>
                                 </div>
                             </td>

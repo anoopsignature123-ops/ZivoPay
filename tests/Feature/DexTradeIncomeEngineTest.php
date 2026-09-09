@@ -3,17 +3,21 @@
 namespace Tests\Feature;
 
 use App\Models\Package;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserPackage;
 use App\Services\Incomes\DirectIncomeService;
 use App\Services\Incomes\MatchingIncomeService;
 use App\Services\Incomes\RoiIncomeService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\User\DepositService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class DexTradeIncomeEngineTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected Package $package;
 
@@ -21,7 +25,7 @@ class DexTradeIncomeEngineTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
 
         $this->package = Package::create([
             'name' => 'Dex Trade Package',
@@ -150,5 +154,69 @@ class DexTradeIncomeEngineTest extends TestCase
 
         $this->assertEquals(270.00, $netMatching);
         $this->assertEquals(270.00, $user->fresh()->earning_wallet);
+    }
+
+    public function test_left_and_right_registration_and_referral_link_generation(): void
+    {
+        $sponsor = User::factory()->create([
+            'referral_code' => 'DEX-SPONSOR1',
+            'status' => 'active',
+        ]);
+
+        $leftUser = User::create([
+            'role_id' => 2,
+            'name' => 'Left Member',
+            'email' => 'left@dextrade.com',
+            'mobile' => '9876543210',
+            'referral_code' => 'DEX-LEFT01',
+            'sponsor_code' => 'DEX-SPONSOR1',
+            'position' => 'left',
+            'status' => 'inactive',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $rightUser = User::create([
+            'role_id' => 2,
+            'name' => 'Right Member',
+            'email' => 'right@dextrade.com',
+            'mobile' => '9876543211',
+            'referral_code' => 'DEX-RIGHT01',
+            'sponsor_code' => 'DEX-SPONSOR1',
+            'position' => 'right',
+            'status' => 'inactive',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $this->assertNotNull($leftUser);
+        $this->assertEquals('left', $leftUser->position);
+        $this->assertEquals('DEX-SPONSOR1', $leftUser->sponsor_code);
+
+        $this->assertNotNull($rightUser);
+        $this->assertEquals('right', $rightUser->position);
+
+        // Verify Left & Right child tree resolution on sponsor
+        $this->assertEquals($leftUser->id, $sponsor->leftChild()->id);
+        $this->assertEquals($rightUser->id, $sponsor->rightChild()->id);
+    }
+
+    public function test_payment_gateway_simulation_mode_and_setting_configuration(): void
+    {
+        Setting::setValue('payment_test_mode', 'true');
+        Setting::setValue('usdt_wallet_address', '0xTESTWALLETHASH123456');
+
+        $this->assertTrue(Setting::isPaymentTestMode());
+        $this->assertEquals('0xTESTWALLETHASH123456', Setting::getUsdtWalletAddress());
+
+        $user = User::factory()->create(['deposit_wallet' => 0.00]);
+        $depositService = app(DepositService::class);
+
+        $result = $depositService->createCustomFund($user, 100.00);
+        $this->assertTrue($result['success']);
+        $deposit = $result['deposit'];
+
+        $isVerified = $depositService->verifyAndProcessDeposit($deposit);
+        $this->assertTrue($isVerified);
+        $this->assertEquals('approved', $deposit->fresh()->status);
+        $this->assertEquals(100.00, $user->fresh()->deposit_wallet);
     }
 }

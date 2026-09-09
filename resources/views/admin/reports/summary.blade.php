@@ -29,7 +29,7 @@
         <!-- 1. Daily ROI Income -->
         <a href="{{ route('admin.reports.roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">1. Daily ROI Yield</span>
+                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Daily ROI Yield</span>
                 <i data-lucide="line-chart" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($roiTotal, 2) }}</p>
@@ -42,7 +42,7 @@
         <!-- 2. Direct Income -->
         <a href="{{ route('admin.reports.direct') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-sky-400 uppercase tracking-wider">2. Direct Income (10%)</span>
+                <span class="text-[10px] font-extrabold text-sky-400 uppercase tracking-wider">Direct Income (10%)</span>
                 <i data-lucide="user-plus" class="w-4 h-4 text-sky-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($directTotal, 2) }}</p>
@@ -55,7 +55,7 @@
         <!-- 3. Matching Income -->
         <a href="{{ route('admin.reports.matching') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-purple-400 uppercase tracking-wider">3. Matching Income (10%)</span>
+                <span class="text-[10px] font-extrabold text-purple-400 uppercase tracking-wider">Matching Income (10%)</span>
                 <i data-lucide="git-merge" class="w-4 h-4 text-purple-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($matchingTotal, 2) }}</p>
@@ -68,7 +68,7 @@
         <!-- 4. Referral ROI Income -->
         <a href="{{ route('admin.reports.referral-roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-teal-400 uppercase tracking-wider">4. Referral ROI Income</span>
+                <span class="text-[10px] font-extrabold text-teal-400 uppercase tracking-wider">Referral ROI Income</span>
                 <i data-lucide="repeat" class="w-4 h-4 text-teal-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($referralRoiTotal, 2) }}</p>
@@ -81,7 +81,7 @@
         <!-- 5. Matching ROI Income -->
         <a href="{{ route('admin.reports.matching-roi') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">5. Matching ROI Income</span>
+                <span class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">Matching ROI Income</span>
                 <i data-lucide="layers" class="w-4 h-4 text-indigo-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($matchingRoiTotal, 2) }}</p>
@@ -94,7 +94,7 @@
         <!-- 6. Upline Matching Income -->
         <a href="{{ route('admin.reports.upline-matching') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-rose-400 uppercase tracking-wider">6. Upline Matching Income</span>
+                <span class="text-[10px] font-extrabold text-rose-400 uppercase tracking-wider">Upline Matching Income</span>
                 <i data-lucide="share-2" class="w-4 h-4 text-rose-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($uplineMatchingTotal, 2) }}</p>
@@ -107,7 +107,7 @@
         <!-- 7. Salary Income -->
         <a href="{{ route('admin.reports.salary') }}" class="group bg-panel p-4 rounded-2xl border border-amber-500/30 hover:border-amber-400 shadow-lg transition block">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">7. Salary Income</span>
+                <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">Salary Income</span>
                 <i data-lucide="award" class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition"></i>
             </div>
             <p class="text-xl font-black text-white font-mono">${{ number_format($salaryTotal, 2) }}</p>

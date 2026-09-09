@@ -28,6 +28,25 @@
             </div>
         @endif
 
+        @if(\App\Models\Setting::isPaymentTestMode())
+            <div class="p-5 rounded-2xl bg-amber-500/20 border-2 border-amber-400 space-y-3 shadow-2xl">
+                <div class="flex items-center gap-2 text-amber-300 font-black text-xs uppercase tracking-wider">
+                    <i data-lucide="flask-conical" class="w-4 h-4 text-amber-400"></i>
+                    <span>PAYMENT GATEWAY IS IN TESTING / SIMULATION MODE</span>
+                </div>
+                <p class="text-xs text-neutral-200 leading-relaxed">
+                    Payment gateway is running in sandbox test mode (live API key not required). You can click the button below to instantly simulate successful blockchain verification and credit <strong class="text-emerald-400 font-mono">${{ number_format($deposit->amount, 2) }} USDT</strong> directly to your Deposit Wallet.
+                </p>
+                <form action="{{ route('user.deposits.simulate-payment', $deposit->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shadow-xl flex items-center justify-center gap-2 cursor-pointer">
+                        <i data-lucide="zap" class="w-4 h-4 text-black font-black"></i>
+                        SIMULATE INSTANT PAYMENT (CREDIT ${{ number_format($deposit->amount, 2) }} TO DEPOSIT WALLET)
+                    </button>
+                </form>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- LEFT CARD: QR Code & Wallet Address -->

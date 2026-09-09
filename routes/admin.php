@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
@@ -102,6 +103,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('tickets/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
         Route::post('tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('tickets.reply');
         Route::post('tickets/{ticket}/close', [AdminTicketController::class, 'close'])->name('tickets.close');
+
+        // System Gateway & Payment Settings Routes
+        Route::get('settings/gateway', [SettingController::class, 'gatewaySettings'])->name('settings.gateway');
+        Route::post('settings/gateway', [SettingController::class, 'updateGatewaySettings'])->name('settings.gateway.update');
 
         // Logout Route
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');

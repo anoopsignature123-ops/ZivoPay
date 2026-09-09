@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-center gap-2 text-xs font-semibold text-rose-400 uppercase tracking-widest mb-1">
                 <i data-lucide="share-2" class="w-4 h-4 text-rose-400"></i>
-                <span>6. Dex Trade Income Stream</span>
+                <span>Dex Trade Income Stream</span>
             </div>
             <h1 class="text-2xl font-black font-heading text-white uppercase tracking-wider">
                 Upline Matching Income Report

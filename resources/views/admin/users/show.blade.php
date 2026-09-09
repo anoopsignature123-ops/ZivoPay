@@ -150,17 +150,31 @@
                         </a>
                     </div>
 
-                    <!-- OFFICIAL MEMBER REFERRAL LINK BOX -->
-                    <div class="p-4 rounded-2xl bg-black/80 border border-amber-500/30 space-y-2">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[11px] font-black text-amber-400 uppercase flex items-center gap-1 shrink-0">
-                                🔗 MEMBER REFERRAL LINK
-                            </span>
-                            <button onclick="copyLink('{{ url('/user/register?sponsor=' . $user->referral_code) }}', 'Referral Link copied!')" class="px-3 py-1 rounded-xl pdf-gold-ribbon font-black text-[10px] uppercase flex items-center gap-1 shrink-0 shadow text-black">
-                                <i data-lucide="copy" class="w-3 h-3 text-black font-black"></i> Copy Link
-                            </button>
+                    <!-- OFFICIAL MEMBER REFERRAL LINKS BOX (LEFT & RIGHT) -->
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-2xl bg-black/80 border border-amber-500/40 space-y-1.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-black text-amber-400 uppercase flex items-center gap-1 shrink-0">
+                                    🔗 LEFT REFERRAL LINK (TEAM A)
+                                </span>
+                                <button onclick="copyLink('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}', 'Left Referral Link copied!')" class="px-2.5 py-0.5 rounded-lg pdf-gold-ribbon font-black text-[9px] uppercase flex items-center gap-1 shrink-0 shadow text-black cursor-pointer">
+                                    <i data-lucide="copy" class="w-3 h-3 text-black font-black"></i> Copy Left
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-amber-300 font-mono break-all font-bold">{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}</p>
                         </div>
-                        <p class="text-[11px] text-amber-300 font-mono break-all font-bold">{{ url('/user/register?sponsor=' . $user->referral_code) }}</p>
+
+                        <div class="p-3 rounded-2xl bg-black/80 border border-emerald-500/40 space-y-1.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-black text-emerald-400 uppercase flex items-center gap-1 shrink-0">
+                                    🔗 RIGHT REFERRAL LINK (TEAM B)
+                                </span>
+                                <button onclick="copyLink('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}', 'Right Referral Link copied!')" class="px-2.5 py-0.5 rounded-lg pdf-gold-ribbon font-black text-[9px] uppercase flex items-center gap-1 shrink-0 shadow text-black cursor-pointer">
+                                    <i data-lucide="copy" class="w-3 h-3 text-black font-black"></i> Copy Right
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-emerald-300 font-mono break-all font-bold">{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>

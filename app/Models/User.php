@@ -103,28 +103,47 @@ class User extends Authenticatable
     }
 
     /**
-     * Direct Left Child node in tree graph (First direct referral or position='left').
+     * Direct Left Child node in tree graph (explicit position='left' or first direct referral).
      */
     public function leftChild(): ?User
     {
+        $explicitLeft = User::where('sponsor_code', $this->referral_code)
+            ->where('position', 'left')
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if ($explicitLeft) {
+            return $explicitLeft;
+        }
+
         return User::where('sponsor_code', $this->referral_code)
-            ->orderByRaw("CASE WHEN position = 'left' THEN 0 ELSE 1 END")
             ->orderBy('id', 'asc')
             ->first();
     }
 
     /**
-     * Direct Right Child node in tree graph (Second direct referral or position='right').
+     * Direct Right Child node in tree graph (explicit position='right' or second direct referral).
      */
     public function rightChild(): ?User
     {
         $left = $this->leftChild();
 
+        $explicitRight = User::where('sponsor_code', $this->referral_code)
+            ->where('position', 'right')
+            ->when($left, function ($q) use ($left) {
+                $q->where('id', '!=', $left->id);
+            })
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if ($explicitRight) {
+            return $explicitRight;
+        }
+
         return User::where('sponsor_code', $this->referral_code)
             ->when($left, function ($q) use ($left) {
                 $q->where('id', '!=', $left->id);
             })
-            ->orderByRaw("CASE WHEN position = 'right' THEN 0 ELSE 1 END")
             ->orderBy('id', 'asc')
             ->first();
     }

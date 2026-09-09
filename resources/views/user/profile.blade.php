@@ -101,26 +101,41 @@
         </div>
     </div>
 
-    <!-- REFERRAL LINK COPY CARD -->
-    <div class="p-6 rounded-3xl pdf-package-card space-y-3">
+    <!-- DUAL REFERRAL LINK COPY CARDS (LEFT & RIGHT BINARY POSITION CARDS) -->
+    <div class="p-6 rounded-3xl pdf-package-card space-y-4">
         <div class="flex items-center gap-3 border-b border-amber-500/20 pb-3">
             <div class="w-10 h-10 rounded-2xl pdf-gold-badge text-black font-black text-sm flex items-center justify-center shadow-md shrink-0">
                 🔗
             </div>
             <div>
-                <h3 class="text-base font-black text-white font-heading uppercase">OFFICIAL MEMBER REFERRAL LINK</h3>
-                <p class="text-xs text-neutral-300">Share your official referral link to invite direct team members</p>
+                <h3 class="text-base font-black text-white font-heading uppercase">OFFICIAL MEMBER REFERRAL LINKS</h3>
+                <p class="text-xs text-neutral-300">Share your official Team A (Left) or Team B (Right) referral links to build your network</p>
             </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-black/80 border border-amber-500/30 space-y-2">
-            <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider block">SHAREABLE REFERRAL URL</span>
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-                <input type="text" id="directRefInput" readonly value="{{ url('/user/register?sponsor='.$user->referral_code) }}" class="flex-1 w-full px-4 py-2.5 rounded-xl bg-black border border-amber-500/40 text-amber-300 font-mono text-xs truncate focus:outline-none">
-                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('directRefInput').value); showToast('Copied!', 'Referral link copied to clipboard.', 'success');" class="px-5 py-2.5 rounded-xl pdf-gold-ribbon font-black text-xs uppercase tracking-wider transition shrink-0 shadow-lg flex items-center justify-center gap-1.5 whitespace-nowrap text-black">
-                    <i data-lucide="copy" class="w-4 h-4 text-black font-black"></i>
-                    <span class="text-black font-black">Copy Link</span>
-                </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- LEFT REFERRAL LINK (TEAM A / LEFT POSITION) -->
+            <div class="p-4 rounded-2xl bg-black/80 border border-amber-500/40 space-y-2">
+                <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider block">LEFT REFERRAL LINK (TEAM A)</span>
+                <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                    <input type="text" id="leftRefInput" readonly value="{{ url('/user/register?sponsor='.$user->referral_code.'&position=left') }}" class="flex-1 w-full px-3.5 py-2 rounded-xl bg-black border border-amber-500/40 text-amber-300 font-mono text-xs truncate focus:outline-none">
+                    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('leftRefInput').value); showToast('Copied!', 'Left Leg (Team A) referral link copied.', 'success');" class="px-4 py-2 rounded-xl pdf-gold-ribbon font-black text-xs uppercase tracking-wider transition shrink-0 shadow-lg flex items-center justify-center gap-1.5 whitespace-nowrap text-black cursor-pointer">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-black font-black"></i>
+                        <span class="text-black font-black">Copy Left Link</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT REFERRAL LINK (TEAM B / RIGHT POSITION) -->
+            <div class="p-4 rounded-2xl bg-black/80 border border-emerald-500/40 space-y-2">
+                <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider block">RIGHT REFERRAL LINK (TEAM B)</span>
+                <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                    <input type="text" id="rightRefInput" readonly value="{{ url('/user/register?sponsor='.$user->referral_code.'&position=right') }}" class="flex-1 w-full px-3.5 py-2 rounded-xl bg-black border border-emerald-500/40 text-emerald-300 font-mono text-xs truncate focus:outline-none">
+                    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('rightRefInput').value); showToast('Copied!', 'Right Leg (Team B) referral link copied.', 'success');" class="px-4 py-2 rounded-xl pdf-gold-ribbon font-black text-xs uppercase tracking-wider transition shrink-0 shadow-lg flex items-center justify-center gap-1.5 whitespace-nowrap text-black cursor-pointer">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-black font-black"></i>
+                        <span class="text-black font-black">Copy Right Link</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

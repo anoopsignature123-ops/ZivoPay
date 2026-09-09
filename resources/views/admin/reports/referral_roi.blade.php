@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-center gap-2 text-xs font-semibold text-teal-400 uppercase tracking-widest mb-1">
                 <i data-lucide="repeat" class="w-4 h-4 text-teal-400"></i>
-                <span>4. Dex Trade Income Stream</span>
+                <span>Dex Trade Income Stream</span>
             </div>
             <h1 class="text-2xl font-black font-heading text-white uppercase tracking-wider">
                 Referral ROI Income Report

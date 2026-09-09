@@ -246,11 +246,11 @@
                 <a href="{{ route('admin.reports.roi') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-amber-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">1</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="line-chart" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-amber-300 text-[9px] font-black font-mono uppercase border border-amber-500/40">Daily Yield</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">1. Daily ROI Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Daily ROI Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-amber-300 font-mono mt-0.5">
                         ${{ number_format($totalRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -262,11 +262,11 @@
                 <a href="{{ route('admin.reports.direct') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-sky-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">2</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-sky-300 text-[9px] font-black font-mono uppercase border border-sky-500/40">Flat 10%</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">2. Direct Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Direct Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-sky-300 font-mono mt-0.5">
                         ${{ number_format($totalDirectCommissionPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -278,11 +278,11 @@
                 <a href="{{ route('admin.reports.matching') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-purple-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">3</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="git-merge" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-purple-300 text-[9px] font-black font-mono uppercase border border-purple-500/40">10% Binary</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">3. Matching Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Matching Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-purple-300 font-mono mt-0.5">
                         ${{ number_format($totalMatchingPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -294,11 +294,11 @@
                 <a href="{{ route('admin.reports.referral-roi') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-teal-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">4</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="repeat" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-teal-300 text-[9px] font-black font-mono uppercase border border-teal-500/40">0.5% Daily</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">4. Referral ROI Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Referral ROI Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-teal-300 font-mono mt-0.5">
                         ${{ number_format($totalReferralRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -310,11 +310,11 @@
                 <a href="{{ route('admin.reports.matching-roi') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-indigo-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">5</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="layers" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-indigo-300 text-[9px] font-black font-mono uppercase border border-indigo-500/40">0.5% Daily</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">5. Matching ROI Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Matching ROI Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-indigo-300 font-mono mt-0.5">
                         ${{ number_format($totalMatchingRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -326,11 +326,11 @@
                 <a href="{{ route('admin.reports.upline-matching') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-rose-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">6</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="share-2" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-rose-300 text-[9px] font-black font-mono uppercase border border-rose-500/40">10% Pool</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">6. Upline Matching Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Upline Matching Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-rose-300 font-mono mt-0.5">
                         ${{ number_format($totalUplineMatchingPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -342,11 +342,11 @@
                 <a href="{{ route('admin.reports.salary') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-emerald-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">7</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center"><i data-lucide="award" class="w-3.5 h-3.5"></i></span>
                         <span
                             class="px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 text-[9px] font-black font-mono uppercase border border-emerald-500/40">17 Ranks</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">7. Salary Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Salary Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-emerald-300 font-mono mt-0.5">
                         ${{ number_format($totalSalaryPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
@@ -418,20 +418,18 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="flex items-center gap-1">
-                                                <span class="text-[10px] text-neutral-400">Link:</span>
-                                                <button
-                                                    onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $ru->referral_code) }}'); showToast('Copied!', 'Registration link copied.', 'success');"
-                                                    class="text-[10px] text-amber-300 hover:underline font-mono flex items-center gap-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-amber-400"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                                                    </svg>
-                                                    Copy Link
-                                                </button>
-                                            </div>
+                                            <div class="flex items-center gap-1.5 mt-0.5">
+                                                 <button
+                                                     onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $ru->referral_code . '&position=left') }}'); showToast('Copied!', 'Left Leg registration link copied.', 'success');"
+                                                     class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 text-[9px] font-bold font-mono border border-amber-500/40 cursor-pointer" title="Copy Left Leg Link">
+                                                     Copy Left
+                                                 </button>
+                                                 <button
+                                                     onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $ru->referral_code . '&position=right') }}'); showToast('Copied!', 'Right Leg registration link copied.', 'success');"
+                                                     class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 text-[9px] font-bold font-mono border border-emerald-500/40 cursor-pointer" title="Copy Right Leg Link">
+                                                     Copy Right
+                                                 </button>
+                                             </div>
                                         </div>
                                     </td>
 

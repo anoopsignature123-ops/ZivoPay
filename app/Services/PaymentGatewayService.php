@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 
 class PaymentGatewayService
@@ -12,7 +13,7 @@ class PaymentGatewayService
 
     public function __construct()
     {
-        $this->apiKey = env('PAYMENT_GATEWAY_API_KEY', 'pk_Hwho4MCbvOT8j1e6h254lJOkh647N3Zs');
+        $this->apiKey = Setting::getPaymentApiKey();
     }
 
     /**
@@ -20,6 +21,19 @@ class PaymentGatewayService
      */
     public function createPayment(string $txnId, float $amount, ?string $redirectUrl = null, ?string $memberId = null): array
     {
+        if (Setting::isPaymentTestMode()) {
+            return [
+                'success' => true,
+                'is_test_mode' => true,
+                'data' => [
+                    'paymentAddress' => Setting::getUsdtWalletAddress(),
+                    'transactionId' => 'SIMULATED-'.$txnId,
+                    'redirectUrl' => $redirectUrl ?? config('app.url'),
+                    'qrUrl' => $redirectUrl ?? config('app.url'),
+                ],
+            ];
+        }
+
         try {
             $payload = [
                 'txnId' => $txnId,
@@ -66,6 +80,17 @@ class PaymentGatewayService
      */
     public function checkPaymentStatus(string $merchantTxnId): array
     {
+        if (Setting::isPaymentTestMode()) {
+            return [
+                'success' => true,
+                'is_test_mode' => true,
+                'payment_confirmed' => true,
+                'data' => [
+                    'tx_hash' => 'SIMULATED-0x'.strtolower(bin2hex(random_bytes(16))),
+                ],
+            ];
+        }
+
         try {
             $response = Http::timeout(30)->withoutVerifying()->withHeaders([
                 'X-API-Key' => $this->apiKey,

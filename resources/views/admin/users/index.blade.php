@@ -110,11 +110,12 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                                     </button>
                                 </div>
-                                <div class="flex items-center gap-1">
-                                    <span class="text-[11px] text-neutral-400">Link:</span>
-                                    <button onclick="copyToClipboard('{{ url('/user/register?sponsor=' . $user->referral_code) }}', 'Referral Link copied!')" class="text-[11px] text-amber-300 hover:underline font-mono flex items-center gap-1" title="Copy Registration Link">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                                        Copy Link
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="copyToClipboard('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}', 'Left Referral Link copied!')" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 text-[10px] font-bold font-mono border border-amber-500/40" title="Copy Left Leg Link">
+                                        Copy Left
+                                    </button>
+                                    <button onclick="copyToClipboard('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}', 'Right Referral Link copied!')" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 text-[10px] font-bold font-mono border border-emerald-500/40" title="Copy Right Leg Link">
+                                        Copy Right
                                     </button>
                                 </div>
                             </div>

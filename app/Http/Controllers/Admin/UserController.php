@@ -101,7 +101,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'mobile' => 'required|string|max:20',
             'sponsor_code' => 'required|string',
-            'position' => 'nullable|in:left,right',
+            'position' => 'required|in:left,right',
             'password' => 'required|min:6|confirmed',
         ]);
 

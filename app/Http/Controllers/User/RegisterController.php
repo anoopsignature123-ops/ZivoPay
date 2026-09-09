@@ -15,9 +15,14 @@ class RegisterController extends Controller
     public function showRegistrationForm(Request $request): View
     {
         $sponsor = $request->query('sponsor', null);
+        $position = strtolower($request->query('position', 'left'));
+        if (! in_array($position, ['left', 'right'])) {
+            $position = 'left';
+        }
         $isLockedSponsor = $request->has('sponsor');
+        $isLockedPosition = $request->has('position');
 
-        return view('user.auth.register', compact('sponsor', 'isLockedSponsor'));
+        return view('user.auth.register', compact('sponsor', 'position', 'isLockedSponsor', 'isLockedPosition'));
     }
 
     /**
@@ -65,6 +70,7 @@ class RegisterController extends Controller
     {
         $request->validate([
             'sponsor_id' => 'required|string',
+            'position' => 'required|in:left,right',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'mobile' => 'required',
@@ -89,6 +95,7 @@ class RegisterController extends Controller
             'mobile' => $request->mobile,
             'referral_code' => $referralCode,
             'sponsor_code' => $sponsorCode,
+            'position' => strtolower($request->position),
             'status' => 'inactive',
             'password' => Hash::make($request->password),
         ]);
@@ -98,6 +105,7 @@ class RegisterController extends Controller
         $registeredUser = [
             'user_id' => $user->referral_code,
             'sponsor_id' => $user->sponsor_code,
+            'position' => strtoupper($user->position),
             'name' => $user->name,
             'email' => $user->email,
             'mobile' => $user->mobile,
@@ -106,7 +114,9 @@ class RegisterController extends Controller
 
         return view('user.auth.register', [
             'sponsor' => $user->sponsor_code,
+            'position' => $user->position,
             'isLockedSponsor' => false,
+            'isLockedPosition' => false,
             'registeredUser' => $registeredUser,
             'showModal' => true,
         ]);

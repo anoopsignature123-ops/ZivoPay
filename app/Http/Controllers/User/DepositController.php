@@ -135,4 +135,20 @@ class DepositController extends Controller
 
         return view('user.deposits.history', compact('user', 'deposits'));
     }
+
+    /**
+     * Instantly confirm and credit deposit payment in Testing / Simulation Mode.
+     */
+    public function simulatePayment(Deposit $deposit, DepositService $depositService): RedirectResponse
+    {
+        abort_unless($deposit->user_id === Auth::id(), 403);
+
+        if ($deposit->status === 'approved') {
+            return redirect()->route('user.deposits.history')->with('success', 'Deposit payment already approved & credited to your Deposit Wallet.');
+        }
+
+        $depositService->verifyAndProcessDeposit($deposit);
+
+        return redirect()->route('user.deposits.history')->with('success', '🧪 [TEST MODE] Payment simulated successfully! $'.number_format($deposit->amount, 2).' credited to your Deposit Wallet.');
+    }
 }

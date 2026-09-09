@@ -46,6 +46,7 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('deposits/history', [DepositController::class, 'history'])->name('deposits.history');
         Route::get('deposits/payment/{deposit}', [DepositController::class, 'paymentView'])->name('deposits.payment');
         Route::get('deposits/{deposit}/check-status', [DepositController::class, 'checkStatus'])->name('deposits.check-status');
+        Route::post('deposits/{deposit}/simulate-payment', [DepositController::class, 'simulatePayment'])->name('deposits.simulate-payment');
         Route::get('deposits/{deposit}', [DepositController::class, 'show'])->name('deposits.show');
 
         // Earning Wallet Withdrawal Routes (PDF Slide 20: Min $10, 10% Deduction, USDT BEP20)
