@@ -17,3 +17,4 @@ Artisan::command('inspire', function () {
 */
 Schedule::command('roi:distribute')->dailyAt('00:00')->withoutOverlapping();
 Schedule::command('income:process')->dailyAt('00:05')->withoutOverlapping();
+Schedule::command('deposits:check-pending')->everyFiveMinutes()->withoutOverlapping();
