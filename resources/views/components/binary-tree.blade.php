@@ -608,7 +608,7 @@
             const image = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             const userCode = "{{ $root->referral_code ?? 'TREE' }}";
-            link.download = `NextGen_Forex_Genealogy_Tree_${userCode}.png`;
+            link.download = `Dex_Trade_Genealogy_Tree_${userCode}.png`;
             link.href = image;
             link.click();
 

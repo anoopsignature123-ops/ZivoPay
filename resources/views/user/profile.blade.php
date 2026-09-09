@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="pdf-num-badge">👤</span>
-                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX MEMBER PORTAL</span>
+                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE MEMBER PORTAL</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">MY PROFILE & ACCOUNT SETTINGS</h1>
             <p class="text-xs text-neutral-300 mt-1">Manage personal details, set withdrawal wallet address, and update security password.</p>

@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Withdrawal;
 use Illuminate\Contracts\Console\Kernel;
 
-$user = User::where('email', 'user@nextgenforex.com')->first();
+$user = User::where('email', 'user@dextrade.com')->first();
 if ($user) {
     $withdrawal = Withdrawal::create([
         'user_id' => $user->id,

@@ -183,7 +183,7 @@
                         <i data-lucide="award" class="w-4 h-4 text-black"></i>
                     </div>
                     <span
-                        class="text-[10px] font-black text-purple-300 font-mono bg-black/60 px-2.5 py-0.5 rounded-full border border-purple-400/50 shrink-0">8
+                        class="text-[10px] font-black text-purple-300 font-mono bg-black/60 px-2.5 py-0.5 rounded-full border border-purple-400/50 shrink-0">7
                         Streams</span>
                     </div>
                 <div>
@@ -220,7 +220,7 @@
 
         </div>
 
-        <!-- DYNAMIC 8 INCOME STREAMS BREAKDOWN CARDS (SLEEK & COMPACT DEEP EMERALD DESIGN) -->
+        <!-- DYNAMIC 7 DEX TRADE INCOME STREAMS BREAKDOWN CARDS -->
         <div class="space-y-3 pt-2 relative z-10">
             <div class="flex items-center justify-between border-b border-amber-400/30 pb-2.5">
                 <div class="flex items-center gap-2.5">
@@ -230,158 +230,132 @@
                     </div>
                     <div>
                         <h2 class="text-base sm:text-lg font-black text-gold-gradient font-heading tracking-wide uppercase">
-                            NEXTGEN FOREX 8 TYPES OF INCOMES</h2>
-                        <p class="text-[11px] text-neutral-300">Live Payout Summaries Across All 8 Business Income Streams</p>
-                        </div>
-                        </div>
+                            DEX TRADE 7 TYPES OF INCOMES</h2>
+                        <p class="text-[11px] text-neutral-300">Live Payout Summaries Across All 7 Business Income Streams</p>
+                    </div>
+                </div>
                 <a href="{{ route('admin.reports.summary') }}"
                     class="px-4 py-1.5 rounded-full pdf-gold-ribbon text-[11px] font-black uppercase tracking-wider shadow transition">
                     View Full Audit Summary &rarr;
                 </a>
-                </div>
+            </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                <!-- 1. ROI INCOME -->
+                <!-- 1. DAILY ROI INCOME -->
                 <a href="{{ route('admin.reports.roi') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-amber-400 transition">
                     <div class="flex justify-between items-center mb-2">
                         <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">1</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-amber-300 text-[9px] font-black font-mono uppercase border border-amber-500/40">Daily
-                            Return</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-amber-300 text-[9px] font-black font-mono uppercase border border-amber-500/40">Daily Yield</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">ROI Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">1. Daily ROI Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-amber-300 font-mono mt-0.5">
                         ${{ number_format($totalRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        Earn <span class="gold-highlight">0.5% to 1.5% daily</span> yield (<span
-                            class="text-emerald-400 font-bold">2X Cap</span>).
+                        0.5% Daily yield for <span class="gold-highlight">400 Days</span> (<span class="text-emerald-400 font-bold">2X Cap</span>).
                     </p>
-                    </a>
+                </a>
 
-                <!-- 2. 24H SPECIAL BONUS -->
-                <a href="{{ route('admin.reports.bonus') }}"
-                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-emerald-400 transition">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">2</span>
-                        <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 text-[9px] font-black font-mono uppercase border border-emerald-500/40">24h
-                            Offer</span>
-                    </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">24 Hours Special Bonus
-                    </h4>
-                    <h3 class="text-xl sm:text-2xl font-black text-emerald-300 font-mono mt-0.5">
-                        ${{ number_format($totalBoosterBonusPaidSum, 2) }}</h3>
-                    <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        Earned via <span class="text-emerald-400 font-bold">5 direct referrals</span> within 24 hours.
-                    </p>
-                    </a>
-
-                <!-- 3. DIRECT INCOME (10%) -->
+                <!-- 2. DIRECT INCOME (10%) -->
                 <a href="{{ route('admin.reports.direct') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-sky-400 transition">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">3</span>
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">2</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-sky-300 text-[9px] font-black font-mono uppercase border border-sky-500/40">Flat
-                            10%</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-sky-300 text-[9px] font-black font-mono uppercase border border-sky-500/40">Flat 10%</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Direct Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">2. Direct Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-sky-300 font-mono mt-0.5">
                         ${{ number_format($totalDirectCommissionPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        Earn a <span class="text-sky-300 font-bold">flat 10% instant</span> referral commission.
+                        Flat <span class="text-sky-300 font-bold">10% instant</span> referral bonus (<span class="text-amber-400 font-bold">8X Cap</span>).
                     </p>
-                    </a>
+                </a>
 
-                <!-- 4. LEVEL INCOME (10 LEVELS) -->
-                <a href="{{ route('admin.reports.level') }}"
+                <!-- 3. MATCHING INCOME (10%) -->
+                <a href="{{ route('admin.reports.matching') }}"
+                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-purple-400 transition">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">3</span>
+                        <span
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-purple-300 text-[9px] font-black font-mono uppercase border border-purple-500/40">10% Binary</span>
+                    </div>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">3. Matching Income</h4>
+                    <h3 class="text-xl sm:text-2xl font-black text-purple-300 font-mono mt-0.5">
+                        ${{ number_format($totalMatchingPaidSum, 2) }}</h3>
+                    <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
+                        10% Binary matching (<span class="text-purple-300 font-bold">1:1 Direct Req</span>, 10% Upline Pool).
+                    </p>
+                </a>
+
+                <!-- 4. REFERRAL ROI INCOME -->
+                <a href="{{ route('admin.reports.referral-roi') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-teal-400 transition">
                     <div class="flex justify-between items-center mb-2">
                         <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">4</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-teal-300 text-[9px] font-black font-mono uppercase border border-teal-500/40">10
-                            Levels</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-teal-300 text-[9px] font-black font-mono uppercase border border-teal-500/40">0.5% Daily</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Level Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">4. Referral ROI Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-teal-300 font-mono mt-0.5">
-                        ${{ number_format($totalLevelPaidSum, 2) }}</h3>
+                        ${{ number_format($totalReferralRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        <span class="text-teal-300 font-bold">10-tier team commissions</span> (20% down to 1%).
+                        0.5% Daily on direct team's investment for <span class="text-teal-300 font-bold">150 Days</span>.
                     </p>
-                    </a>
+                </a>
 
-                <!-- 5. MATCHING INCOME (5%) -->
-                <a href="{{ route('admin.reports.matching') }}"
-                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-purple-400 transition">
+                <!-- 5. MATCHING ROI INCOME -->
+                <a href="{{ route('admin.reports.matching-roi') }}"
+                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-indigo-400 transition">
                     <div class="flex justify-between items-center mb-2">
                         <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">5</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-purple-300 text-[9px] font-black font-mono uppercase border border-purple-500/40">Team
-                            5%</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-indigo-300 text-[9px] font-black font-mono uppercase border border-indigo-500/40">0.5% Daily</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Matching Income</h4>
-                    <h3 class="text-xl sm:text-2xl font-black text-purple-300 font-mono mt-0.5">
-                        ${{ number_format($totalMatchingPaidSum, 2) }}</h3>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">5. Matching ROI Income</h4>
+                    <h3 class="text-xl sm:text-2xl font-black text-indigo-300 font-mono mt-0.5">
+                        ${{ number_format($totalMatchingRoiPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        Earn <span class="text-purple-300 font-bold">5% matching</span> on 50:50 team ratio.
+                        0.5% Daily of matching bonus for <span class="text-indigo-300 font-bold">150 Days</span>.
                     </p>
-                    </a>
+                </a>
 
-                <!-- 6. DIRECT SALARY INCOME -->
-                <a href="{{ route('admin.reports.direct-salary') }}"
+                <!-- 6. UPLINE MATCHING INCOME -->
+                <a href="{{ route('admin.reports.upline-matching') }}"
                     class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-rose-400 transition">
                     <div class="flex justify-between items-center mb-2">
                         <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">6</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-rose-300 text-[9px] font-black font-mono uppercase border border-rose-500/40">365
-                            Days</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-rose-300 text-[9px] font-black font-mono uppercase border border-rose-500/40">10% Pool</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Direct Salary Income</h4>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">6. Upline Matching Income</h4>
                     <h3 class="text-xl sm:text-2xl font-black text-rose-300 font-mono mt-0.5">
-                        ${{ number_format($totalDirectSalaryPaidSum, 2) }}</h3>
+                        ${{ number_format($totalUplineMatchingPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        <span class="text-rose-300 font-bold">Daily salary</span> ($1 to $50/day) for 365 days.
+                        10% Sponsor matching pool <span class="text-rose-300 font-bold">shared equally</span> among direct team.
                     </p>
-                    </a>
+                </a>
 
-                <!-- 7. TEAM SALARY INCOME -->
-                <a href="{{ route('admin.reports.team-salary') }}"
-                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-orange-400 transition">
+                <!-- 7. SALARY INCOME -->
+                <a href="{{ route('admin.reports.salary') }}"
+                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-emerald-400 transition">
                     <div class="flex justify-between items-center mb-2">
                         <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">7</span>
                         <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-orange-300 text-[9px] font-black font-mono uppercase border border-orange-500/40">12
-                            Months</span>
+                            class="px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 text-[9px] font-black font-mono uppercase border border-emerald-500/40">17 Ranks</span>
                     </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Team Salary Income</h4>
-                    <h3 class="text-xl sm:text-2xl font-black text-orange-300 font-mono mt-0.5">
-                        ${{ number_format($totalTeamSalaryPaidSum, 2) }}</h3>
+                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">7. Salary Income</h4>
+                    <h3 class="text-xl sm:text-2xl font-black text-emerald-300 font-mono mt-0.5">
+                        ${{ number_format($totalSalaryPaidSum, 2) }}</h3>
                     <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        <span class="text-orange-300 font-bold">Monthly salary</span> ($100–$6,000/mo) for 12 months.
+                        17 Milestone ranks (<span class="text-emerald-300 font-bold">$50 to $12 Lakh/mo</span> over 5–25 months).
                     </p>
-                    </a>
-
-                <!-- 8. REWARD INCOME -->
-                <a href="{{ route('admin.reports.rewards') }}"
-                    class="p-3.5 sm:p-4 rounded-2xl pdf-package-card relative group block hover:border-violet-400 transition">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="w-6 h-6 rounded-lg pdf-gold-badge font-black text-[10px] flex items-center justify-center">8</span>
-                        <span
-                            class="px-2 py-0.5 rounded-full bg-black/60 text-violet-300 text-[9px] font-black font-mono uppercase border border-violet-500/40">10%
-                            Reward</span>
-                    </div>
-                    <h4 class="text-xs font-extrabold text-white font-heading uppercase tracking-wide">Reward Income</h4>
-                    <h3 class="text-xl sm:text-2xl font-black text-violet-300 font-mono mt-0.5">
-                        ${{ number_format($totalRewardPaidSum, 2) }}</h3>
-                    <p class="text-[11px] text-neutral-400 font-normal mt-1 leading-snug">
-                        <span class="text-violet-300 font-bold">10% cash & career</span> milestone rewards.
-                    </p>
-                    </a>
+                </a>
 
             </div>
-            </div>
+        </div>
 
         <!-- DYNAMIC SIDE-BY-SIDE TABLES GRID -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 relative z-10">

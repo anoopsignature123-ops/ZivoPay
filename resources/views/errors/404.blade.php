@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>404 - Page Not Found | NEXTGEN FOREX</title>
+    <title>404 - Page Not Found | DEX TRADE</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/nextgen-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <style>
         body.ng-error-bg {
             background-color: #020b06 !important;
@@ -53,7 +53,7 @@
         <!-- Description -->
         <div class="space-y-3 max-w-lg mx-auto">
             <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight font-heading">
-                UNMAPPED FOREX TERRITORY
+                UNMAPPED TRADING TERRITORY
             </h2>
             <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-medium">
                 The requested page URL does not exist or has been relocated in our network.
@@ -101,7 +101,7 @@
     <!-- Footer -->
     <footer class="w-full max-w-5xl py-4 text-center border-t border-amber-500/20">
         <p class="text-xs text-neutral-400 font-semibold font-mono">
-            NEXTGEN FOREX TRADING SYSTEM • ALL RIGHTS RESERVED © {{ date('Y') }}
+            DEX TRADE TRADING SYSTEM • ALL RIGHTS RESERVED © {{ date('Y') }}
         </p>
     </footer>
 

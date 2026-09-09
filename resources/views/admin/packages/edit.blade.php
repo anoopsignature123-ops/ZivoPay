@@ -15,7 +15,7 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="pdf-num-badge">EP</span>
-                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX NETWORK</span>
+                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE NETWORK</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">EDIT PACKAGE: {{ $package->name }}</h1>
             <p class="text-xs text-neutral-300 mt-1">Modify investment parameters, ROI percentages, duration, and plan limits.</p>
@@ -130,7 +130,7 @@
                     </div>
 
                     <p id="previewDesc" class="text-[11px] text-neutral-400 leading-relaxed italic">
-                        {{ $package->description ?? 'Official NextGen Forex investment plan.' }}
+                        {{ $package->description ?? 'Official Dex Trade investment plan.' }}
                     </p>
                 </div>
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (previewDuration) previewDuration.innerText = (inputDuration.value||0) + ' Days';
         if (previewMultiplier) previewMultiplier.innerText = (parseFloat(inputMultiplier.value)||0).toFixed(1) + 'X Return';
         if (previewStatus) previewStatus.innerText = (inputStatus.value || 'active').toUpperCase();
-        if (previewDesc) previewDesc.innerText = inputDesc.value || 'Official NextGen Forex investment plan.';
+        if (previewDesc) previewDesc.innerText = inputDesc.value || 'Official Dex Trade investment plan.';
     }
 
     [inputName, inputMin, inputMax, inputRoi, inputDuration, inputMultiplier, inputStatus, inputDesc].forEach(el => {

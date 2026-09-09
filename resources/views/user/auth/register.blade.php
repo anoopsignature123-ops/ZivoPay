@@ -1,6 +1,6 @@
 @extends('user.auth.app')
 
-@section('title', 'NEXTGEN FOREX - Member Registration')
+@section('title', 'DEX TRADE - Member Registration')
 
 @section('content')
     <div class="min-h-screen flex items-center justify-center p-4 relative font-sans">
@@ -17,7 +17,7 @@
                 <!-- Header Brand Logo -->
                 <div class="text-center space-y-3">
                     <a href="{{ url('/') }}" class="inline-block">
-                        <img src="{{ asset('images/nextgen_logo.png') }}" alt="NEXTGEN FOREX Logo" class="h-16 sm:h-20 w-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(243,202,82,0.8)] hover:scale-105 transition duration-300">
+                        <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="h-16 sm:h-20 w-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(243,202,82,0.8)] hover:scale-105 transition duration-300">
                     </a>
                 </div>
 
@@ -30,7 +30,7 @@
                             CREATE NEW ACCOUNT
                         </span>
                         <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">MEMBER REGISTRATION</h2>
-                        <p class="text-xs text-neutral-400">Join the next-generation forex investment ecosystem</p>
+                        <p class="text-xs text-neutral-400">Join the premier Dex Trade investment ecosystem</p>
                     </div>
 
                     <!-- Form -->
@@ -141,7 +141,7 @@
                             <label class="flex items-center gap-2 cursor-pointer text-xs text-neutral-300">
                                 <input type="checkbox" required checked class="w-4 h-4 rounded accent-amber-500">
                                 <span>I agree to the <a href="javascript:void(0)" class="text-amber-400 font-bold hover:underline">Terms &
-                                        Conditions</a> of NextGen Forex.</span>
+                                        Conditions</a> of Dex Trade.</span>
                                 </label>
                                 </div>
 
@@ -204,7 +204,7 @@
                         </span>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight mt-2 font-heading">REGISTRATION
                             SUCCESSFUL</h3>
-                        <p class="text-xs text-neutral-300 mt-1">Welcome to NextGen Forex Trading. Please save your login details
+                        <p class="text-xs text-neutral-300 mt-1">Welcome to Dex Trade. Please save your login details
                             below.</p>
                     </div>
 
@@ -317,7 +317,7 @@
         }
 
             function copyDetails(userId, sponsorId, name) {
-                const text = `NextGen Forex Member Credentials:\nMember ID: ${userId}\nSponsor ID: ${sponsorId}\nMember Name: ${name}`;
+                const text = `Dex Trade Member Credentials:\nMember ID: ${userId}\nSponsor ID: ${sponsorId}\nMember Name: ${name}`;
                 navigator.clipboard.writeText(text).then(() => {
                     alert('Member details copied to clipboard!');
                 });

@@ -15,10 +15,10 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="pdf-num-badge">AP</span>
-                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX NETWORK</span>
+                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE NETWORK</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">ADD NEW PACKAGE</h1>
-            <p class="text-xs text-neutral-300 mt-1">Configure a new investment tier for NextGen Forex members.</p>
+            <p class="text-xs text-neutral-300 mt-1">Configure a new investment tier for Dex Trade members.</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -124,19 +124,18 @@
                         </div>
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-neutral-400 font-sans font-bold">Total Return:</span>
-                            <span id="previewMultiplier" class="text-amber-300 font-black text-sm">2.0X Return</span>
+                            <span id="previewMultiplier" class="text-amber-300 font-black text-sm">0.0X Return</span>
                         </div>
                     </div>
 
                     <p id="previewDesc" class="text-[11px] text-neutral-400 leading-relaxed italic">
-                        Official NextGen Forex investment plan.
+                        Official Dex Trade investment plan.
                     </p>
                 </div>
 
-                <div class="pt-3 border-t border-amber-500/20">
-                    <button class="w-full py-3 rounded-xl bg-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-1.5 cursor-default">
-                        BUY PACKAGE NOW
-                    </button>
+                <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-neutral-400">
+                    <span>Status</span>
+                    <span id="previewStatus" class="font-bold text-emerald-400 uppercase">ACTIVE</span>
                 </div>
             </div>
         </div>
@@ -145,18 +144,18 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const inputName = document.getElementById('inputName');
-    const inputMin = document.getElementById('inputMin');
-    const inputMax = document.getElementById('inputMax');
-    const inputRoi = document.getElementById('inputRoi');
-    const inputDuration = document.getElementById('inputDuration');
-    const inputMultiplier = document.getElementById('inputMultiplier');
-    const inputStatus = document.getElementById('inputStatus');
-    const inputDesc = document.getElementById('inputDesc');
+    const inputName = document.getElementById('name');
+    const inputMin = document.getElementById('min_amount');
+    const inputMax = document.getElementById('max_amount');
+    const inputRoi = document.getElementById('daily_roi_percent');
+    const inputDuration = document.getElementById('duration_days');
+    const inputMultiplier = document.getElementById('capping_multiplier');
+    const inputStatus = document.getElementById('status');
+    const inputDesc = document.getElementById('description');
 
     const previewName = document.getElementById('previewName');
-    const previewRange = document.getElementById('previewRange');
+    const previewMin = document.getElementById('previewMin');
+    const previewMax = document.getElementById('previewMax');
     const previewRoi = document.getElementById('previewRoi');
     const previewDuration = document.getElementById('previewDuration');
     const previewMultiplier = document.getElementById('previewMultiplier');
@@ -164,13 +163,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewDesc = document.getElementById('previewDesc');
 
     function updatePreview() {
-        if (previewName) previewName.innerText = inputName.value || 'NEW PACKAGE';
-        if (previewRange) previewRange.innerText = '$' + (parseFloat(inputMin.value)||10).toLocaleString() + ' - $' + (parseFloat(inputMax.value)||500).toLocaleString();
-        if (previewRoi) previewRoi.innerText = (parseFloat(inputRoi.value)||0.75).toFixed(2) + '% / Day';
-        if (previewDuration) previewDuration.innerText = (inputDuration.value||200) + ' Days';
-        if (previewMultiplier) previewMultiplier.innerText = (parseFloat(inputMultiplier.value)||2.0).toFixed(1) + 'X Return';
+        if (previewName) previewName.innerText = inputName.value || 'Package Title';
+        if (previewMin) previewMin.innerText = '$' + (parseFloat(inputMin.value)||0).toFixed(2);
+        if (previewMax) previewMax.innerText = '$' + (parseFloat(inputMax.value)||0).toFixed(2);
+        if (previewRoi) previewRoi.innerText = (parseFloat(inputRoi.value)||0).toFixed(2) + '% Daily';
+        if (previewDuration) previewDuration.innerText = (inputDuration.value||0) + ' Days';
+        if (previewMultiplier) previewMultiplier.innerText = (parseFloat(inputMultiplier.value)||0).toFixed(1) + 'X Return';
         if (previewStatus) previewStatus.innerText = (inputStatus.value || 'active').toUpperCase();
-        if (previewDesc) previewDesc.innerText = inputDesc.value || 'Official NextGen Forex investment plan.';
+        if (previewDesc) previewDesc.innerText = inputDesc.value || 'Official Dex Trade investment plan.';
     }
 
     [inputName, inputMin, inputMax, inputRoi, inputDuration, inputMultiplier, inputStatus, inputDesc].forEach(el => {

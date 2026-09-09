@@ -11,7 +11,7 @@ use App\Services\User\DepositService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Auth;
 
-echo "=== Testing iPaymentWallet Integration in NextGen Forex ===\n";
+echo "=== Testing iPaymentWallet Integration in Dex Trade ===\n";
 
 $user = User::first();
 if (! $user) {

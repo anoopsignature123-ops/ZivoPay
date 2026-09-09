@@ -93,10 +93,10 @@
             </div>
         </div>
 
-        <!-- DUAL CAPPING METRIC CARDS (8X WORKING & 2X NON-WORKING) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+        <!-- DUAL CAPPING METRIC CARDS (8X WORKING & 2X NON-WORKING IN 1 ROW) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 relative z-10">
             <!-- 8X WORKING INCOME CAPPING METER -->
-            <div class="p-5 rounded-3xl pdf-package-card space-y-3">
+            <div class="p-5 rounded-3xl pdf-package-card space-y-3 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest">8X WORKING INCOME CAP</span>
                     <span class="text-xs font-bold font-mono text-emerald-400">Allowed: ${{ number_format($workingCap, 2) }}</span>
@@ -115,7 +115,7 @@
             </div>
 
             <!-- 2X NON-WORKING INCOME CAPPING METER -->
-            <div class="p-5 rounded-3xl pdf-package-card space-y-3">
+            <div class="p-5 rounded-3xl pdf-package-card space-y-3 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest">2X NON-WORKING ROI CAP</span>
                     <span class="text-xs font-bold font-mono text-emerald-400">Allowed: ${{ number_format($nonWorkingCap, 2) }}</span>

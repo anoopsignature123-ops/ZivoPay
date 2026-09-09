@@ -8,8 +8,8 @@
     <!-- Logo Section -->
     <div class="logo-section flex items-center justify-between gap-2 px-4 py-4 border-b border-amber-500/30 shrink-0 bg-gradient-to-b from-amber-500/20 via-amber-500/5 to-transparent">
         <a href="{{ route('user.dashboard') }}" class="flex items-center justify-center flex-1 min-w-0">
-            <img src="{{ asset('images/nextgen_logo.png') }}" alt="NEXTGEN FOREX Logo" class="full-logo h-12 sm:h-14 w-auto max-w-[210px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.9)] hover:scale-105 transition duration-300">
-            <img src="{{ asset('assets/images/favicon.png') }}" alt="NEXTGEN Emblem" class="mini-logo hidden w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(243,202,82,0.9)] hover:scale-110 transition duration-300 mx-auto">
+            <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="full-logo h-12 sm:h-14 w-auto max-w-[210px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.9)] hover:scale-105 transition duration-300">
+            <img src="{{ asset('images/dextrade_emblem.png') }}" alt="DEX TRADE Emblem" class="mini-logo hidden w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(243,202,82,0.9)] hover:scale-110 transition duration-300 mx-auto">
         </a>
         <button
             class="lg:hidden! flex w-8 h-8 items-center justify-center rounded-lg text-amber-400 hover:bg-amber-500/20 transition js-mobile-menu-toggle shrink-0"
@@ -118,7 +118,7 @@
 
         <!-- 5. MY INCOMES & REPORTS SECTION -->
         <div class="nav-section-title px-5 pt-4 pb-2 mt-2 text-[10px] font-black uppercase tracking-[2px] text-amber-400/70">
-            MY INCOMES & REPORTS
+            DEX TRADE REPORTS
         </div>
 
         <!-- 0. Income Overview Summary -->
@@ -128,60 +128,53 @@
             <span class="nav-text">Income Overview Summary</span>
         </a>
 
-        <!-- 1. My ROI Income -->
+        <!-- Daily ROI Income -->
         <a class='nav-item {{ request()->routeIs("user.reports.roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("user.reports.roi") }}'>
-            <i data-lucide="trending-up" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">My ROI Income</span>
+            <i data-lucide="line-chart" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Daily ROI Income</span>
         </a>
 
-        <!-- 2. My Direct Income -->
+        <!-- Direct Income -->
         <a class='nav-item {{ request()->routeIs("user.reports.direct") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("user.reports.direct") }}'>
-            <i data-lucide="user-check" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Direct Commission Report</span>
+            <i data-lucide="user-plus" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Direct Income</span>
         </a>
 
-        <!-- 3. My Special Bonus -->
-        <a class='nav-item {{ request()->routeIs("user.reports.bonus") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("user.reports.bonus") }}'>
-            <i data-lucide="gift" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">24H Special Bonus</span>
-        </a>
-
-        <!-- 4. Level Income Report -->
-        <a class='nav-item {{ request()->routeIs("user.reports.level") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("user.reports.level") }}'>
-            <i data-lucide="layers" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Level Income Report</span>
-        </a>
-
-        <!-- 4. My Matching Income -->
+        <!-- Matching Income -->
         <a class='nav-item {{ request()->routeIs("user.reports.matching") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("user.reports.matching") }}'>
             <i data-lucide="git-merge" class="w-4 h-4 shrink-0 text-amber-400"></i>
             <span class="nav-text">Matching Income</span>
         </a>
 
-        <!-- 5. My Direct Salary -->
-        <a class='nav-item {{ request()->routeIs("user.reports.direct-salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("user.reports.direct-salary") }}'>
-            <i data-lucide="banknote" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Direct Salary Income</span>
+        <!-- Referral ROI Income -->
+        <a class='nav-item {{ request()->routeIs("user.reports.referral-roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("user.reports.referral-roi") }}'>
+            <i data-lucide="repeat" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Referral ROI Income</span>
         </a>
 
-        <!-- 6. My Team Salary -->
-        <a class='nav-item {{ request()->routeIs("user.reports.team-salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("user.reports.team-salary") }}'>
-            <i data-lucide="users" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Team Salary Income</span>
+        <!-- Matching ROI Income -->
+        <a class='nav-item {{ request()->routeIs("user.reports.matching-roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("user.reports.matching-roi") }}'>
+            <i data-lucide="layers" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Matching ROI Income</span>
         </a>
 
-        <!-- 7. My Rewards -->
-        <a class='nav-item {{ request()->routeIs("user.reports.rewards") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("user.reports.rewards") }}'>
-            <i data-lucide="trophy" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Reward Income</span>
+        <!-- Upline Matching Income -->
+        <a class='nav-item {{ request()->routeIs("user.reports.upline-matching") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("user.reports.upline-matching") }}'>
+            <i data-lucide="share-2" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Upline Matching Income</span>
+        </a>
+
+        <!-- Salary Income -->
+        <a class='nav-item {{ request()->routeIs("user.reports.salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("user.reports.salary") }}'>
+            <i data-lucide="award" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Salary Income</span>
         </a>
 
         <!-- 6. ACCOUNT & SECURITY SECTION -->

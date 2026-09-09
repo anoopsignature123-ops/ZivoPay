@@ -9,35 +9,35 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the database seeds for Dex Trade.
      */
     public function run(): void
     {
-        // 1. Default Super Admin User (Role 1 - System Admin, Not a Member)
+        // 1. Default Super Admin User
         User::updateOrCreate(
-            ['email' => 'admin@nextgenforex.com'],
+            ['email' => 'admin@dextrade.com'],
             [
                 'role_id' => 1,
                 'name' => 'Super Admin',
-                'email' => 'admin@nextgenforex.com',
+                'email' => 'admin@dextrade.com',
                 'mobile' => '1234567890',
-                'referral_code' => 'NGF-ADMIN01',
+                'referral_code' => 'DEX-ADMIN01',
                 'sponsor_code' => null,
                 'status' => 'active',
                 'password' => Hash::make('Admin@123'),
             ]
         );
 
-        // 2. Default Root Member User (Role 2 - Top MLM Member with No Sponsor)
+        // 2. Default Root Member User (Top Member)
         User::updateOrCreate(
-            ['email' => 'root@nextgenforex.com'],
+            ['email' => 'root@dextrade.com'],
             [
                 'role_id' => 2,
                 'name' => 'Root User',
-                'email' => 'root@nextgenforex.com',
+                'email' => 'root@dextrade.com',
                 'mobile' => '9876543210',
-                'referral_code' => 'NGF-0000001',
-                'sponsor_code' => null, // Top Root member has no sponsor
+                'referral_code' => 'DEX-0000001',
+                'sponsor_code' => null,
                 'status' => 'active',
                 'deposit_wallet' => 0.00,
                 'earning_wallet' => 0.00,

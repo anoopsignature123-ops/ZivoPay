@@ -40,17 +40,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // System Financial Transaction Logs & Audit Route
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
 
-        // Comprehensive Income Reports Routes
+        // Comprehensive Income Reports Routes (7 Dex Trade Incomes)
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('summary', [IncomeReportController::class, 'summary'])->name('summary');
             Route::get('roi', [IncomeReportController::class, 'roi'])->name('roi');
             Route::get('direct', [IncomeReportController::class, 'direct'])->name('direct');
-            Route::get('bonus', [IncomeReportController::class, 'bonus'])->name('bonus');
-            Route::get('level', [IncomeReportController::class, 'level'])->name('level');
             Route::get('matching', [IncomeReportController::class, 'matching'])->name('matching');
-            Route::get('direct-salary', [IncomeReportController::class, 'directSalary'])->name('direct-salary');
-            Route::get('team-salary', [IncomeReportController::class, 'teamSalary'])->name('team-salary');
-            Route::get('rewards', [IncomeReportController::class, 'reward'])->name('rewards');
+            Route::get('referral-roi', [IncomeReportController::class, 'referralRoi'])->name('referral-roi');
+            Route::get('matching-roi', [IncomeReportController::class, 'matchingRoi'])->name('matching-roi');
+            Route::get('upline-matching', [IncomeReportController::class, 'uplineMatching'])->name('upline-matching');
+            Route::get('salary', [IncomeReportController::class, 'salary'])->name('salary');
         });
 
         // Package Management Routes

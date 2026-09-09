@@ -8,13 +8,12 @@
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <span class="pdf-num-badge">PH</span>
-                    <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX MEMBER
+                    <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE MEMBER
                         PORTAL</span>
                     </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">MY PACKAGES HISTORY</h1>
-                <p class="text-xs text-neutral-300 mt-1">Review your active NextGen Forex growth plans, daily ROI earnings,
-                    and maturity
-                    dates.</p>
+                <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">INVESTMENT HISTORY</h1>
+                <p class="text-xs text-neutral-300 mt-1">Review your active Dex Trade growth plans, daily ROI earnings,
+                    contract duration, and status.</p>
                 </div>
 
             <a href="{{ route('user.packages.index') }}"
@@ -59,7 +58,7 @@
                                             <div class="flex items-center gap-2.5">
                                                 <span
                                                     class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold text-xs">🚀</span>
-                                                <span>{{ $userPkg->package->name ?? 'NextGen Package' }}</span>
+                                                <span>{{ $userPkg->package->name ?? 'Dex Trade Package' }}</span>
                                             </div>
                                         </td>
 

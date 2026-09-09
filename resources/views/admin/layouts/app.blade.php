@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>NEXTGEN FOREX - Admin Control Panel</title>
+    <title>DEX TRADE - Admin Control Panel</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/favicon.png') }}?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}?v=2" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/favicon.png') }}?v=2" />
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/nextgen-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 </head>
@@ -57,7 +57,7 @@
             const overlay = document.getElementById('sidebarOverlay');
 
             // Restore Desktop Sidebar Preference
-            if (localStorage.getItem('nextgen_sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
+            if (localStorage.getItem('dextrade_sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
                 document.body.classList.add('sidebar-collapsed');
             }
 
@@ -67,7 +67,7 @@
                     if (window.innerWidth >= 1024) {
                         document.body.classList.toggle('sidebar-collapsed');
                         const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-                        localStorage.setItem('nextgen_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+                        localStorage.setItem('dextrade_sidebar_collapsed', isCollapsed ? 'true' : 'false');
                     } else {
                         if (sidebar) sidebar.classList.toggle('mobile-sidebar-open');
                         if (overlay) {

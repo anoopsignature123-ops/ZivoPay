@@ -1,13 +1,13 @@
 @extends('user.auth.app')
 
-@section('title', 'NEXTGEN FOREX - Admin Portal Login')
+@section('title', 'DEX TRADE - Admin Portal Login')
 
 @section('content')
     <div class="space-y-6">
         <!-- Brand Logo -->
         <div class="text-center space-y-3">
             <a href="{{ url('/') }}" class="inline-block">
-                <img src="{{ asset('images/nextgen_logo.png') }}" alt="NEXTGEN FOREX Logo" class="h-16 sm:h-20 w-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(243,202,82,0.8)] hover:scale-105 transition duration-300">
+                <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="h-16 sm:h-20 w-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(243,202,82,0.8)] hover:scale-105 transition duration-300">
             </a>
         </div>
 

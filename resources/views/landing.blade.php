@@ -19,7 +19,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#home" class="nav-logo">
-                <img src="{{ asset('website/assets/images/logo.png') }}" alt="Next Gen Forex Logo" />
+                <img src="{{ asset('website/assets/images/logo.png') }}" alt="Dex Trade Logo" />
             </a>
             <div class="nav-links" id="navLinks">
                 <a href="#home">Home</a>
@@ -90,7 +90,7 @@
                             <div class="hlf-odot hlf-odot-3"></div>
                         </div>
                         <div class="hlf-coin-wrap">
-                            <img src="{{ asset('website/assets/images/mainlogo.png') }}" alt="Next Gen Forex Logo" class="hlf-coin-img" />
+                            <img src="{{ asset('website/assets/images/mainlogo.png') }}" alt="Dex Trade Logo" class="hlf-coin-img" />
                             <div class="hlf-shine"></div>
                         </div>
                         <!-- Floating micro chips around logo -->
@@ -172,7 +172,7 @@
         <div class="about-container">
     
             <div class="about-img-wrap reveal-left">
-                <img src="{{ asset('website/assets/images/icons.png') }}" alt="About Next Gen Forex"
+                <img src="{{ asset('website/assets/images/icons.png') }}" alt="About Dex Trade"
                     onerror="this.src='{{ asset('website/assets/images/image1.png') }}'" />
             </div>
             <div class="about-text reveal-right">
@@ -192,7 +192,7 @@
                         <h4 class="aob-title">A Gateway to Global Financial Markets</h4>
                         </div>
                         <p class="aob-desc">
-                            Headquartered in the United States, Next Gen Forex Trading is a forward-thinking
+                            Headquartered in the United States, Dex Trade Trading is a forward-thinking
                             financial market brand dedicated to redefining how individuals and institutions
                             interact with the global economy. We are built on the belief that financial
                             independence should be accessible to anyone willing to learn and take action.
@@ -224,7 +224,7 @@
                 <h2 class="section-title">Our Business <span class="sectors-accent">Sectors</span></h2>
                 <div class="divider"></div>
                 <p class="section-subtitle">
-                    Next Gen Forex operates across six powerful domains — giving you a complete edge in the world of
+                    Dex Trade operates across six powerful domains — giving you a complete edge in the world of
                     digital
                     finance.
                 </p>
@@ -764,7 +764,7 @@
                 <h2 class="section-title">Frequently Asked<br /><span class="faq-accent">Questions</span></h2>
                 <div class="divider"></div>
                 <p class="section-subtitle">
-                    Got questions about Next Gen Forex, cryptocurrency, or the platform? We've got clear answers — right
+                    Got questions about Dex Trade, cryptocurrency, or the platform? We've got clear answers — right
                     here.
                 </p>
             </div>
@@ -779,13 +779,13 @@
                             <span class="faq-q-icon">
                                 <img src="{{ asset('website/assets/icons/lucide/circle-help.svg') }}" alt="" />
                             </span>
-                            <span>What is Next Gen Forex?</span>
+                            <span>What is Dex Trade?</span>
                             <span class="faq-chevron">
                                 <img src="{{ asset('website/assets/icons/lucide/chevron-down.svg') }}" alt="" />
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>Next Gen Forex is a next-generation digital platform built around Forex trading,
+                            <p>Dex Trade is a next-generation digital platform built around Forex trading,
                                 cryptocurrency, and
                                 digital assets. It offers structured earning opportunities through multiple income
                                 categories,
@@ -803,7 +803,7 @@
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>No prior experience is required. Next Gen Forex is designed to be beginner-friendly. We
+                            <p>No prior experience is required. Dex Trade is designed to be beginner-friendly. We
                                 break down complex
                                 Forex and crypto concepts into simple, clear, and actionable insights that anyone can
                                 understand and act on.
@@ -841,7 +841,7 @@
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>Next Gen Forex offers a systematic, multi-category income plan. Participants can explore
+                            <p>Dex Trade offers a systematic, multi-category income plan. Participants can explore
                                 level-based growth,
                                 performance-based ranks and rewards, and community network earnings. The structure is
                                 designed to be
@@ -860,7 +860,7 @@
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>Yes. Next Gen Forex provides access to global Forex and crypto market trends, regional
+                            <p>Yes. Dex Trade provides access to global Forex and crypto market trends, regional
                                 data, and
                                 international movement analysis. Participants from across the world can join and benefit
                                 from the platform's
@@ -882,7 +882,7 @@
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>Next Gen Forex is built with industry-grade security protocols. Cryptographic techniques
+                            <p>Dex Trade is built with industry-grade security protocols. Cryptographic techniques
                                 are used to
                                 secure all transactions and wallets, ensuring your data and digital assets are protected
                                 at every step
@@ -895,7 +895,7 @@
                             <span class="faq-q-icon">
                                 <img src="{{ asset('website/assets/icons/lucide/circle-help.svg') }}" alt="" />
                             </span>
-                            <span>What currencies and cryptocurrencies does Next Gen Forex support?</span>
+                            <span>What currencies and cryptocurrencies does Dex Trade support?</span>
                             <span class="faq-chevron">
                                 <img src="{{ asset('website/assets/icons/lucide/chevron-down.svg') }}" alt="" />
                             </span>
@@ -951,13 +951,13 @@
                             <span class="faq-q-icon">
                                 <img src="{{ asset('website/assets/icons/lucide/circle-help.svg') }}" alt="" />
                             </span>
-                            <span>How do I get started with Next Gen Forex?</span>
+                            <span>How do I get started with Dex Trade?</span>
                             <span class="faq-chevron">
                                 <img src="{{ asset('website/assets/icons/lucide/chevron-down.svg') }}" alt="" />
                             </span>
                         </button>
                         <div class="faq-answer">
-                            <p>Getting started is simple. Join the Next Gen Forex ecosystem, explore the structured
+                            <p>Getting started is simple. Join the Dex Trade ecosystem, explore the structured
                                 earning opportunities
                                 available, and begin building your network. The platform is designed to guide you from
                                 day one — whether
@@ -983,7 +983,7 @@
             <div class="footer-cta-inner">
                 <div class="footer-cta-text">
                     <h3>Ready to <span>Grow Together?</span></h3>
-                    <p>Join the Next Gen Forex ecosystem and start your structured earning journey today.</p>
+                    <p>Join the Dex Trade ecosystem and start your structured earning journey today.</p>
                 </div>
                 <a href="#home" class="footer-cta-btn">
                     <img src="{{ asset('website/assets/icons/lucide/rocket.svg') }}" alt="" />
@@ -997,9 +997,9 @@
 
             <div class="footer-brand">
                 <div class="logo-wrap">
-                    <img src="{{ asset('website/assets/images/logo.png') }}" alt="Next Gen Forex Logo" />
+                    <img src="{{ asset('website/assets/images/logo.png') }}" alt="Dex Trade Logo" />
                 </div>
-                <p>Next Gen Forex is a next-generation digital platform built around Forex trading,
+                <p>Dex Trade is a next-generation digital platform built around Forex trading,
                     cryptocurrency, and digital assets. One Platform. Multiple Opportunities. Structured Growth.</p>
                 <div class="footer-tagline">Grow Together. Earn Together.</div>
 
@@ -1054,7 +1054,7 @@
         </div>
 
         <div class="footer-bottom">
-            <span>&copy; 2026 Next Gen Forex. All rights reserved.</span>
+            <span>&copy; 2026 Dex Trade. All rights reserved.</span>
             <span class="footer-sep">|</span>
             <span>Smart Digital Income &amp; Growth Platform</span>
         </div>

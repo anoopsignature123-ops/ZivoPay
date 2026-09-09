@@ -4,7 +4,7 @@
 <!-- Header Banner -->
 <div class="p-6 rounded-2xl bg-gradient-to-r from-amber-950 via-neutral-900 to-black border border-amber-500/30 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div>
-        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">NEXTGEN FOREX NETWORK</span>
+        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">DEX TRADE NETWORK</span>
         <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">USER & TEAM MANAGEMENT</h1>
         <p class="text-xs text-neutral-400 mt-1">Manage platform members, binary legs ratio (50:50), active packages, and total business.</p>
     </div>

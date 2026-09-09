@@ -8,8 +8,8 @@
     <!-- Logo Section -->
     <div class="logo-section flex items-center justify-between gap-2 px-4 py-4 border-b border-amber-500/30 shrink-0 bg-gradient-to-b from-amber-500/20 via-amber-500/5 to-transparent">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center justify-center flex-1 min-w-0">
-            <img src="{{ asset('images/nextgen_logo.png') }}" alt="NEXTGEN FOREX Logo" class="full-logo h-12 sm:h-14 w-auto max-w-[210px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.9)] hover:scale-105 transition duration-300">
-            <img src="{{ asset('assets/images/favicon.png') }}" alt="NEXTGEN Emblem" class="mini-logo hidden w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(243,202,82,0.9)] hover:scale-110 transition duration-300 mx-auto">
+            <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="full-logo h-12 sm:h-14 w-auto max-w-[210px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.9)] hover:scale-105 transition duration-300">
+            <img src="{{ asset('images/dextrade_emblem.png') }}" alt="DEX TRADE Emblem" class="mini-logo hidden w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(243,202,82,0.9)] hover:scale-110 transition duration-300 mx-auto">
         </a>
         <button
             class="lg:hidden! flex w-8 h-8 items-center justify-center rounded-lg text-amber-400 hover:bg-amber-500/20 transition js-mobile-menu-toggle shrink-0"
@@ -104,7 +104,7 @@ $pendingWithdrawalsCount = \App\Models\Withdrawal::where('status', 'pending')->c
 
         <!-- 5. INCOME REPORTS SECTION -->
         <div class="nav-section-title px-5 pt-4 pb-2 mt-2 text-[10px] font-black uppercase tracking-[2px] text-amber-400/70">
-            INCOME REPORTS
+            DEX TRADE REPORTS
         </div>
 
         <!-- 0. Income Overview Summary -->
@@ -114,60 +114,53 @@ $pendingWithdrawalsCount = \App\Models\Withdrawal::where('status', 'pending')->c
             <span class="nav-text">Income Overview Summary</span>
         </a>
 
-        <!-- 1. ROI Income Report -->
+        <!-- Daily ROI Income -->
         <a class='nav-item {{ request()->routeIs("admin.reports.roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("admin.reports.roi") }}'>
-            <i data-lucide="trending-up" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">ROI Income Report</span>
+            <i data-lucide="line-chart" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Daily ROI Income</span>
         </a>
 
-        <!-- 2. Direct Income Report -->
+        <!-- Direct Income -->
         <a class='nav-item {{ request()->routeIs("admin.reports.direct") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("admin.reports.direct") }}'>
-            <i data-lucide="user-check" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Direct Commission Report</span>
+            <i data-lucide="user-plus" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Direct Income</span>
         </a>
 
-        <!-- 3. Bonus Income Report -->
-        <a class='nav-item {{ request()->routeIs("admin.reports.bonus") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("admin.reports.bonus") }}'>
-            <i data-lucide="gift" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">24H Special Bonus</span>
-        </a>
-
-        <!-- 4. Level Income Report -->
-        <a class='nav-item {{ request()->routeIs("admin.reports.level") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("admin.reports.level") }}'>
-            <i data-lucide="layers" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Level Income Report</span>
-        </a>
-
-        <!-- 4. Matching Income Report -->
+        <!-- Matching Income -->
         <a class='nav-item {{ request()->routeIs("admin.reports.matching") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
             href='{{ route("admin.reports.matching") }}'>
             <i data-lucide="git-merge" class="w-4 h-4 shrink-0 text-amber-400"></i>
             <span class="nav-text">Matching Income</span>
         </a>
 
-        <!-- 5. Direct Salary Report -->
-        <a class='nav-item {{ request()->routeIs("admin.reports.direct-salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("admin.reports.direct-salary") }}'>
-            <i data-lucide="banknote" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Direct Salary Income</span>
+        <!-- Referral ROI Income -->
+        <a class='nav-item {{ request()->routeIs("admin.reports.referral-roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("admin.reports.referral-roi") }}'>
+            <i data-lucide="repeat" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Referral ROI Income</span>
         </a>
 
-        <!-- 6. Team Salary Report -->
-        <a class='nav-item {{ request()->routeIs("admin.reports.team-salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("admin.reports.team-salary") }}'>
-            <i data-lucide="users" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Team Salary Income</span>
+        <!-- Matching ROI Income -->
+        <a class='nav-item {{ request()->routeIs("admin.reports.matching-roi") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("admin.reports.matching-roi") }}'>
+            <i data-lucide="layers" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Matching ROI Income</span>
         </a>
 
-        <!-- 7. Reward Income Report -->
-        <a class='nav-item {{ request()->routeIs("admin.reports.rewards") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
-            href='{{ route("admin.reports.rewards") }}'>
-            <i data-lucide="trophy" class="w-4 h-4 shrink-0 text-amber-400"></i>
-            <span class="nav-text">Reward Income</span>
+        <!-- Upline Matching Income -->
+        <a class='nav-item {{ request()->routeIs("admin.reports.upline-matching") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("admin.reports.upline-matching") }}'>
+            <i data-lucide="share-2" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Upline Matching Income</span>
+        </a>
+
+        <!-- Salary Income -->
+        <a class='nav-item {{ request()->routeIs("admin.reports.salary") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("admin.reports.salary") }}'>
+            <i data-lucide="award" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span class="nav-text">Salary Income</span>
         </a>
 
         <!-- 6. HELP DESK & SUPPORT SECTION -->
@@ -202,7 +195,7 @@ $pendingTicketCount = \App\Models\SupportTicket::whereIn('status', ['open', 'use
             </div>
             <div class="user-info flex-1 min-w-0">
                 <p class="font-bold text-sm text-white truncate">Super Admin</p>
-                <p class="text-[11px] text-amber-400 font-semibold truncate">NEXTGEN FOREX</p>
+                <p class="text-[11px] text-amber-400 font-semibold truncate">DEX TRADE</p>
             </div>
         </div>
     </div>

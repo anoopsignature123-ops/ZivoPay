@@ -46,12 +46,12 @@ class RegisterController extends Controller
         }
 
         // System default admin fallback code
-        if ($code === 'NGF-0000001') {
+        if ($code === 'DEX-0000001') {
             return response()->json([
                 'success' => true,
-                'name' => 'NextGen System Admin',
-                'email' => 'admin@nextgenforex.com',
-                'referral_code' => 'NGF-0000001',
+                'name' => 'Dex Trade System Admin',
+                'email' => 'admin@dextrade.com',
+                'referral_code' => 'DEX-0000001',
             ]);
         }
 
@@ -74,7 +74,7 @@ class RegisterController extends Controller
         $sponsorCode = trim($request->sponsor_id);
         $sponsorUser = User::where('referral_code', $sponsorCode)->first();
 
-        if (! $sponsorUser && $sponsorCode !== 'NGF-0000001') {
+        if (! $sponsorUser && $sponsorCode !== 'DEX-0000001') {
             return redirect()->back()->withInput()->withErrors(['sponsor_id' => 'Invalid Sponsor Code! Member not found in system.']);
         }
 

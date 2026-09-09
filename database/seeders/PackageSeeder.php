@@ -17,9 +17,9 @@ class PackageSeeder extends Seeder
                 'name' => 'DEX TRADE STARTER',
                 'min_amount' => 10.00,
                 'max_amount' => 100000.00,
-                'daily_roi' => 0.50, // 0.5% Daily ROI Income
-                'duration_days' => 400, // 400 Days Duration (2X Total Non-Working Return)
-                'total_return_multiplier' => 2.00, // 2X Return Cap
+                'daily_roi' => 0.50,
+                'duration_days' => 400,
+                'total_return_multiplier' => 2.00,
                 'status' => 'active',
                 'description' => 'Dex Trade Package: Minimum $10 (Multiple of $10) | 0.5% Daily ROI | 400 Days | 2X Non-Working Return | 8X Working Cap',
             ],

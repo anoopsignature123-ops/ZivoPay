@@ -1,5 +1,5 @@
 /**
- * NextGen Forex Global Toast & Real-Time Form Validation Helper
+ * Dex Trade Global Toast & Real-Time Form Validation Helper
  */
 
 // Global Toast Notification Function

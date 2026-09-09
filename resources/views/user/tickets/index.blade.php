@@ -13,7 +13,7 @@
                 <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">CUSTOMER HELP DESK</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">MY SUPPORT TICKETS</h1>
-            <p class="text-xs text-neutral-300 mt-1">Submit support requests, track status, and chat directly with NextGen Forex support.</p>
+            <p class="text-xs text-neutral-300 mt-1">Submit support requests, track status, and chat directly with Dex Trade support.</p>
         </div>
 
         <a href="{{ route('user.tickets.create') }}" class="px-6 py-3.5 rounded-full pdf-gold-ribbon font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition text-black">

@@ -50,29 +50,43 @@ class IncomeReportController extends Controller
     }
 
     /**
-     * Master Income Summary Report across all 8 income types.
+     * Master Income Summary Report across all 7 Dex Trade income types.
      */
     public function summary(Request $request): View
     {
         $roiTotal = Transaction::where('type', 'daily_roi')->sum('amount');
         $directTotal = Transaction::where('type', 'direct_commission')->sum('amount');
-        $bonusTotal = Transaction::where('type', '24h_bonus')->sum('amount');
-        $levelTotal = Transaction::where('type', 'level_income')->sum('amount');
         $matchingTotal = Transaction::where('type', 'matching_income')->sum('amount');
-        $directSalaryTotal = Transaction::where('type', 'direct_salary')->sum('amount');
-        $teamSalaryTotal = Transaction::where('type', 'team_salary')->sum('amount');
-        $rewardTotal = Transaction::where('type', 'reward_income')->sum('amount');
+        $referralRoiTotal = Transaction::where('type', 'referral_roi')->sum('amount');
+        $matchingRoiTotal = Transaction::where('type', 'matching_roi')->sum('amount');
+        $uplineMatchingTotal = Transaction::where('type', 'upline_matching')->sum('amount');
+        $salaryTotal = Transaction::where('type', 'salary_income')->sum('amount');
 
-        $grandTotal = $roiTotal + $directTotal + $bonusTotal + $levelTotal + $matchingTotal + $directSalaryTotal + $teamSalaryTotal + $rewardTotal;
+        $grandTotal = $roiTotal + $directTotal + $matchingTotal + $referralRoiTotal + $matchingRoiTotal + $uplineMatchingTotal + $salaryTotal;
 
         $recentIncomes = Transaction::with(['user', 'user.sponsor', 'userPackage.user'])
-            ->whereIn('type', ['daily_roi', 'direct_commission', '24h_bonus', 'level_income', 'matching_income', 'direct_salary', 'team_salary', 'reward_income'])
+            ->whereIn('type', [
+                'daily_roi',
+                'direct_commission',
+                'matching_income',
+                'referral_roi',
+                'matching_roi',
+                'upline_matching',
+                'salary_income',
+            ])
             ->latest('id')
             ->paginate(15);
 
         return view('admin.reports.summary', compact(
-            'roiTotal', 'directTotal', 'bonusTotal', 'levelTotal', 'matchingTotal',
-            'directSalaryTotal', 'teamSalaryTotal', 'rewardTotal', 'grandTotal', 'recentIncomes'
+            'roiTotal',
+            'directTotal',
+            'matchingTotal',
+            'referralRoiTotal',
+            'matchingRoiTotal',
+            'uplineMatchingTotal',
+            'salaryTotal',
+            'grandTotal',
+            'recentIncomes'
         ));
     }
 
@@ -90,20 +104,6 @@ class IncomeReportController extends Controller
         return view('admin.reports.direct', $data);
     }
 
-    public function bonus(Request $request): View
-    {
-        $data = $this->getIncomeReport($request, '24h_bonus');
-
-        return view('admin.reports.bonus', $data);
-    }
-
-    public function level(Request $request): View
-    {
-        $data = $this->getIncomeReport($request, 'level_income');
-
-        return view('admin.reports.level', $data);
-    }
-
     public function matching(Request $request): View
     {
         $data = $this->getIncomeReport($request, 'matching_income');
@@ -111,24 +111,31 @@ class IncomeReportController extends Controller
         return view('admin.reports.matching', $data);
     }
 
-    public function directSalary(Request $request): View
+    public function referralRoi(Request $request): View
     {
-        $data = $this->getIncomeReport($request, 'direct_salary');
+        $data = $this->getIncomeReport($request, 'referral_roi');
 
-        return view('admin.reports.direct_salary', $data);
+        return view('admin.reports.referral_roi', $data);
     }
 
-    public function teamSalary(Request $request): View
+    public function matchingRoi(Request $request): View
     {
-        $data = $this->getIncomeReport($request, 'team_salary');
+        $data = $this->getIncomeReport($request, 'matching_roi');
 
-        return view('admin.reports.team_salary', $data);
+        return view('admin.reports.matching_roi', $data);
     }
 
-    public function reward(Request $request): View
+    public function uplineMatching(Request $request): View
     {
-        $data = $this->getIncomeReport($request, 'reward_income');
+        $data = $this->getIncomeReport($request, 'upline_matching');
 
-        return view('admin.reports.reward', $data);
+        return view('admin.reports.upline_matching', $data);
+    }
+
+    public function salary(Request $request): View
+    {
+        $data = $this->getIncomeReport($request, 'salary_income');
+
+        return view('admin.reports.salary', $data);
     }
 }

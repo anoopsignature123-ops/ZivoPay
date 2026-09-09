@@ -80,7 +80,7 @@
                     <div class="p-5 rounded-3xl pdf-package-card space-y-2 border-2 border-amber-400/80 shadow-2xl relative w-full">
                         <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
                             <span class="font-black text-amber-300 text-xs font-heading flex items-center gap-1.5">
-                                <span>NEXTGEN FOREX SUPPORT TEAM</span>
+                                <span>DEX TRADE SUPPORT TEAM</span>
                                 <span class="px-2 py-0.5 rounded bg-amber-500 text-black text-[9px] font-black uppercase">Official</span>
                             </span>
                             <span class="text-[10px] text-neutral-400 font-mono">{{ $msg->created_at ? $msg->created_at->format('d M Y, h:i A') : '' }}</span>

@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>403 - Access Restricted | NEXTGEN FOREX</title>
+    <title>403 - Access Restricted | DEX TRADE</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/nextgen-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <style>
         body.ng-error-bg {
             background-color: #020b06 !important;
@@ -101,7 +101,7 @@
     <!-- Footer -->
     <footer class="w-full max-w-5xl py-4 text-center border-t border-rose-500/20">
         <p class="text-xs text-neutral-400 font-semibold font-mono">
-            NEXTGEN FOREX SECURITY GATEWAY • ALL RIGHTS RESERVED © {{ date('Y') }}
+            DEX TRADE SECURITY GATEWAY • ALL RIGHTS RESERVED © {{ date('Y') }}
         </p>
     </footer>
 

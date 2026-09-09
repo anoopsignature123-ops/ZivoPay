@@ -31,20 +31,19 @@ class DashboardController extends Controller
         $activePackagesCount = UserPackage::where('status', 'active')->count();
         $totalCapitalInvestedSum = UserPackage::sum('invested_amount');
 
-        // 5. Income Payout Summaries (Across all 8 Income Streams)
+        // 5. Income Payout Summaries (Across all 7 Dex Trade Income Streams)
         $totalRoiPaidSum = Transaction::where('type', 'daily_roi')->sum('amount');
         $totalDirectCommissionPaidSum = Transaction::where('type', 'direct_commission')->sum('amount');
-        $totalBoosterBonusPaidSum = Transaction::where('type', '24h_bonus')->sum('amount');
-        $totalLevelPaidSum = Transaction::where('type', 'level_income')->sum('amount');
         $totalMatchingPaidSum = Transaction::where('type', 'matching_income')->sum('amount');
-        $totalDirectSalaryPaidSum = Transaction::where('type', 'direct_salary')->sum('amount');
-        $totalTeamSalaryPaidSum = Transaction::where('type', 'team_salary')->sum('amount');
-        $totalRewardPaidSum = Transaction::where('type', 'reward_income')->sum('amount');
+        $totalReferralRoiPaidSum = Transaction::where('type', 'referral_roi')->sum('amount');
+        $totalMatchingRoiPaidSum = Transaction::where('type', 'matching_roi')->sum('amount');
+        $totalUplineMatchingPaidSum = Transaction::where('type', 'upline_matching')->sum('amount');
+        $totalSalaryPaidSum = Transaction::where('type', 'salary_income')->sum('amount');
 
-        $totalIncomeDistributedSum = $totalRoiPaidSum + $totalDirectCommissionPaidSum + $totalBoosterBonusPaidSum
-            + $totalLevelPaidSum + $totalMatchingPaidSum + $totalDirectSalaryPaidSum + $totalTeamSalaryPaidSum + $totalRewardPaidSum;
+        $totalIncomeDistributedSum = $totalRoiPaidSum + $totalDirectCommissionPaidSum + $totalMatchingPaidSum
+            + $totalReferralRoiPaidSum + $totalMatchingRoiPaidSum + $totalUplineMatchingPaidSum + $totalSalaryPaidSum;
 
-        // 6. Recent Live Activity Collections (Recent Registered Members)
+        // 6. Recent Live Activity Collections
         $recentUsers = User::where('role_id', '!=', 1)->latest()->take(5)->get();
         $recentDeposits = Deposit::with('user')->latest()->take(5)->get();
         $recentInvestments = UserPackage::with(['user', 'package'])->latest()->take(5)->get();
@@ -55,8 +54,8 @@ class DashboardController extends Controller
             'totalDepositWalletSum', 'totalEarningWalletSum',
             'totalApprovedDepositsSum', 'pendingDepositsCount',
             'totalPackagesPurchasedCount', 'activePackagesCount', 'totalCapitalInvestedSum',
-            'totalRoiPaidSum', 'totalDirectCommissionPaidSum', 'totalBoosterBonusPaidSum',
-            'totalLevelPaidSum', 'totalMatchingPaidSum', 'totalDirectSalaryPaidSum', 'totalTeamSalaryPaidSum', 'totalRewardPaidSum',
+            'totalRoiPaidSum', 'totalDirectCommissionPaidSum', 'totalMatchingPaidSum',
+            'totalReferralRoiPaidSum', 'totalMatchingRoiPaidSum', 'totalUplineMatchingPaidSum', 'totalSalaryPaidSum',
             'totalIncomeDistributedSum',
             'recentUsers', 'recentDeposits', 'recentInvestments', 'recentTransactions'
         ));

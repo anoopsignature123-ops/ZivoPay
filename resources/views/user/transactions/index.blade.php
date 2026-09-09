@@ -8,7 +8,7 @@
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <span class="pdf-num-badge">TL</span>
-                    <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX MEMBER
+                    <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE MEMBER
                         PORTAL</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading"> TRANSACTION HISTORY</h1>

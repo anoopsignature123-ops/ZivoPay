@@ -7,7 +7,7 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="pdf-num-badge">UM</span>
-                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">NEXTGEN FOREX NETWORK</span>
+                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE NETWORK</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">USER MANAGEMENT MODULE</h1>
             <p class="text-xs text-neutral-300 mt-1">Inspect registered accounts, active investment packages, wallet balances, and direct fund credits.</p>

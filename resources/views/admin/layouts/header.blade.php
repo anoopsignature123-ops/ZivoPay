@@ -42,7 +42,7 @@
         <!-- Centered Mobile Brand Logo -->
         <div class="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none z-10">
             <a href="{{ route('admin.dashboard') }}" class="pointer-events-auto flex items-center justify-center">
-                <img src="{{ asset('images/nextgen_logo.png') }}" alt="NEXTGEN FOREX Logo" class="h-11 sm:h-12 w-auto max-w-[210px] sm:max-w-[240px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.95)]">
+                <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="h-11 sm:h-12 w-auto max-w-[210px] sm:max-w-[240px] object-contain drop-shadow-[0_0_16px_rgba(243,202,82,0.95)]">
             </a>
         </div>
 
@@ -96,7 +96,7 @@
                         <p class="font-semibold text-white flex items-center gap-1.5 text-sm">
                             {{ Auth::user() ? Auth::user()->name : 'Super Admin' }} <span class="px-1.5 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 rounded">ROOT</span>
                         </p>
-                        <p class="text-xs text-neutral-400">{{ Auth::user() ? Auth::user()->email : 'admin@nextgenforex.com' }}</p>
+                        <p class="text-xs text-neutral-400">{{ Auth::user() ? Auth::user()->email : 'admin@dextrade.com' }}</p>
                     </div>
                     
                     <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white hover:bg-amber-500/10 transition"
