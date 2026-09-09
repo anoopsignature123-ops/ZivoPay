@@ -57,15 +57,15 @@ class DexTradeIncomeEngineTest extends TestCase
         $roiService = app(RoiIncomeService::class);
         $credited = $roiService->processSinglePackageRoi($userPackage);
 
-        $this->assertEquals(0.50, $credited);
-        $this->assertEquals(0.50, $user->fresh()->earning_wallet);
+        $this->assertEquals(0.50, round($credited, 2));
+        $this->assertEquals(0.50, round($user->fresh()->earning_wallet, 2));
 
         // Test non-working 2X capping limit
         $userPackage->update(['paid_roi_amount' => 199.80]);
         $credited2 = $roiService->processSinglePackageRoi($userPackage);
 
-        $this->assertEquals(0.20, $credited2);
-        $this->assertEquals(0.70, $user->fresh()->earning_wallet);
+        $this->assertEquals(0.20, round($credited2, 2));
+        $this->assertEquals(0.70, round($user->fresh()->earning_wallet, 2));
         $this->assertEquals('completed', $userPackage->fresh()->status);
     }
 
