@@ -121,6 +121,9 @@ class User extends Authenticatable
         }
 
         return User::where('sponsor_code', $this->referral_code)
+            ->where(function ($q) {
+                $q->whereNull('position')->orWhere('position', '!=', 'right');
+            })
             ->orderBy('id', 'asc')
             ->first();
     }
@@ -147,6 +150,9 @@ class User extends Authenticatable
         return User::where('sponsor_code', $this->referral_code)
             ->when($left, function ($q) use ($left) {
                 $q->where('id', '!=', $left->id);
+            })
+            ->where(function ($q) {
+                $q->whereNull('position')->orWhere('position', '!=', 'left');
             })
             ->orderBy('id', 'asc')
             ->first();

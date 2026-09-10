@@ -12,10 +12,20 @@
                     <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">ADMIN MEMBER PROFILE AUDIT</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">{{ $user->name }}</h1>
-                <div class="flex items-center gap-3 text-xs text-neutral-300 mt-1 font-mono">
+                <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-300 mt-1 font-mono">
                     <span>Code: <strong class="text-amber-400 font-black">{{ $user->referral_code }}</strong></span>
                     <span>•</span>
                     <span>Sponsor: <strong class="text-white font-black">{{ $user->sponsor ? $user->sponsor->name . ' (' . $user->sponsor_code . ')' : ($user->sponsor_code ?? 'No Sponsor (N/A)') }}</strong></span>
+                    <span>•</span>
+                    <span>Position: 
+                        @if(strtolower((string)$user->position) === 'left')
+                            <strong class="text-amber-300 font-black uppercase">👈 LEFT LEG</strong>
+                        @elseif(strtolower((string)$user->position) === 'right')
+                            <strong class="text-emerald-400 font-black uppercase">RIGHT LEG 👉</strong>
+                        @else
+                            <strong class="text-neutral-400 font-bold uppercase">N/A</strong>
+                        @endif
+                    </span>
                     <span>•</span>
                     <span>Registered: <strong class="text-neutral-300 font-semibold">{{ $user->created_at ? $user->created_at->format('d M Y') : 'N/A' }}</strong></span>
                 </div>
@@ -96,6 +106,16 @@
                     <div class="flex justify-between items-center py-1.5 border-b border-amber-500/10">
                         <span class="text-neutral-400 font-medium">Sponsor Code:</span>
                         <span class="font-bold text-white font-mono">{{ $user->sponsor_code ?? 'N/A (No Sponsor)' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-amber-500/10">
+                        <span class="text-neutral-400 font-medium">Binary Tree Position:</span>
+                        @if(strtolower((string)$user->position) === 'left')
+                            <span class="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase">👈 LEFT LEG</span>
+                        @elseif(strtolower((string)$user->position) === 'right')
+                            <span class="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase">RIGHT LEG 👉</span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700 text-[10px] font-bold uppercase">UNASSIGNED</span>
+                        @endif
                     </div>
 
                     <div class="flex justify-between items-center py-1.5 border-b border-amber-500/10">

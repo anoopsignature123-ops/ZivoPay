@@ -122,7 +122,7 @@
                             </div>
                         </td>
 
-                        <!-- Sponsor Info -->
+                        <!-- Sponsor Info & Position -->
                         <td class="p-4 min-w-[140px]">
                             <div>
                                 @if($user->sponsor)
@@ -147,6 +147,16 @@
                                         N/A
                                     </div>
                                 @endif
+
+                                <div class="mt-1">
+                                    @if(strtolower((string)$user->position) === 'left')
+                                        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black uppercase">👈 LEFT LEG</span>
+                                    @elseif(strtolower((string)$user->position) === 'right')
+                                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[9px] font-black uppercase">RIGHT LEG 👉</span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700 text-[9px] font-bold uppercase">UNASSIGNED</span>
+                                    @endif
+                                </div>
                             </div>
                         </td>
 

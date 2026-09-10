@@ -87,4 +87,31 @@ class WithdrawalLifecycleTest extends TestCase
         // Wallet refunded back to $100
         $this->assertEquals(100.00, (float) $user->fresh()->earning_wallet);
     }
+
+    public function test_minimum_withdrawal_amount_validation_five_dollars(): void
+    {
+        $user = User::factory()->create([
+            'role_id' => 2,
+            'earning_wallet' => 50.00,
+        ]);
+
+        // Attempting $4 (under $5 min) should trigger validation error
+        $response = $this->actingAs($user)->post(route('user.withdrawals.store'), [
+            'amount' => 4.00,
+            'usdt_address' => '0x1234567890abcdef1234567890abcdef12345678',
+        ]);
+
+        $response->assertSessionHasErrors('amount');
+        $this->assertEquals(0, Withdrawal::count());
+
+        // Submitting $5 (exact min) should pass validation and create withdrawal
+        $validResponse = $this->actingAs($user)->post(route('user.withdrawals.store'), [
+            'amount' => 5.00,
+            'usdt_address' => '0x1234567890abcdef1234567890abcdef12345678',
+        ]);
+
+        $validResponse->assertRedirect(route('user.withdrawals.history'));
+        $this->assertEquals(1, Withdrawal::count());
+        $this->assertEquals(45.00, (float) $user->fresh()->earning_wallet);
+    }
 }

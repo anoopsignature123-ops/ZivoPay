@@ -31,9 +31,9 @@ class WithdrawalController extends Controller
     {
         $user = Auth::user();
 
-        // PDF SLIDE 20 TERMS: Minimum Withdrawal $10
+        // PDF SLIDE 20 TERMS: Minimum Withdrawal $5
         $request->validate([
-            'amount' => 'required|numeric|min:10',
+            'amount' => 'required|numeric|min:5',
             'usdt_address' => 'required|string|min:10|max:255',
         ]);
 
@@ -46,7 +46,7 @@ class WithdrawalController extends Controller
 
         // 2. Check Earning Wallet Balance
         if ((float) $user->earning_wallet < $requestedAmount) {
-            return redirect()->back()->with('error', "Insufficient Earning Wallet Balance (\${$user->earning_wallet}). Minimum withdrawal is \$10!");
+            return redirect()->back()->with('error', "Insufficient Earning Wallet Balance (\${$user->earning_wallet}). Minimum withdrawal is \$5!");
         }
 
         // 2. Calculate 10% Withdrawal Deduction (PDF Slide 20 Rule 4)

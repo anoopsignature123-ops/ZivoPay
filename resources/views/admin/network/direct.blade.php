@@ -38,14 +38,14 @@
         </div>
         <div class="p-5 rounded-2xl pdf-package-card shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-neutral-400">Team A Network</span>
+                <span class="text-xs font-bold uppercase text-neutral-400">👈 Left Leg Team</span>
                 <i data-lucide="users" class="w-5 h-5 text-amber-400"></i>
             </div>
             <h3 class="text-2xl font-black text-amber-300 mt-2">{{ $stats['left'] }}</h3>
         </div>
         <div class="p-5 rounded-2xl pdf-package-card shadow-lg">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-neutral-400">Team B Network</span>
+                <span class="text-xs font-bold uppercase text-neutral-400">Right Leg Team 👉</span>
                 <i data-lucide="users" class="w-5 h-5 text-emerald-400"></i>
             </div>
             <h3 class="text-2xl font-black text-emerald-400 mt-2">{{ $stats['right'] }}</h3>
@@ -64,8 +64,8 @@
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <select name="position" onchange="this.form.submit()" class="px-4 py-2.5 rounded-xl bg-bg border border-amber-500/40 text-amber-400 font-bold text-xs focus:outline-none cursor-pointer">
                     <option value="">All Team Branches</option>
-                    <option value="left" {{ request('position') === 'left' ? 'selected' : '' }}>Team A Network</option>
-                    <option value="right" {{ request('position') === 'right' ? 'selected' : '' }}>Team B Network</option>
+                    <option value="left" {{ request('position') === 'left' ? 'selected' : '' }}>👈 Left Leg Team</option>
+                    <option value="right" {{ request('position') === 'right' ? 'selected' : '' }}>Right Leg Team 👉</option>
                 </select>
 
                 <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 rounded-xl bg-bg border border-amber-500/40 text-amber-400 font-bold text-xs focus:outline-none cursor-pointer">
@@ -119,11 +119,11 @@
                         </td>
                         <td class="p-4">
                             @if(strtolower((string)$direct->position) === 'left')
-                                <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase">TEAM A</span>
+                                <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase">👈 LEFT LEG</span>
                             @elseif(strtolower((string)$direct->position) === 'right')
-                                <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase">TEAM B</span>
+                                <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase">RIGHT LEG 👉</span>
                             @else
-                                <span class="px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase">DIRECT</span>
+                                <span class="px-2.5 py-1 rounded bg-neutral-800 text-neutral-400 border border-neutral-700 text-[10px] font-bold uppercase">UNASSIGNED</span>
                             @endif
                         </td>
                         <td class="p-4 text-xs font-medium text-neutral-300">{{ $direct->created_at ? $direct->created_at->format('M d, Y h:i A') : 'N/A' }}</td>
