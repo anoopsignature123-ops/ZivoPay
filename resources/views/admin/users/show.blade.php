@@ -106,6 +106,22 @@
                         <span class="text-neutral-400 font-medium">Mobile Phone:</span>
                         <span class="font-bold text-white font-mono">{{ $user->mobile ?? 'N/A' }}</span>
                     </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-amber-500/10">
+                        <span class="text-neutral-400 font-medium">Quant BOT Status:</span>
+                        @if($user->is_bot_active)
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/60 text-[10px] font-black uppercase tracking-wider animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.5)] flex items-center gap-1.5" title="Activated at: {{ $user->bot_activated_at?->format('d M Y H:i') }}">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                BOT ACTIVE ({{ $user->bot_activated_at?->format('M d, Y H:i') }})
+                            </span>
+                        @else
+                            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                                BOT INACTIVE
+                            </span>
+                        @endif
+                    </div>
                     <div class="flex justify-between items-center py-1.5">
                         <span class="text-neutral-400 font-medium">Registration Date:</span>
                         <span class="font-bold text-neutral-300 font-mono">{{ $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A' }}</span>

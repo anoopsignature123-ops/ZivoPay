@@ -27,6 +27,8 @@ class User extends Authenticatable
         'sponsor_code',
         'position',
         'status',
+        'is_bot_active',
+        'bot_activated_at',
         'deposit_wallet',
         'earning_wallet',
         'password',
@@ -52,6 +54,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'activated_at' => 'datetime',
+            'is_bot_active' => 'boolean',
+            'bot_activated_at' => 'datetime',
             'password' => 'hashed',
             'deposit_wallet' => 'decimal:2',
             'earning_wallet' => 'decimal:2',

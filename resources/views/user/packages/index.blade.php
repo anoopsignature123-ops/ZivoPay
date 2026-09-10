@@ -59,16 +59,16 @@
         @endif
 
         <!-- MAIN INVESTMENT CARD & REAL-TIME CALCULATOR -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-black/90 border-2 border-amber-400 shadow-[0_0_35px_rgba(243,202,82,0.3)] space-y-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="p-6 sm:p-8 rounded-3xl bg-black/95 border-2 border-amber-400 shadow-[0_0_35px_rgba(243,202,82,0.3)] space-y-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-amber-500/30 pb-4">
                 <div>
                     <h3 class="text-lg font-black text-amber-400 uppercase tracking-wider font-heading flex items-center gap-2">
                         <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i> SELECT OR ENTER INVESTMENT AMOUNT
                     </h3>
                     <p class="text-xs text-neutral-300 mt-1">Minimum investment amount is <strong>$10.00 USD</strong>. Amount must be an exact multiple of <strong>$10</strong> (e.g. $10, $20, $30, $50, $100, $500, $1,000).</p>
                 </div>
-                <div class="px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-400 text-[11px] font-mono font-bold tracking-wider uppercase">
-                    0.5% DAILY ROI • 200% (2X) CAP
+                <div class="px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/50 text-amber-300 text-xs font-mono font-bold tracking-wider uppercase shrink-0">
+                    ⚡ 0.5% DAILY ROI • 200% (2X) CAP
                 </div>
             </div>
 
@@ -90,25 +90,26 @@
                 </div>
             </div>
 
-
             <!-- Investment Form -->
-            <form action="{{ route('user.packages.buy') }}" method="POST" id="investForm" class="space-y-5" onsubmit="return confirmInvest()">
+            <form action="{{ route('user.packages.buy') }}" method="POST" id="investForm" class="space-y-4" onsubmit="return confirmInvest()">
                 @csrf
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-end">
-                    <div class="lg:col-span-5 space-y-2">
-                        <label for="investedAmount" class="text-xs font-bold text-amber-300 uppercase tracking-wider block font-mono">Investment Amount ($ USD)</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400 font-black text-xl">$</span>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <!-- Amount Input (7 cols out of 12) -->
+                    <div class="md:col-span-7 space-y-1.5">
+                        <label for="investedAmount" class="text-xs font-bold text-amber-300 uppercase tracking-wider block font-mono whitespace-nowrap">Investment Amount ($ USD)</label>
+                        <div class="relative w-full">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400 font-bold font-mono text-sm pointer-events-none">$</span>
                             <input type="number" step="10" min="10" id="investedAmount" name="invested_amount" value="100"
-                                class="w-full pl-10 pr-4 py-4 rounded-2xl bg-black border-2 border-amber-500/60 text-white font-mono font-black text-xl focus:outline-none focus:border-amber-400 transition"
+                                class="w-full pl-8 pr-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono font-bold text-sm focus:outline-none focus:border-amber-400 transition"
                                 required oninput="validateAndCalculatePackage(this.value)">
                         </div>
                     </div>
 
-                    <div class="lg:col-span-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <!-- Invest Button (5 cols out of 12) -->
+                    <div class="md:col-span-5">
                         <button type="submit" id="submitInvestBtn"
-                            class="w-full py-4 rounded-2xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-base uppercase tracking-wider shadow-xl flex items-center justify-center gap-2 shrink-0 cursor-pointer transition">
-                            <i data-lucide="sparkles" class="w-5 h-5 text-black"></i> INVEST NOW
+                            class="w-full py-2.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-[1.01] transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-black"></i> INVEST NOW
                         </button>
                     </div>
                 </div>
@@ -118,22 +119,22 @@
                     <div class="flex items-center justify-between border-b border-amber-500/20 pb-3">
                         <span class="text-xs font-bold uppercase tracking-wider flex items-center gap-2" id="valStatusIcon">
                             <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-                            <span id="valStatusText" class="text-emerald-300">Valid Investment Amount</span>
+                            <span id="valStatusText" class="text-emerald-300">Valid Investment Amount ($10 Multiple Satisfied)</span>
                         </span>
-                        <span class="text-[11px] text-amber-400 font-black" id="valAmountText">$100.00 USD</span>
+                        <span class="text-xs text-amber-400 font-black" id="valAmountText">$100.00 USD</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
-                        <div class="p-3 rounded-xl bg-black/60 border border-amber-500/30">
-                            <span class="text-neutral-400 font-sans block text-[11px]">Daily ROI Yield (0.50%):</span>
+                        <div class="p-3.5 rounded-xl bg-black/70 border border-amber-500/30">
+                            <span class="text-neutral-400 font-sans block text-[11px] mb-1">Daily ROI Yield (0.50%):</span>
                             <strong class="text-amber-300 text-sm font-black" id="calcDailyRoi">$0.50 / Day</strong>
                         </div>
-                        <div class="p-3 rounded-xl bg-black/60 border border-amber-500/30">
-                            <span class="text-neutral-400 font-sans block text-[11px]">Total Max Return (2X Cap):</span>
+                        <div class="p-3.5 rounded-xl bg-black/70 border border-amber-500/30">
+                            <span class="text-neutral-400 font-sans block text-[11px] mb-1">Total Max Return (2X Cap):</span>
                             <strong class="text-emerald-400 text-sm font-black" id="calcTotalReturn">$200.00 Return</strong>
                         </div>
-                        <div class="p-3 rounded-xl bg-black/60 border border-amber-500/30">
-                            <span class="text-neutral-400 font-sans block text-[11px]">Contract Period:</span>
+                        <div class="p-3.5 rounded-xl bg-black/70 border border-amber-500/30">
+                            <span class="text-neutral-400 font-sans block text-[11px] mb-1">Contract Period:</span>
                             <strong class="text-white text-sm font-black">400 Days</strong>
                         </div>
                     </div>

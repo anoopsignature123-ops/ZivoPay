@@ -78,6 +78,7 @@
                         <th class="p-4 min-w-[140px]">Registration Date</th>
                         <th class="p-4 min-w-[140px]">Activation Date</th>
                         <th class="p-4 min-w-[120px]">Status</th>
+                        <th class="p-4 min-w-[140px]">BOT Status</th>
                         <th class="p-4 rounded-r-xl text-center min-w-[290px]">DIRECT ACTIONS</th>
                     </tr>
                 </thead>
@@ -205,6 +206,24 @@
                                 <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase">ACTIVE</span>
                             @else
                                 <span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-black uppercase">INACTIVE</span>
+                            @endif
+                        </td>
+
+                        <!-- BOT Status (Highlighted & Glowing/Blinking) -->
+                        <td class="p-4 min-w-[140px]">
+                            @if($user->is_bot_active)
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/60 text-emerald-300 text-[10px] font-black uppercase tracking-wider animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.5)]" title="Activated at: {{ $user->bot_activated_at?->format('d M Y H:i') }}">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    BOT ACTIVE
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                    BOT INACTIVE
+                                </span>
                             @endif
                         </td>
 

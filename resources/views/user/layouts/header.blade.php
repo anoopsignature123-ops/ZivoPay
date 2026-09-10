@@ -61,49 +61,51 @@
 
 
             <!-- User Profile Dropdown -->
-            <div class="relative">
+            <div class="relative z-50">
                 <button
                     type="button"
                     id="userDropdownBtn"
                     onclick="toggleUserProfileMenu(event)"
-                    class="flex items-center gap-2 p-1 rounded-xl hover:bg-white/10 transition cursor-pointer">
+                    class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer border border-amber-500/30 bg-black/40">
                     <span
-                        class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
-                        <span class="text-white font-bold text-sm">US</span>
+                        class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md border border-amber-300">
+                        <span class="text-black font-black text-sm">{{ strtoupper(substr(Auth::user() ? Auth::user()->name : 'US', 0, 2)) }}</span>
                     </span>
-                    <i data-lucide="chevron-down" class="w-4 h-4 text-muted hidden sm:block"></i>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-amber-400 hidden sm:block"></i>
                 </button>
 
                 <div
                     id="userProfileMenu"
-                    style="display: none;"
-                    class="!absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#062417] backdrop-blur-2xl border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-[9999]">
+                    style="display: none; background-color: #041d13 !important; z-index: 999999 !important;"
+                    class="!absolute right-0 top-full mt-2 w-64 rounded-2xl bg-[#041d13] border-2 border-amber-400/80 shadow-[0_20px_50px_rgba(0,0,0,0.95)] overflow-hidden p-3 z-[999999] opacity-100">
 
-                    <div class="p-3 mb-1 border-b border-amber-500/20">
-                        <p class="font-semibold text-white flex items-center gap-1.5 text-sm">
-                            {{ Auth::user() ? Auth::user()->name : 'Member' }}
+                    <div class="p-3 mb-2 rounded-xl bg-black/80 border border-amber-500/30">
+                        <p class="font-bold text-white flex items-center justify-between text-sm">
+                            <span class="truncate max-w-[130px]">{{ Auth::user() ? Auth::user()->name : 'Member' }}</span>
                             @if(Auth::user() && Auth::user()->status === 'active')
-                                <span class="px-1.5 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-400 rounded">ACTIVE</span>
+                                <span class="px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full font-bold">ACTIVE</span>
                             @else
-                                <span class="px-1.5 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 rounded">INACTIVE</span>
+                                <span class="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full font-bold">INACTIVE</span>
                             @endif
                         </p>
-                        <p class="text-xs text-neutral-400">{{ Auth::user() ? Auth::user()->email : 'user@dextrade.com' }}</p>
+                        <p class="text-xs text-neutral-400 truncate mt-0.5 font-mono">{{ Auth::user() ? Auth::user()->email : 'user@dextrade.com' }}</p>
                     </div>
                     
                     @if(session()->has('impersonated_by'))
-                        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-amber-400 hover:bg-amber-500/10 transition"
+                        <a class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-amber-400 hover:bg-amber-500/10 transition border border-amber-500/20 mb-2"
                             href="{{ route('user.stop-impersonate') }}">
                             <i data-lucide="arrow-left" class="w-4 h-4 text-amber-400"></i>
                             <span>Return to Admin Panel</span>
                         </a>
                     @endif
+
                     <div class="my-1 border-t border-amber-500/20"></div>
+
                     <form action="{{ route('user.logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition cursor-pointer">
+                        <button type="submit" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/20 transition cursor-pointer">
                             <i data-lucide="log-out" class="w-4 h-4 text-rose-400"></i>
-                            <span>Logout</span>
+                            <span>Logout Account</span>
                         </button>
                     </form>
                 </div>

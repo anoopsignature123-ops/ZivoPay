@@ -33,6 +33,106 @@
             <span class="nav-text">Dashboard</span>
         </a>
 
+        <style>
+            @keyframes arbitrageShimmer {
+                0% { background-position: -200% 0; }
+                100% { background-position: 200% 0; }
+            }
+
+            @keyframes activeGlowPulse {
+                0%, 100% {
+                    box-shadow: 0 0 18px rgba(243, 202, 82, 0.8), 0 0 35px rgba(212, 175, 55, 0.5);
+                }
+                50% {
+                    box-shadow: 0 0 30px rgba(243, 202, 82, 1), 0 0 48px rgba(0, 230, 118, 0.6);
+                }
+            }
+
+            .arbitrage-pill-active {
+                background: linear-gradient(90deg, #d4af37 0%, #fef08a 35%, #f3ca52 65%, #d4af37 100%) !important;
+                background-size: 200% 100% !important;
+                animation: arbitrageShimmer 4s infinite linear, activeGlowPulse 2.5s infinite ease-in-out !important;
+                border-radius: 9999px !important;
+                border: 2px solid #ffffff !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+            .arbitrage-pill-active > .flex > .nav-text,
+            .arbitrage-pill-active > .flex > i,
+            .arbitrage-pill-active > .flex > svg {
+                color: #000000 !important;
+                font-weight: 900 !important;
+                stroke: #000000 !important;
+            }
+            .arbitrage-pill-active:hover {
+                transform: scale(1.04) !important;
+            }
+
+            .arbitrage-pill-inactive {
+                background: rgba(6, 56, 36, 0.75) !important;
+                border: 1.5px solid rgba(243, 202, 82, 0.75) !important;
+                border-radius: 9999px !important;
+                transition: all 0.25s ease-in-out !important;
+            }
+            .arbitrage-pill-inactive > .flex > .nav-text {
+                color: #f3ca52 !important;
+                font-weight: 800 !important;
+            }
+            .arbitrage-pill-inactive > .flex > i,
+            .arbitrage-pill-inactive > .flex > svg {
+                color: #f3ca52 !important;
+                stroke: #f3ca52 !important;
+            }
+            .arbitrage-pill-inactive:hover {
+                background: rgba(243, 202, 82, 0.25) !important;
+                border-color: #f3ca52 !important;
+                box-shadow: 0 0 20px rgba(243, 202, 82, 0.5) !important;
+                transform: translateX(4px) scale(1.02) !important;
+            }
+
+            .badge-live-pulse {
+                background: #000000 !important;
+                color: #fef08a !important;
+                border: 1px solid rgba(243, 202, 82, 0.6) !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+            }
+            .badge-live-pulse * {
+                color: #fef08a !important;
+            }
+        </style>
+
+        <!-- Arbitrage Link -->
+        @if(request()->routeIs('user.arbitrage'))
+            <a class='nav-item arbitrage-pill-active flex items-center justify-between gap-2 mx-3 my-1.5 px-4 py-2.5 rounded-full text-sm font-black shadow-2xl transition'
+                href='{{ route("user.arbitrage") }}'>
+                <div class="flex items-center gap-3 min-w-0">
+                    <i data-lucide="rocket" class="w-5 h-5 shrink-0 text-black"></i>
+                    <span class="nav-text text-black font-black tracking-wide">Arbitrage</span>
+                </div>
+                <span class="badge-live-pulse inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase shrink-0">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span style="color: #fef08a !important;">LIVE</span>
+                </span>
+            </a>
+        @else
+            <a class='nav-item arbitrage-pill-inactive flex items-center justify-between gap-2 mx-3 my-1.5 px-4 py-2.5 rounded-full text-sm font-bold shadow-lg transition'
+                href='{{ route("user.arbitrage") }}'>
+                <div class="flex items-center gap-3 min-w-0">
+                    <i data-lucide="rocket" class="w-5 h-5 shrink-0 text-amber-400"></i>
+                    <span class="nav-text text-amber-300 font-bold tracking-wide">Arbitrage</span>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[10px] font-black tracking-widest uppercase shrink-0">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    <span>LIVE</span>
+                </span>
+            </a>
+        @endif
+
         <!-- 1. ADD FUND & WITHDRAWAL SECTION -->
         <div class="nav-section-title px-5 pt-4 pb-2 mt-2 text-[10px] font-black uppercase tracking-[2px] text-amber-400/70">
             ADD FUND & WITHDRAWAL
@@ -76,6 +176,13 @@
             href='{{ route("user.packages.index") }}'>
             <i data-lucide="package-check" class="w-5 h-5 shrink-0 text-amber-400"></i>
             <span class="nav-text">Buy Packages</span>
+        </a>
+
+        <!-- BOT -->
+        <a class='nav-item {{ request()->routeIs("user.bot*") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-3 rounded-xl text-sm font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+            href='{{ route("user.bot.index") }}'>
+            <i data-lucide="bot" class="w-5 h-5 shrink-0 text-amber-400"></i>
+            <span class="nav-text">BOT</span>
         </a>
 
         <!-- Packages History -->

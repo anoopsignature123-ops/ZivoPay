@@ -86,11 +86,65 @@
                     @endif
                 </p>
             </div>
-            <div
-                class="px-5 py-2.5 rounded-2xl bg-black/80 border-2 border-amber-400/80 text-amber-300 text-xs font-bold font-mono flex items-center gap-2 shadow-xl">
-                <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
-                <span>{{ date('l, d M Y') }}</span>
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if($user->is_bot_active)
+                    <a href="{{ route('user.bot.trading') }}" class="px-4 py-2.5 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/80 text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.4)] animate-pulse hover:scale-105 transition" title="Quant Bot is Active & Mining ROI">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span>BOT: ACTIVE ⚡</span>
+                    </a>
+                @else
+                    <a href="{{ route('user.bot.index') }}" class="px-4 py-2.5 rounded-2xl bg-amber-500/20 border-2 border-amber-400/80 text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(243,202,82,0.4)] animate-pulse hover:scale-105 transition" title="Click to Start Quant Bot for Daily ROI">
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                        <span>BOT: INACTIVE (START BOT) ⚡</span>
+                    </a>
+                @endif
+
+                <div
+                    class="px-4 py-2.5 rounded-2xl bg-black/80 border-2 border-amber-400/80 text-amber-300 text-xs font-bold font-mono flex items-center gap-2 shadow-xl">
+                    <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+                    <span>{{ date('l, d M Y') }}</span>
+                </div>
             </div>
+        </div>
+
+        <!-- BOT STATUS ALERT BANNER -->
+        <div class="relative z-10">
+            @if(!$user->is_bot_active)
+                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl animate-pulse">
+                    <div class="flex items-center gap-3 text-center sm:text-left overflow-hidden">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 shrink-0">
+                            <i data-lucide="zap" class="w-5 h-5 text-amber-400 fill-amber-400"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="text-xs sm:text-sm font-black text-amber-300 uppercase tracking-wider truncate">⚡ ATTENTION: TRADING BOT IS INACTIVE</h4>
+                            <p class="text-[11px] text-neutral-200 truncate">Daily ROI income is ONLY paid with an active Trading Bot.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('user.bot.index') }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition shrink-0 flex items-center gap-1.5 border border-yellow-200 whitespace-nowrap">
+                        <i data-lucide="play-circle" class="w-4 h-4 text-black fill-black"></i>
+                        <span>START BOT</span>
+                    </a>
+                </div>
+            @else
+                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+                    <div class="flex items-center gap-3 text-center sm:text-left overflow-hidden">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+                            <i data-lucide="cpu" class="w-5 h-5 text-emerald-400"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wider truncate">🚀 TRADING BOT IS ACTIVE & MINING</h4>
+                            <p class="text-[11px] text-neutral-200 truncate">Activated on <strong class="text-amber-300 font-mono">{{ $user->bot_activated_at?->format('M d, Y H:i') }}</strong>. Yield mining 24/7.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('user.bot.trading') }}" class="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 transition shrink-0 flex items-center gap-1.5 whitespace-nowrap">
+                        <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
+                        <span>TERMINAL</span>
+                    </a>
+                </div>
+            @endif
         </div>
 
         <!-- DUAL CAPPING METRIC CARDS (8X WORKING & 2X NON-WORKING IN 1 ROW) -->

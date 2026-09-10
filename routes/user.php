@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\User\ArbitrageController;
+use App\Http\Controllers\User\BotController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\IncomeReportController;
@@ -39,6 +41,15 @@ Route::prefix('user')->name('user.')->group(function () {
     Route::middleware(UserAuth::class)->group(function () {
         Route::get('/', [DashboardController::class, '__invoke']);
         Route::get('dashboard', [DashboardController::class, '__invoke'])->name('dashboard');
+
+        // Live Arbitrage Trading Dashboard Routes
+        Route::get('arbitrage', [ArbitrageController::class, 'index'])->name('arbitrage');
+        Route::get('arbitration', [ArbitrageController::class, 'index'])->name('arbitration');
+
+        // AI BOT Trading & One-Time Activation Routes
+        Route::get('bot', [BotController::class, 'index'])->name('bot.index');
+        Route::get('bot/trading', [BotController::class, 'tradingView'])->name('bot.trading');
+        Route::post('bot/activate', [BotController::class, 'activate'])->name('bot.activate');
 
         // Add Fund / Deposit Wallet Routes
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
