@@ -77,7 +77,8 @@
                 <div
                     id="userProfileMenu"
                     style="display: none;"
-                    class="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-panel border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-50">
+                    class="!absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#062417] backdrop-blur-2xl border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-[9999]">
+
                     <div class="p-3 mb-1 border-b border-amber-500/20">
                         <p class="font-semibold text-white flex items-center gap-1.5 text-sm">
                             {{ Auth::user() ? Auth::user()->name : 'Member' }}

@@ -22,16 +22,17 @@ class PackageController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        $packages = Package::where('status', 'active')->orderBy('id', 'asc')->get();
+        $packageConfig = Package::where('status', 'active')->first();
 
+        // Get all active packages/investments of this user
         $userActivePackages = UserPackage::where('user_id', $user->id)
             ->where('status', 'active')
-            ->selectRaw('package_id, SUM(invested_amount) as total_invested, COUNT(id) as active_count, MAX(expires_at) as max_expires_at')
-            ->groupBy('package_id')
-            ->get()
-            ->keyBy('package_id');
+            ->latest('id')
+            ->get();
 
-        return view('user.packages.index', compact('user', 'packages', 'userActivePackages'));
+        $totalActiveCapital = $userActivePackages->sum('invested_amount');
+
+        return view('user.packages.index', compact('user', 'packageConfig', 'userActivePackages', 'totalActiveCapital'));
     }
 
     /**
@@ -45,9 +46,13 @@ class PackageController extends Controller
 
         $investedAmount = (float) $request->invested_amount;
 
-        // Enforce Multiple of $10 Rule (Dex Trade PDF Slide 8)
+        // Enforce Minimum $10 & Multiple of $10 Rule (Dex Trade PDF Slide 8)
+        if ($investedAmount < 10.0) {
+            return redirect()->back()->with('error', 'Minimum investment amount is $10.00 USD.');
+        }
+
         if (fmod($investedAmount, 10.0) != 0) {
-            return redirect()->back()->with('error', 'Investment amount must be an exact multiple of $10 (e.g., $10, $20, $30, $100, $500).');
+            return redirect()->back()->with('error', 'Investment amount must be an exact multiple of $10 (e.g., $10, $20, $30, $50, $100, $500).');
         }
 
         $user = Auth::user();
@@ -110,7 +115,7 @@ class PackageController extends Controller
             app(DirectIncomeService::class)->distributeDirectCommission($user, $userPackage, $investedAmount);
         });
 
-        return redirect()->route('user.packages.history')->with('success', 'Congratulations! You have successfully invested $'.number_format($investedAmount, 2).' in Dex Trade! 0.5% Daily ROI activated.');
+        return redirect()->route('user.packages.index')->with('success', 'Congratulations! You have successfully invested $'.number_format($investedAmount, 2).' in Dex Trade! 0.5% Daily ROI activated.');
     }
 
     /**

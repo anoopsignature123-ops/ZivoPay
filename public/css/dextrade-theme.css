@@ -69,10 +69,11 @@ h1, h2, h3 {
     }
 }
 
-.bg-panel, .gold-card-animated, .pdf-package-card, .ng-pkg-card, .btn-gold, .bg-amber-500 {
+.bg-panel:not(.absolute):not([class*="absolute"]), .gold-card-animated, .pdf-package-card, .ng-pkg-card, .btn-gold, .bg-amber-500 {
     position: relative;
     overflow: hidden;
 }
+
 
 .bg-panel::after, .gold-card-animated::after, .pdf-package-card::after, .ng-pkg-card::after {
     content: '';
@@ -132,7 +133,13 @@ h1, h2, h3 {
 }
 
 /* Header Dropdown Menu Styling */
+#adminProfileMenu, #userProfileMenu, #globalSearchSuggestions, .dropdown-menu {
+    position: absolute !important;
+    z-index: 9999 !important;
+}
+
 .dropdown-menu:not(.hidden) {
+
     display: block !important;
     animation: fadeInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }

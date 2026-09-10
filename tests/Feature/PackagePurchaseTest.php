@@ -48,15 +48,15 @@ class PackagePurchaseTest extends TestCase
             'invested_amount' => 50.00,
         ]);
 
-        $response->assertRedirect(route('user.packages.history'));
+        $response->assertRedirect(route('user.packages.index'));
         $response->assertSessionHas('success');
 
         // Check user wallet deducted and activated
         $this->assertEquals(150.00, $user->fresh()->deposit_wallet);
         $this->assertEquals('active', $user->fresh()->status);
 
-        // Check UserPackage created for matched tier (Package 1: $10 - $100)
-        $pkg1 = Package::where('min_amount', '<=', 50)->where('max_amount', '>=', 50)->first();
+        // Check UserPackage created
+        $pkg1 = Package::where('status', 'active')->first();
         $this->assertDatabaseHas('user_packages', [
             'user_id' => $user->id,
             'package_id' => $pkg1->id,
@@ -64,6 +64,7 @@ class PackagePurchaseTest extends TestCase
             'status' => 'active',
             'total_return_amount' => 100.00, // 2X Return
         ]);
+
     }
 
     /**
@@ -108,5 +109,39 @@ class PackagePurchaseTest extends TestCase
         $response->assertRedirect(route('user.deposits.index'));
         $response->assertSessionHas('error');
         $this->assertEquals(10.00, $user->fresh()->deposit_wallet);
+    }
+
+    /**
+     * Test investment amount that is not a multiple of $10 fails.
+     */
+    public function test_investment_not_multiple_of_10_fails(): void
+    {
+        $user = User::factory()->create([
+            'deposit_wallet' => 500.00,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('user.packages.buy'), [
+            'invested_amount' => 15.00,
+        ]);
+
+        $response->assertSessionHas('error');
+        $this->assertEquals(500.00, $user->fresh()->deposit_wallet);
+    }
+
+    /**
+     * Test investment amount less than $10 fails.
+     */
+    public function test_investment_less_than_10_fails(): void
+    {
+        $user = User::factory()->create([
+            'deposit_wallet' => 500.00,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('user.packages.buy'), [
+            'invested_amount' => 5.00,
+        ]);
+
+        $response->assertSessionHasErrors(['invested_amount']);
+        $this->assertEquals(500.00, $user->fresh()->deposit_wallet);
     }
 }

@@ -12,13 +12,31 @@ use Illuminate\View\View;
 class PackageController extends Controller
 {
     /**
-     * Display a listing of all packages.
+     * Display a listing of all packages & live investment statistics.
      */
     public function index(): View
     {
         $packages = Package::withCount('userPackages')->orderBy('id', 'asc')->get();
+        $package = Package::where('status', 'active')->first() ?? Package::first();
 
-        return view('admin.packages.index', compact('packages'));
+        // Platform Summary Statistics KPIs
+        $totalInvestments = UserPackage::count();
+        $totalCapitalInvested = UserPackage::sum('invested_amount');
+        $totalRoiPaid = UserPackage::sum('paid_roi_amount');
+        $activePackagesCount = UserPackage::where('status', 'active')->count();
+
+        // Recent Member Investment Packages
+        $recentInvestments = UserPackage::with(['user', 'package'])->latest('id')->paginate(10);
+
+        return view('admin.packages.index', compact(
+            'packages',
+            'package',
+            'totalInvestments',
+            'totalCapitalInvested',
+            'totalRoiPaid',
+            'activePackagesCount',
+            'recentInvestments'
+        ));
     }
 
     /**

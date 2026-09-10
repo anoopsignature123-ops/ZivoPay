@@ -27,7 +27,8 @@
                 </form>
 
                 <!-- Live Autocomplete Suggestions Dropdown Box -->
-                <div id="globalSearchSuggestions" style="display: none;" class="absolute left-0 top-full mt-2 w-96 rounded-2xl bg-panel border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-50">
+                <div id="globalSearchSuggestions" style="display: none;" class="!absolute left-0 top-full mt-2 w-96 rounded-2xl bg-[#062417] backdrop-blur-2xl border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-[9999]">
+
                     <div class="p-2 border-b border-amber-500/20 text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
                         <span>SUGGESTED MEMBERS</span>
                         <span id="searchResultCount" class="text-neutral-400 font-mono text-[10px]">0 found</span>
@@ -91,7 +92,8 @@
                 <div
                     id="adminProfileMenu"
                     style="display: none;"
-                    class="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-panel border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-50">
+                    class="!absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#062417] backdrop-blur-2xl border border-amber-500/40 shadow-2xl overflow-hidden p-2 z-[9999]">
+
                     <div class="p-3 mb-1 border-b border-amber-500/20">
                         <p class="font-semibold text-white flex items-center gap-1.5 text-sm">
                             {{ Auth::user() ? Auth::user()->name : 'Super Admin' }} <span class="px-1.5 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 rounded">ROOT</span>
