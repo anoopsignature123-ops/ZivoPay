@@ -73,8 +73,6 @@ class NetworkController extends Controller
      */
     private function buildBinaryTreeData(User $root): array
     {
-        $root->load(['sponsor', 'userPackages', 'transactions']);
-
         // Helper closure to fetch all downline members for a direct leg in creation order
         $getLegMembers = function (User $rootUser, string $position) {
             $directs = User::where('sponsor_code', $rootUser->referral_code)
@@ -111,74 +109,100 @@ class NetworkController extends Controller
         $leftMembers = $getLegMembers($root, 'left');
         $rightMembers = $getLegMembers($root, 'right');
 
-        // Level 1 Nodes
-        $leftNode = $leftMembers->first();
-        $rightNode = $rightMembers->first();
+        $assignedLeftIds = [];
+        $assignedRightIds = [];
 
-        // Track used member IDs to avoid duplicate rendering across slots
-        $usedLeftIds = $leftNode ? [$leftNode->id] : [];
-        $usedRightIds = $rightNode ? [$rightNode->id] : [];
-
-        // Populate Level 2 (Grandchildren) under Left Node
-        if ($leftNode) {
-            // L-LEFT candidate: Check direct left referral of leftNode first, or next available left member in pool
-            $llCandidate = User::where('sponsor_code', $leftNode->referral_code)
-                ->where('position', 'left')
-                ->first()
-                ?? $leftMembers->whereNotIn('id', $usedLeftIds)->first();
-
-            if ($llCandidate) {
-                $llCandidate->load(['sponsor', 'userPackages', 'transactions']);
-                $leftNode->left_child = $llCandidate;
-                $usedLeftIds[] = $llCandidate->id;
-            } else {
-                $leftNode->left_child = null;
+        // Helper to populate children recursively for a node up to depth 3
+        $populateNodeChildren = function (User $node, string $leg, int $depth) use (&$populateNodeChildren, &$assignedLeftIds, &$assignedRightIds, $leftMembers, $rightMembers): void {
+            if ($depth >= 4) {
+                return;
             }
 
-            // L-RIGHT candidate: Check direct right referral of leftNode first, or next available left member in pool
-            $lrCandidate = User::where('sponsor_code', $leftNode->referral_code)
+            if ($leg === 'left') {
+                $legPool = $leftMembers;
+                $assignedIds = &$assignedLeftIds;
+            } else {
+                $legPool = $rightMembers;
+                $assignedIds = &$assignedRightIds;
+            }
+
+            // Left Child for $node:
+            // 1. Direct referral of $node (position left or null)
+            // 2. Or next available in leg pool
+            $leftChild = User::where('sponsor_code', $node->referral_code)
+                ->whereNotIn('id', $assignedIds)
+                ->where('id', '!=', $node->id)
+                ->where(function ($q) {
+                    $q->where('position', 'left')->orWhereNull('position');
+                })
+                ->oldest()
+                ->first()
+                ?? $legPool->whereNotIn('id', array_merge($assignedIds, [$node->id]))->first();
+
+            if ($leftChild) {
+                $leftChild->load(['sponsor', 'userPackages', 'transactions']);
+                $assignedIds[] = $leftChild->id;
+                $node->left_child = $leftChild;
+                $populateNodeChildren($leftChild, $leg, $depth + 1);
+            } else {
+                $node->left_child = null;
+            }
+
+            // Right Child for $node:
+            // 1. Direct referral of $node (position right)
+            // 2. Or next available in leg pool
+            $rightChild = User::where('sponsor_code', $node->referral_code)
+                ->whereNotIn('id', $assignedIds)
+                ->where('id', '!=', $node->id)
                 ->where('position', 'right')
+                ->oldest()
                 ->first()
-                ?? $leftMembers->whereNotIn('id', $usedLeftIds)->first();
+                ?? $legPool->whereNotIn('id', array_merge($assignedIds, [$node->id]))->first();
 
-            if ($lrCandidate) {
-                $lrCandidate->load(['sponsor', 'userPackages', 'transactions']);
-                $leftNode->right_child = $lrCandidate;
-                $usedLeftIds[] = $lrCandidate->id;
+            if ($rightChild) {
+                $rightChild->load(['sponsor', 'userPackages', 'transactions']);
+                $assignedIds[] = $rightChild->id;
+                $node->right_child = $rightChild;
+                $populateNodeChildren($rightChild, $leg, $depth + 1);
             } else {
-                $leftNode->right_child = null;
+                $node->right_child = null;
             }
+        };
+
+        $root->load(['sponsor', 'userPackages', 'transactions']);
+
+        // First Left Direct / Member of Root
+        $firstLeft = User::where('sponsor_code', $root->referral_code)
+            ->where(function ($q) {
+                $q->where('position', 'left')->orWhereNull('position');
+            })
+            ->oldest()
+            ->first()
+            ?? $leftMembers->first();
+
+        if ($firstLeft) {
+            $firstLeft->load(['sponsor', 'userPackages', 'transactions']);
+            $assignedLeftIds[] = $firstLeft->id;
+            $root->left_child = $firstLeft;
+            $populateNodeChildren($firstLeft, 'left', 1);
+        } else {
+            $root->left_child = null;
         }
 
-        // Populate Level 2 (Grandchildren) under Right Node
-        if ($rightNode) {
-            // R-LEFT candidate: Check direct left referral of rightNode first, or next available right member in pool
-            $rlCandidate = User::where('sponsor_code', $rightNode->referral_code)
-                ->where('position', 'left')
-                ->first()
-                ?? $rightMembers->whereNotIn('id', $usedRightIds)->first();
+        // First Right Direct / Member of Root
+        $firstRight = User::where('sponsor_code', $root->referral_code)
+            ->where('position', 'right')
+            ->oldest()
+            ->first()
+            ?? $rightMembers->first();
 
-            if ($rlCandidate) {
-                $rlCandidate->load(['sponsor', 'userPackages', 'transactions']);
-                $rightNode->left_child = $rlCandidate;
-                $usedRightIds[] = $rlCandidate->id;
-            } else {
-                $rightNode->left_child = null;
-            }
-
-            // R-RIGHT candidate: Check direct right referral of rightNode first, or next available right member in pool
-            $rrCandidate = User::where('sponsor_code', $rightNode->referral_code)
-                ->where('position', 'right')
-                ->first()
-                ?? $rightMembers->whereNotIn('id', $usedRightIds)->first();
-
-            if ($rrCandidate) {
-                $rrCandidate->load(['sponsor', 'userPackages', 'transactions']);
-                $rightNode->right_child = $rrCandidate;
-                $usedRightIds[] = $rrCandidate->id;
-            } else {
-                $rightNode->right_child = null;
-            }
+        if ($firstRight) {
+            $firstRight->load(['sponsor', 'userPackages', 'transactions']);
+            $assignedRightIds[] = $firstRight->id;
+            $root->right_child = $firstRight;
+            $populateNodeChildren($firstRight, 'right', 1);
+        } else {
+            $root->right_child = null;
         }
 
         // Calculate Business Volumes and Total Downline Counts
@@ -198,8 +222,8 @@ class NetworkController extends Controller
 
         return [
             'root' => $root,
-            'left_child' => $leftNode,
-            'right_child' => $rightNode,
+            'left_child' => $root->left_child,
+            'right_child' => $root->right_child,
             'left_business' => $leftBusiness,
             'right_business' => $rightBusiness,
             'left_count' => $leftCount,

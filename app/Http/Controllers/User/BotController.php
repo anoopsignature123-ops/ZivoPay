@@ -37,6 +37,11 @@ class BotController extends Controller
     {
         $user = Auth::user();
 
+        // Account Activation Guard: User must have an active account / package to start the BOT
+        if ($user->status !== 'active') {
+            return redirect()->route('user.bot.trading')->with('error', '⚠️ Please activate your account first by purchasing an investment package before starting the Quant Trading BOT!');
+        }
+
         if ($user->is_bot_active) {
             return redirect()->route('user.bot.trading')->with('info', 'Quant Trading BOT is already ACTIVE & mining ROI 24/7!');
         }

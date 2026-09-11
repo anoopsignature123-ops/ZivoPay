@@ -9,8 +9,8 @@
                 <span class="pdf-num-badge">GW</span>
                 <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">SYSTEM CONFIGURATION</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">PAYMENT GATEWAY & SIMULATION SETTINGS</h1>
-            <p class="text-xs text-neutral-300 mt-1">Configure live API credentials, USDT wallet addresses, or enable sandbox testing simulation mode.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">PAYMENT GATEWAY SETTINGS</h1>
+            <p class="text-xs text-neutral-300 mt-1">Configure live API credentials for production payment gateway.</p>
         </div>
     </div>
 
@@ -25,45 +25,18 @@
         <form action="{{ route('admin.settings.gateway.update') }}" method="POST" class="space-y-6">
             @csrf
 
-            <!-- MODE SELECTOR CARD -->
-            <div class="p-5 rounded-2xl bg-black/60 border-2 {{ $testMode ? 'border-amber-400' : 'border-emerald-500/50' }} space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i>
-                        PAYMENT GATEWAY OPERATION MODE
-                    </span>
-                    @if($testMode)
-                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase border border-amber-500/40">
-                            🧪 TEST / SIMULATION MODE ACTIVE
-                        </span>
-                    @else
-                        <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase border border-emerald-500/40">
-                            🚀 LIVE PRODUCTION GATEWAY ACTIVE
-                        </span>
-                    @endif
+            <!-- LIVE MODE STATUS BANNER -->
+            <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div>
+                        <span class="text-xs font-extrabold text-emerald-400 uppercase tracking-wider block">LIVE PRODUCTION GATEWAY ACTIVE</span>
+                        <p class="text-[11px] text-neutral-400">All deposit transactions are processed directly on live blockchain via gateway API.</p>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    <label class="p-4 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition flex items-start gap-3 group">
-                        <input type="radio" name="payment_test_mode" value="true" {{ $testMode ? 'checked' : '' }} class="mt-0.5 accent-amber-500">
-                        <div class="space-y-1">
-                            <span class="text-xs font-extrabold text-amber-300 uppercase block">Testing / Simulation Mode</span>
-                            <p class="text-[11px] text-neutral-400 leading-snug">
-                                Allows member add funds to be instantly verified & credited in sandbox mode without requiring live gateway API key.
-                            </p>
-                        </div>
-                    </label>
-
-                    <label class="p-4 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition flex items-start gap-3 group">
-                        <input type="radio" name="payment_test_mode" value="false" {{ !$testMode ? 'checked' : '' }} class="mt-0.5 accent-amber-500">
-                        <div class="space-y-1">
-                            <span class="text-xs font-extrabold text-emerald-400 uppercase block">Live Production Gateway</span>
-                            <p class="text-[11px] text-neutral-400 leading-snug">
-                                Connects to iPaymentWallet API gateway using production API Key and verifies real blockchain transactions.
-                            </p>
-                        </div>
-                    </label>
-                </div>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase border border-emerald-500/40 shrink-0">
+                    🚀 LIVE MODE
+                </span>
             </div>
 
             <!-- GATEWAY CREDENTIALS FORM -->
@@ -73,13 +46,6 @@
                     <input type="text" name="payment_api_key" value="{{ old('payment_api_key', $apiKey) }}" placeholder="pk_Hwho4MCbvOT8j1e6h254lJOkh..."
                         class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
                     <p class="text-[10px] text-neutral-400 mt-1">Provided by your payment gateway provider (e.g. iPaymentWallet / Oxapay / Nowpayments).</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-amber-400 uppercase mb-1.5">USDT BEP-20 Receiver Wallet Address *</label>
-                    <input type="text" name="usdt_wallet_address" value="{{ old('usdt_wallet_address', $usdtAddress) }}" required placeholder="0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
-                        class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-amber-300 font-mono text-xs focus:outline-none focus:border-amber-400">
-                    <p class="text-[10px] text-neutral-400 mt-1">Official Binance Smart Chain (BEP20) wallet address displayed to members during deposit checkout.</p>
                 </div>
             </div>
 

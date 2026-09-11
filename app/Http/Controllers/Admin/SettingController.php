@@ -28,14 +28,15 @@ class SettingController extends Controller
     public function updateGatewaySettings(Request $request): RedirectResponse
     {
         $request->validate([
-            'payment_test_mode' => 'required|in:true,false',
             'payment_api_key' => 'nullable|string',
-            'usdt_wallet_address' => 'required|string',
+            'usdt_wallet_address' => 'nullable|string',
         ]);
 
-        Setting::setValue('payment_test_mode', $request->payment_test_mode);
+        Setting::setValue('payment_test_mode', 'false');
         Setting::setValue('payment_api_key', trim((string) $request->payment_api_key));
-        Setting::setValue('usdt_wallet_address', trim((string) $request->usdt_wallet_address));
+        if ($request->filled('usdt_wallet_address')) {
+            Setting::setValue('usdt_wallet_address', trim((string) $request->usdt_wallet_address));
+        }
 
         return redirect()->back()->with('success', 'Payment Gateway Settings updated successfully.');
     }

@@ -20,7 +20,7 @@ class DepositController extends Controller
     {
         $user = Auth::user();
         $deposits = Deposit::where('user_id', $user->id)->latest()->paginate(10);
-        $usdtWalletAddress = config('services.usdt.wallet_address', env('USDT_WALLET_ADDRESS', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'));
+        $usdtWalletAddress = $user->wallet_address;
 
         return view('user.deposits.index', compact('user', 'deposits', 'usdtWalletAddress'));
     }

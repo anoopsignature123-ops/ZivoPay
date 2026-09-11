@@ -163,6 +163,30 @@
             </div>
         </div>
 
+        @if($user->status !== 'active')
+            <div class="p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_20px_rgba(244,63,94,0.35)]">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0 animate-pulse"></i>
+                    <span>⚠️ Please activate your account first by purchasing an investment package before starting the Quant Trading BOT!</span>
+                </div>
+                <a href="{{ route('user.packages.index') }}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shrink-0 shadow transition whitespace-nowrap">
+                    Activate Account
+                </a>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(244,63,94,0.3)]">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <a href="{{ route('user.packages.index') }}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider shrink-0 shadow">
+                    Activate Account
+                </a>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/80 text-emerald-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(0,230,118,0.3)]">
                 <div class="flex items-center gap-2.5">
@@ -269,7 +293,7 @@
                         <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
                         <span>BOT ACTIVE & MINING 24/7</span>
                     </button>
-                @else
+                @elseif($user->status === 'active')
                     <form action="{{ route('user.bot.activate') }}" method="POST" onsubmit="return confirm('Are you sure you want to START the Trading BOT? This will initiate automated ROI mining.');" class="w-full sm:w-auto">
                         @csrf
                         <button type="submit"
@@ -278,6 +302,13 @@
                             <span>START BOT</span>
                         </button>
                     </form>
+                @else
+                    <button type="button" disabled
+                        title="Account Activation Required: Purchase an investment package first to start BOT"
+                        class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-rose-500/20 border-2 border-rose-500/60 text-rose-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-not-allowed opacity-85 shadow">
+                        <i class="fa-solid fa-lock text-rose-400 text-base"></i>
+                        <span>START BOT (DISABLED)</span>
+                    </button>
                 @endif
             </div>
         </div>

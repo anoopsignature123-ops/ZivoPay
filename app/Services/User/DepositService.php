@@ -51,7 +51,7 @@ class DepositService
 
                 if ($paymentUrl) {
                     $deposit->update([
-                        'wallet_address' => $innerData['paymentAddress'] ?? null,
+                        'wallet_address' => $user->wallet_address ?: ($innerData['paymentAddress'] ?? null),
                         'gateway_reference' => $innerData['transactionId'] ?? null,
                     ]);
 

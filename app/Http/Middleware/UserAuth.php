@@ -29,6 +29,12 @@ class UserAuth
             return redirect()->route('user.login')->with('error', 'Please log in to access your Member Portal.');
         }
 
+        if (Auth::user()->isAdmin()) {
+            Auth::logout();
+
+            return redirect()->route('user.login')->withErrors(['email' => 'Invalid user credentials provided.']);
+        }
+
         return $next($request);
     }
 }

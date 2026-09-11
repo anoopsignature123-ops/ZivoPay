@@ -28,24 +28,7 @@
             </div>
         @endif
 
-        @if(\App\Models\Setting::isPaymentTestMode())
-            <div class="p-5 rounded-2xl bg-amber-500/20 border-2 border-amber-400 space-y-3 shadow-2xl">
-                <div class="flex items-center gap-2 text-amber-300 font-black text-xs uppercase tracking-wider">
-                    <i data-lucide="flask-conical" class="w-4 h-4 text-amber-400"></i>
-                    <span>PAYMENT GATEWAY IS IN TESTING / SIMULATION MODE</span>
-                </div>
-                <p class="text-xs text-neutral-200 leading-relaxed">
-                    Payment gateway is running in sandbox test mode (live API key not required). You can click the button below to instantly simulate successful blockchain verification and credit <strong class="text-emerald-400 font-mono">${{ number_format($deposit->amount, 2) }} USDT</strong> directly to your Deposit Wallet.
-                </p>
-                <form action="{{ route('user.deposits.simulate-payment', $deposit->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shadow-xl flex items-center justify-center gap-2 cursor-pointer">
-                        <i data-lucide="zap" class="w-4 h-4 text-black font-black"></i>
-                        SIMULATE INSTANT PAYMENT (CREDIT ${{ number_format($deposit->amount, 2) }} TO DEPOSIT WALLET)
-                    </button>
-                </form>
-            </div>
-        @endif
+
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -72,7 +55,9 @@
                     <!-- QR Code Box -->
                     <div class="flex flex-col items-center justify-center p-4 bg-bg rounded-2xl border border-amber-500/30 text-center">
                         @php
-                            $qrImage = "https://quickchart.io/qr?text=" . urlencode($deposit->wallet_address ?? '') . "&size=180&margin=1";
+                            $userAddress = Auth::user()->wallet_address ?? null;
+                            $displayAddress = !empty($userAddress) ? $userAddress : ($deposit->wallet_address ?? '');
+                            $qrImage = "https://quickchart.io/qr?text=" . urlencode($displayAddress) . "&size=180&margin=1";
                         @endphp
                         <div class="p-2.5 bg-white rounded-2xl shadow-xl border-4 border-amber-400">
                             <img src="{{ $qrImage }}" alt="Payment QR Code" class="w-44 h-44 rounded-lg">
@@ -83,10 +68,12 @@
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-amber-400 uppercase tracking-wider block">Wallet Address:</label>
                         <div class="p-3 rounded-xl bg-black border border-amber-500/40 text-xs font-mono text-amber-300 break-all flex items-center justify-between gap-2 shadow-inner">
-                            <span id="walletAddressText">{{ $deposit->wallet_address ?? 'Generating payment address...' }}</span>
-                            <button onclick="copyAddress()" class="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-black text-xs uppercase hover:bg-amber-400 transition shrink-0 shadow">
-                                Copy
-                            </button>
+                            <span id="walletAddressText">{{ $displayAddress ?: 'Please update your USDT Wallet Address in Profile' }}</span>
+                            @if($displayAddress)
+                                <button onclick="copyAddress()" class="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-black text-xs uppercase hover:bg-amber-400 transition shrink-0 shadow">
+                                    Copy
+                                </button>
+                            @endif
                         </div>
                     </div>
 

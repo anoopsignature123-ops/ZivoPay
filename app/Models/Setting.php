@@ -43,14 +43,7 @@ class Setting extends Model
             return filter_var($dbMode, FILTER_VALIDATE_BOOLEAN);
         }
 
-        // Fallback to env or true if no live API key is set
-        $apiKey = env('PAYMENT_GATEWAY_API_KEY', '');
-
-        if (empty(trim($apiKey))) {
-            return true;
-        }
-
-        return filter_var(env('PAYMENT_TESTMODE', true), FILTER_VALIDATE_BOOLEAN);
+        return false;
     }
 
     /**
@@ -78,6 +71,6 @@ class Setting extends Model
             return trim($dbAddress);
         }
 
-        return env('USDT_WALLET_ADDRESS', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F');
+        return env('USDT_WALLET_ADDRESS', '');
     }
 }

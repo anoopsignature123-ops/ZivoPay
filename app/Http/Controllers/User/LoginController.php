@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function showLoginForm(): View
+    public function showLoginForm(): View|RedirectResponse
     {
         if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+
             return redirect()->route('user.dashboard');
         }
 
@@ -30,6 +34,18 @@ class LoginController extends Controller
 
         if (Auth::attempt([$fieldType => $request->email, 'password' => $request->password], $request->remember)) {
             $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                Auth::logout();
+
+                return back()->withErrors(['email' => 'Invalid user credentials provided.']);
+            }
+
+            if ($user->status !== 'active') {
+                Auth::logout();
+
+                return back()->withErrors(['email' => 'Your account is currently inactive. Please contact support.']);
+            }
 
             $request->session()->regenerate();
 
