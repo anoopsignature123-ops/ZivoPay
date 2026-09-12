@@ -9,6 +9,10 @@
     $rightBusiness = $treeData['right_business'] ?? 0.00;
     $leftCount = $treeData['left_count'] ?? 0;
     $rightCount = $treeData['right_count'] ?? 0;
+    $leftActive = $treeData['left_active'] ?? 0;
+    $leftInactive = $treeData['left_inactive'] ?? 0;
+    $rightActive = $treeData['right_active'] ?? 0;
+    $rightInactive = $treeData['right_inactive'] ?? 0;
     $totalTeam = $treeData['total_team'] ?? 0;
     $totalBusiness = $treeData['total_business'] ?? 0.00;
 
@@ -27,7 +31,7 @@
 
         $activeInvest = $u->userPackages ? $u->userPackages->where('status', 'active')->sum('invested_amount') : 0;
         $dailyRoi = $u->transactions ? $u->transactions->where('type', 'daily_roi')->sum('amount') : 0;
-        $directInc = $u->transactions ? $u->transactions->where('type', 'direct_income')->sum('amount') : 0;
+        $directInc = $u->transactions ? $u->transactions->whereIn('type', ['direct_commission', 'direct_income'])->sum('amount') : 0;
         
         return [
             'sponsor_name' => $u->sponsor ? $u->sponsor->name : ($u->sponsor_code ? $u->sponsor_code : 'No Sponsor'),
@@ -140,41 +144,80 @@
 
 .node-tooltip {
     position: absolute;
-    bottom: 108%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-4px);
     background: linear-gradient(180deg, #051b11 0%, #010a06 100%);
     border: 2px solid #f3ca52;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95), 0 0 35px rgba(243, 202, 82, 0.45);
     border-radius: 1.25rem;
-    padding: 1.15rem;
-    width: 300px;
+    padding: 1.35rem;
+    width: 330px;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: all 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0.2s;
     z-index: 999999 !important;
     text-align: left;
 }
 
-.root-node-wrapper .node-tooltip {
+/* Level 0 & Level 1 Tooltips open DOWNWARDS to prevent top container clipping */
+.level-0-node-wrapper .node-tooltip,
+.level-1-node-wrapper .node-tooltip {
     bottom: auto;
     top: 108%;
+    left: 50%;
     transform: translateX(-50%) translateY(4px);
 }
 
-.node-card-wrapper:hover .node-tooltip {
+.level-0-node-wrapper:hover .node-tooltip,
+.level-1-node-wrapper:hover .node-tooltip {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    transform: translateX(-50%) translateY(12px);
 }
 
-.node-card-wrapper:hover .node-tooltip:not(.root-tooltip) {
-    transform: translateX(-50%) translateY(-10px);
+/* Level 2 & Level 3 Tooltips open UPWARDS */
+.level-2-node-wrapper .node-tooltip,
+.level-3-node-wrapper .node-tooltip {
+    top: auto;
+    bottom: 108%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
 }
 
-.root-node-wrapper:hover .node-tooltip {
-    transform: translateX(-50%) translateY(10px);
+.level-2-node-wrapper:hover .node-tooltip,
+.level-3-node-wrapper:hover .node-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-12px);
+}
+
+/* 3D Glossy Sphere Avatars matching reference image */
+.avatar-3d-gold {
+    background: radial-gradient(circle at 35% 30%, #fff7ed 0%, #fbbf24 35%, #d97706 70%, #78350f 100%) !important;
+    border: 2px solid #fef08a !important;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.4) !important;
+    color: #1c1917 !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.avatar-3d-emerald {
+    background: radial-gradient(circle at 35% 30%, #ecfdf5 0%, #34d399 35%, #059669 70%, #064e3b 100%) !important;
+    border: 2px solid #a7f3d0 !important;
+    box-shadow: 0 0 15px rgba(52, 211, 153, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.4) !important;
+    color: #022c22 !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.avatar-3d-rose {
+    background: radial-gradient(circle at 35% 30%, #fff1f2 0%, #fb7185 35%, #e11d48 70%, #881337 100%) !important;
+    border: 2px solid #fecdd3 !important;
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.4) !important;
+    color: #4c0519 !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
 .gold-glowing-avatar {
@@ -204,82 +247,164 @@
 }
 </style>
 
+@php
+    $leftLink = url('/user/register?sponsor=' . ($root->referral_code ?? '') . '&position=left');
+    $rightLink = url('/user/register?sponsor=' . ($root->referral_code ?? '') . '&position=right');
+@endphp
+
 <div class="w-full space-y-4 select-none font-sans">
 
-    <!-- TOP 4 BINARY TEAM STATS CARDS (MATCHING REFERENCE IMAGE 3 LAYOUT WITH DEX TRADE THEME) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <!-- TOP 3 BINARY TEAM STATS CARDS (ALWAYS 1 ROW ON TABLET/DESKTOP, FULLY RESPONSIVE ON MOBILE) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 items-stretch">
         
-        <!-- Card 1: ROOT USER NAME -->
-        <div class="p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 shadow-md flex flex-col justify-between">
-            <h3 class="text-base sm:text-lg font-black text-amber-400 font-heading truncate">{{ $root ? $root->name : 'N/A' }}</h3>
-            <span class="text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider text-neutral-300 mt-1 block">USER NAME</span>
-        </div>
-
-        <!-- Card 2: ROOT USER ID -->
-        <div class="p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 shadow-md flex flex-col justify-between">
-            <h3 class="text-base sm:text-lg font-black text-amber-300 font-mono truncate">{{ $root ? $root->referral_code : 'N/A' }}</h3>
-            <span class="text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider text-neutral-300 mt-1 block">USER ID</span>
-        </div>
-
-        <!-- Card 3: LEFT BUSINESS -->
-        <div class="p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 shadow-md flex flex-col justify-between">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base sm:text-lg font-black text-emerald-400 font-mono">${{ number_format($leftBusiness, 2) }}</h3>
-                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-mono font-bold">{{ $leftCount }} Members</span>
+        <!-- CARD 1: COMBINED USER PROFILE & USER ID WITH COPY CODE -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Root User: {{ $root ? $root->name : 'N/A' }} ({{ $root ? $root->referral_code : 'N/A' }})">
+            <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(245,158,11,0.6)] border-2 border-yellow-200">
+                        {{ strtoupper(substr($root ? $root->name : 'U', 0, 1)) }}
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-xs sm:text-sm font-black text-amber-300 font-heading truncate max-w-[120px] sm:max-w-[150px]">{{ $root ? $root->name : 'N/A' }}</h3>
+                        <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 flex items-center gap-1">
+                            <span>👤</span> <span>USER PROFILE</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end shrink-0">
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs sm:text-sm font-black text-amber-300 font-mono">{{ $root ? $root->referral_code : 'N/A' }}</span>
+                        <button type="button" 
+                                onclick="copyReferralCode(event, '{{ $root ? $root->referral_code : '' }}')" 
+                                class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer"
+                                title="Copy User ID Code">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block mt-0.5">USER ID</span>
+                </div>
             </div>
-            <span class="text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider text-neutral-300 mt-1 block">👈 LEFT BUSINESS</span>
+            <div class="flex items-center justify-between pt-1.5 text-[9.5px] sm:text-[10px] font-mono font-bold text-neutral-300 flex-wrap gap-1">
+                <span class="flex items-center gap-1"><span class="text-amber-400">⚡</span> Status: <strong class="uppercase {{ ($root && $root->status === 'active') ? 'text-emerald-400' : 'text-amber-400' }}">{{ $root ? $root->status : 'N/A' }}</strong></span>
+                <span class="flex items-center gap-1"><span class="text-amber-400">📅</span> Root Tree View</span>
+            </div>
         </div>
 
-        <!-- Card 4: RIGHT BUSINESS -->
-        <div class="p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 shadow-md flex flex-col justify-between">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base sm:text-lg font-black text-emerald-400 font-mono">${{ number_format($rightBusiness, 2) }}</h3>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold">{{ $rightCount }} Members</span>
+        <!-- CARD 2: LEFT BUSINESS & COPY LEFT REFERRAL LINK -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Left Leg Business: ${{ number_format($leftBusiness, 2) }} ({{ $leftActive }} Active, {{ $leftInactive }} Inactive, {{ $leftCount }} Total Members)">
+            <div class="flex items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+                <div class="min-w-0">
+                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">${{ number_format($leftBusiness, 2) }}</h3>
+                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">👈 LEFT BUSINESS</span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                    <span class="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[8.5px] font-mono font-bold">{{ $leftCount }} Total</span>
+                    <button type="button" 
+                            onclick="copyReferralCode(event, '{{ $leftLink }}')" 
+                            class="px-2 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-[9px] sm:text-[9.5px] uppercase tracking-wider transition flex items-center gap-1 shadow cursor-pointer whitespace-nowrap"
+                            title="Copy Left Leg Referral Link">
+                        <span>📋</span> <span class="hidden sm:inline xl:inline">Copy</span> Left Link
+                    </button>
+                </div>
             </div>
-            <span class="text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider text-neutral-300 mt-1 block">RIGHT BUSINESS 👉</span>
+            <div class="flex items-center justify-between pt-1.5 text-[8.5px] sm:text-[9.5px] font-mono font-bold flex-wrap gap-1">
+                <div class="flex items-center gap-1 flex-wrap">
+                    <span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active: {{ $leftActive }}
+                    </span>
+                    <span class="px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inactive: {{ $leftInactive }}
+                    </span>
+                </div>
+                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-amber-300 shrink-0">TEAM A</span>
+            </div>
+        </div>
+
+        <!-- CARD 3: RIGHT BUSINESS & COPY RIGHT REFERRAL LINK -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Right Leg Business: ${{ number_format($rightBusiness, 2) }} ({{ $rightActive }} Active, {{ $rightInactive }} Inactive, {{ $rightCount }} Total Members)">
+            <div class="flex items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+                <div class="min-w-0">
+                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">${{ number_format($rightBusiness, 2) }}</h3>
+                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">RIGHT BUSINESS 👉</span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                    <span class="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[8.5px] font-mono font-bold">{{ $rightCount }} Total</span>
+                    <button type="button" 
+                            onclick="copyReferralCode(event, '{{ $rightLink }}')" 
+                            class="px-2 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-[9px] sm:text-[9.5px] uppercase tracking-wider transition flex items-center gap-1 shadow cursor-pointer whitespace-nowrap"
+                            title="Copy Right Leg Referral Link">
+                        <span>📋</span> <span class="hidden sm:inline xl:inline">Copy</span> Right Link
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 text-[8.5px] sm:text-[9.5px] font-mono font-bold flex-wrap gap-1">
+                <div class="flex items-center gap-1 flex-wrap">
+                    <span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active: {{ $rightActive }}
+                    </span>
+                    <span class="px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inactive: {{ $rightInactive }}
+                    </span>
+                </div>
+                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-emerald-300 shrink-0">TEAM B</span>
+            </div>
         </div>
 
     </div>
 
     <!-- CANVAS HEADER TOOLBAR WITH DOWNLOAD IMAGE BUTTON & LEGEND -->
-    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#042115] to-[#010c07] border border-amber-500/40 shadow-md">
+    <div class="w-full flex flex-col md:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#042115] to-[#010c07] border border-amber-500/40 shadow-md">
         <!-- Left Group: Title Badge & Legend -->
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-            <span class="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <div class="flex items-center gap-2.5 flex-wrap justify-center md:justify-start">
+            <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-400/50 text-amber-300 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm whitespace-nowrap">
                 <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>BINARY TREE</span>
             </span>
-            <span class="hidden sm:inline text-neutral-600">|</span>
-            <span class="text-amber-400 font-bold text-[11px] sm:text-xs flex items-center gap-1">👈 Left Branch</span>
-            <span class="text-neutral-600">|</span>
-            <span class="text-amber-400 font-bold text-[11px] sm:text-xs flex items-center gap-1">Right Branch 👉</span>
+
+            <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-black/60 border border-amber-500/30 text-xs font-bold text-amber-300 whitespace-nowrap">
+                <span class="text-amber-400 flex items-center gap-1">👈 Left Branch</span>
+                <span class="text-amber-500/40">|</span>
+                <span class="text-amber-400 flex items-center gap-1">Right Branch 👉</span>
+            </div>
         </div>
 
         <!-- Right Group: Action Buttons & Zoom Controls -->
-        <div class="flex items-center gap-2 shrink-0 flex-wrap justify-center">
+        <div class="flex items-center gap-2 shrink-0 flex-wrap justify-center w-full md:w-auto">
             <!-- Mobile/Desktop Zoom Controls -->
             <div class="flex items-center gap-1 bg-black/80 p-1 rounded-xl border border-amber-500/40 shadow-sm">
-                <button type="button" onclick="zoomTree(0.85)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm" title="Zoom Out">-</button>
-                <button type="button" onclick="zoomTree(1)" class="px-1.5 h-6 sm:h-7 rounded-lg text-amber-300 font-mono font-bold text-[10px] sm:text-[11px] hover:bg-amber-500/20" title="Reset Zoom">100%</button>
-                <button type="button" onclick="zoomTree(1.15)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm" title="Zoom In">+</button>
+                <button type="button" onclick="zoomTree(0.85)" class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom Out">-</button>
+                <button type="button" onclick="zoomTree(1)" class="px-2 h-7 rounded-lg text-amber-300 font-mono font-bold text-[10px] sm:text-[11px] hover:bg-amber-500/20 active:scale-95 transition" title="Reset Zoom">100%</button>
+                <button type="button" onclick="zoomTree(1.15)" class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom In">+</button>
             </div>
 
             <button type="button" 
                     onclick="downloadTreeImage()" 
                     id="downloadTreeBtn"
-                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1 transition shadow cursor-pointer whitespace-nowrap">
+                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1 transition shadow cursor-pointer whitespace-nowrap active:scale-95">
                 <span>📸 Save</span>
             </button>
 
-            <a href="{{ route($routePrefix . '.network.tree') }}" 
-               class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-black/90 hover:bg-black border border-amber-500/50 text-amber-300 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition shadow whitespace-nowrap">
+            <button type="button" 
+                    onclick="centerTreeCanvas()" 
+                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-black/90 hover:bg-black border border-amber-500/50 text-amber-300 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition shadow whitespace-nowrap active:scale-95"
+                    title="Recenter Tree View">
                 <span>🎯 Recenter</span>
-            </a>
+            </button>
         </div>
     </div>
 
+    <!-- MOBILE HORIZONTAL SWIPE & TAP HINT BAR -->
+    <div class="md:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[10.5px] text-amber-300 font-mono shadow-sm">
+        <span class="flex items-center gap-1.5 font-bold">
+            <span class="text-amber-400 animate-pulse">↔️</span> <span>Swipe horizontally to view binary tree</span>
+        </span>
+        <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-black text-[9.5px] uppercase border border-amber-400/40">
+            Tap node for info
+        </span>
+    </div>
+
     <!-- MAIN LEFT / RIGHT BINARY TREE GRAPH CANVAS -->
-    <div id="treeCanvasContainer" class="w-full rounded-2xl bg-black/80 border border-amber-500/40 p-4 relative">
+    <div id="treeCanvasContainer" class="w-full rounded-2xl bg-black/80 border border-amber-500/40 p-2 sm:p-4 relative overflow-hidden">
         
         <div class="genealogy-tree-wrapper">
             <div class="binary-tree-container">
@@ -293,75 +418,117 @@
 </div>
 
 <!-- DETAILED MOBILE MEMBER INFO MODAL OVERLAY -->
-<div id="mobileMemberModal" style="display: none;" class="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-sm items-center justify-center p-4">
-    <div class="relative w-full max-w-xs sm:max-w-sm p-5 rounded-3xl border-2 border-amber-400 shadow-[0_0_50px_rgba(243,202,82,0.4)] text-left space-y-3 text-xs" style="background-color: #07120a !important;">
+<div id="mobileMemberModal" style="display: none;" class="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="relative w-full max-w-[340px] sm:max-w-md p-5 rounded-3xl border-2 border-amber-400 shadow-[0_0_50px_rgba(243,202,82,0.45)] text-left space-y-3 text-xs animate-modal-pop" style="background: linear-gradient(180deg, #051b11 0%, #010a06 100%) !important;">
         
         <!-- Header -->
-        <div class="flex justify-between items-center pb-2.5 border-b border-amber-500/30">
-            <div class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-full pdf-gold-badge text-black font-black text-xs flex items-center justify-center shadow">ID</span>
-                <div>
-                    <h3 id="mobileModalName" class="font-black text-white text-sm font-heading">Member Name</h3>
-                    <p id="mobileModalCode" class="text-[11px] text-amber-400 font-mono">0000000</p>
+        <div class="flex justify-between items-center pb-3 border-b border-amber-500/30 gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div id="mobileModalAvatar" class="w-10 h-10 rounded-full font-black text-sm flex items-center justify-center shrink-0 shadow-md avatar-3d-gold">
+                    U
+                </div>
+                <div class="min-w-0">
+                    <h3 id="mobileModalName" class="font-black text-white text-sm sm:text-base font-heading truncate">Member Name</h3>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="mobileModalCode" class="text-[11px] sm:text-xs text-amber-400 font-mono font-bold">0000000</span>
+                        <button type="button" 
+                                onclick="copyReferralCode(event, document.getElementById('mobileModalCode').textContent)" 
+                                class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer">
+                            📋 Copy
+                        </button>
+                    </div>
                 </div>
             </div>
-            <button type="button" onclick="closeMobileMemberModal()" class="w-7 h-7 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/40 flex items-center justify-center font-black text-sm transition">
+            <button type="button" onclick="closeMobileMemberModal()" class="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/40 flex items-center justify-center font-black text-sm transition shrink-0">
                 ✕
             </button>
         </div>
 
-        <!-- Details Rows -->
+        <!-- Details Rows with Icons & Subtle Dividers -->
         <div class="space-y-2 py-1">
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Sponsor:</span>
-                <span id="mobileModalSponsor" class="font-bold text-amber-300 font-mono">ROOT</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">👤</span> Sponsor:</span>
+                <span id="mobileModalSponsor" class="font-bold text-white font-mono truncate max-w-[160px]">ROOT</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Status:</span>
-                <span id="mobileModalStatus" class="font-black text-emerald-400 uppercase">ACTIVE</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">⚡</span> Status:</span>
+                <span id="mobileModalStatus" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-400/40">ACTIVE</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Active Capital:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">💰</span> Active Capital:</span>
                 <span id="mobileModalActiveInvest" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Earning Wallet:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">👛</span> Earning Wallet:</span>
                 <span id="mobileModalEarningWallet" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Daily ROI Income:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">📈</span> Daily ROI Income:</span>
                 <span id="mobileModalDailyRoi" class="font-mono text-amber-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Direct Income:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">🎁</span> Direct Income:</span>
                 <span id="mobileModalDirectIncome" class="font-mono text-amber-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-neutral-400 font-medium">Downline Count:</span>
-                <span id="mobileModalDirects" class="font-bold text-amber-400 font-mono">0 Members</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-300">👥</span> Downline Count:</span>
+                <span id="mobileModalDirects" class="font-bold text-amber-300 font-mono">0 Members</span>
             </div>
             <div class="flex justify-between items-center py-1">
-                <span class="text-neutral-400 font-medium">Joined Date:</span>
-                <span id="mobileModalJoined" class="font-mono text-neutral-200">2026-01-01</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-neutral-400">📅</span> Joined Date:</span>
+                <span id="mobileModalJoined" class="font-mono text-neutral-300 text-[11px]">2026-01-01</span>
             </div>
         </div>
 
         <div class="pt-2 flex flex-col gap-2">
-            <a id="mobileModalNavBtn" href="#" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider text-center block shadow">
-                🔍 Inspect This Branch Tree
+            <a id="mobileModalNavBtn" href="#" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider text-center block shadow transition">
+                🔍 Inspect This Branch Subtree
             </a>
-            <button type="button" onclick="closeMobileMemberModal()" class="w-full py-2 rounded-xl bg-black/80 border border-white/40 text-neutral-300 font-bold text-xs uppercase tracking-wider">
+            <button type="button" onclick="closeMobileMemberModal()" class="w-full py-2 rounded-xl bg-black/80 hover:bg-black border border-white/30 text-neutral-300 font-bold text-xs uppercase tracking-wider transition">
                 Close
             </button>
         </div>
     </div>
 </div>
 
+<style>
+@keyframes modalPop {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-modal-pop {
+    animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+</style>
+
 <!-- HTML2CANVAS SCRIPT FOR 1-CLICK TREE IMAGE EXPORT -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
     let currentTreeScale = 1;
+
+    function copyReferralCode(event, code) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (!code) return;
+
+        navigator.clipboard.writeText(code).then(() => {
+            const target = event ? event.currentTarget : null;
+            if (target) {
+                const orig = target.innerHTML;
+                target.innerHTML = '<span>✓ Copied!</span>';
+                target.classList.add('bg-emerald-500/40', 'text-emerald-300');
+                setTimeout(() => {
+                    target.innerHTML = orig;
+                    target.classList.remove('bg-emerald-500/40', 'text-emerald-300');
+                }, 1800);
+            }
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
+    }
 
     function zoomTree(scale) {
         const container = document.querySelector('.binary-tree-container');
@@ -377,6 +544,17 @@
 
         container.style.transform = `scale(${currentTreeScale})`;
         container.style.transformOrigin = 'top center';
+    }
+
+    function centerTreeCanvas() {
+        const wrapper = document.querySelector('.genealogy-tree-wrapper');
+        const container = document.querySelector('.binary-tree-container');
+        if (wrapper && container) {
+            const scrollLeft = (container.scrollWidth - wrapper.clientWidth) / 2;
+            if (scrollLeft > 0) {
+                wrapper.scrollLeft = scrollLeft;
+            }
+        }
     }
 
     function downloadTreeImage() {
@@ -425,13 +603,36 @@
         document.getElementById('mobileModalName').textContent = name;
         document.getElementById('mobileModalCode').textContent = code;
         document.getElementById('mobileModalSponsor').textContent = sponsor;
-        document.getElementById('mobileModalStatus').textContent = status;
+        
+        const statusEl = document.getElementById('mobileModalStatus');
+        if (statusEl) {
+            statusEl.textContent = status.toUpperCase();
+            if (status.toUpperCase() === 'ACTIVE') {
+                statusEl.className = 'px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-400/40';
+            } else {
+                statusEl.className = 'px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-400/40';
+            }
+        }
+
         document.getElementById('mobileModalActiveInvest').textContent = activeInvest;
         document.getElementById('mobileModalEarningWallet').textContent = earningWallet;
         document.getElementById('mobileModalDailyRoi').textContent = dailyRoi;
         document.getElementById('mobileModalDirectIncome').textContent = directIncome;
         document.getElementById('mobileModalDirects').textContent = directs;
         document.getElementById('mobileModalJoined').textContent = joined;
+
+        const avatar = document.getElementById('mobileModalAvatar');
+        if (avatar) {
+            avatar.textContent = name.charAt(0).toUpperCase();
+            const rootCode = "{{ $root->referral_code ?? '' }}";
+            if (code === rootCode) {
+                avatar.className = 'w-10 h-10 rounded-full avatar-3d-gold flex items-center justify-center text-sm shadow-md shrink-0';
+            } else if (status.toUpperCase() === 'ACTIVE') {
+                avatar.className = 'w-10 h-10 rounded-full avatar-3d-emerald flex items-center justify-center text-sm shadow-md shrink-0';
+            } else {
+                avatar.className = 'w-10 h-10 rounded-full avatar-3d-rose flex items-center justify-center text-sm shadow-md shrink-0';
+            }
+        }
         
         const navBtn = document.getElementById('mobileModalNavBtn');
         if (navBtn) {
@@ -454,14 +655,19 @@
         }
     });
 
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMemberModal();
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
-        const wrapper = document.querySelector('.genealogy-tree-wrapper');
-        const container = document.querySelector('.binary-tree-container');
-        if (wrapper && container) {
-            const scrollLeft = (container.scrollWidth - wrapper.clientWidth) / 2;
-            if (scrollLeft > 0) {
-                wrapper.scrollLeft = scrollLeft;
-            }
+        setTimeout(centerTreeCanvas, 100);
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth < 768) {
+            centerTreeCanvas();
         }
     });
 </script>

@@ -43,6 +43,7 @@ class DexTradeIncomeEngineTest extends TestCase
     {
         $user = User::factory()->create([
             'status' => 'active',
+            'is_bot_active' => true,
             'earning_wallet' => 0.00,
         ]);
 
@@ -71,6 +72,41 @@ class DexTradeIncomeEngineTest extends TestCase
         $this->assertEquals(0.20, round($credited2, 2));
         $this->assertEquals(0.70, round($user->fresh()->earning_wallet, 2));
         $this->assertEquals('completed', $userPackage->fresh()->status);
+    }
+
+    public function test_roi_income_skipped_when_bot_inactive(): void
+    {
+        $user = User::factory()->create([
+            'status' => 'active',
+            'is_bot_active' => false,
+            'earning_wallet' => 0.00,
+        ]);
+
+        $userPackage = UserPackage::create([
+            'user_id' => $user->id,
+            'package_id' => $this->package->id,
+            'invested_amount' => 100.00,
+            'daily_roi' => 0.50,
+            'daily_roi_amount' => 0.50,
+            'duration_days' => 400,
+            'total_return_amount' => 200.00,
+            'paid_roi_amount' => 0.00,
+            'status' => 'active',
+        ]);
+
+        $roiService = app(RoiIncomeService::class);
+        $credited = $roiService->processSinglePackageRoi($userPackage);
+
+        $this->assertEquals(0.00, $credited);
+        $this->assertEquals(0.00, $user->fresh()->earning_wallet);
+
+        // Activate bot and test distribution now succeeds
+        $user->update(['is_bot_active' => true]);
+        $userPackage->load('user');
+        $creditedActive = $roiService->processSinglePackageRoi($userPackage);
+
+        $this->assertEquals(0.50, round($creditedActive, 2));
+        $this->assertEquals(0.50, round($user->fresh()->earning_wallet, 2));
     }
 
     public function test_direct_income_10_percent_and_8x_working_cap(): void

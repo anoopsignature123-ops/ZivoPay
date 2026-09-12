@@ -41,12 +41,6 @@ class LoginController extends Controller
                 return back()->withErrors(['email' => 'Invalid user credentials provided.']);
             }
 
-            if ($user->status !== 'active') {
-                Auth::logout();
-
-                return back()->withErrors(['email' => 'Your account is currently inactive. Please contact support.']);
-            }
-
             $request->session()->regenerate();
 
             return redirect()->route('user.dashboard')->with('success', 'Welcome back, '.$user->name);

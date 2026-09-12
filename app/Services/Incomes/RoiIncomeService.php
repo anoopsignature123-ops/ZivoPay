@@ -27,7 +27,7 @@ class RoiIncomeService
      */
     public function processSinglePackageRoi(UserPackage $userPkg): float
     {
-        if ($userPkg->status !== 'active' || ! $userPkg->user) {
+        if ($userPkg->status !== 'active' || ! $userPkg->user || ! $userPkg->user->is_bot_active) {
             return 0.00;
         }
 
@@ -90,6 +90,9 @@ class RoiIncomeService
     {
         $activePackages = UserPackage::with(['user', 'package'])
             ->where('status', 'active')
+            ->whereHas('user', function ($query) {
+                $query->where('is_bot_active', true);
+            })
             ->whereColumn('paid_roi_amount', '<', 'total_return_amount')
             ->get();
 

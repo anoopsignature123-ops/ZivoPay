@@ -16,7 +16,9 @@ class IncomeReportController extends Controller
     private function getUserIncomeReport(Request $request, string $type)
     {
         $userId = Auth::id();
-        $query = Transaction::where('user_id', $userId)->where('type', $type);
+        $query = Transaction::with(['user', 'user.sponsor', 'userPackage.user'])
+            ->where('user_id', $userId)
+            ->where('type', $type);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -59,7 +61,8 @@ class IncomeReportController extends Controller
 
         $grandTotal = $roiTotal + $directTotal + $matchingTotal + $referralRoiTotal + $matchingRoiTotal + $uplineMatchingTotal + $salaryTotal;
 
-        $recentIncomes = Transaction::where('user_id', $userId)
+        $query = Transaction::with(['user', 'user.sponsor', 'userPackage.user'])
+            ->where('user_id', $userId)
             ->whereIn('type', [
                 'daily_roi',
                 'direct_commission',
@@ -68,9 +71,29 @@ class IncomeReportController extends Controller
                 'matching_roi',
                 'upline_matching',
                 'salary_income',
-            ])
-            ->latest('id')
-            ->paginate(15);
+            ]);
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('txn_number', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $recentIncomes = $query->latest('id')->paginate(15)->withQueryString();
 
         return view('user.reports.summary', compact(
             'user',

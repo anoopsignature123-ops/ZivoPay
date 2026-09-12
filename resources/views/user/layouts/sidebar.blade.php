@@ -178,11 +178,37 @@
             <span class="nav-text">Buy Packages</span>
         </a>
 
-        <!-- BOT -->
-        <a class='nav-item {{ request()->routeIs("user.bot*") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-3 rounded-xl text-sm font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition'
+        <!-- BOT (WITH LIVE TRADING GLOW & ANIMATED BADGE) -->
+        <a class='nav-item {{ request()->routeIs("user.bot*") ? "active bg-amber-500/15 text-amber-300 border-r-4 border-amber-400 font-bold shadow-lg" : "" }} flex items-center justify-between gap-2 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:bg-amber-500/10 hover:text-amber-300 transition group'
             href='{{ route("user.bot.index") }}'>
-            <i data-lucide="bot" class="w-5 h-5 shrink-0 text-amber-400"></i>
-            <span class="nav-text">BOT</span>
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="relative flex items-center justify-center shrink-0">
+                    <i data-lucide="bot" class="w-5 h-5 text-amber-400 group-hover:scale-110 transition duration-300"></i>
+                    <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ (auth()->user()?->is_bot_active) ? 'bg-emerald-400' : 'bg-amber-400' }} opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 {{ (auth()->user()?->is_bot_active) ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                    </span>
+                </div>
+                <span class="nav-text font-extrabold tracking-wide">BOT</span>
+            </div>
+
+            @if(auth()->user()?->is_bot_active)
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/60 text-[9px] font-black tracking-widest uppercase animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)] shrink-0">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span>LIVE 24/7</span>
+                </span>
+            @else
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/60 text-[9px] font-black tracking-widest uppercase animate-pulse shadow-[0_0_10px_rgba(243,202,82,0.4)] shrink-0">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    <span>AI TRADING</span>
+                </span>
+            @endif
         </a>
 
         <!-- Packages History -->

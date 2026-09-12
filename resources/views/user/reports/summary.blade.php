@@ -119,6 +119,59 @@
 
     </div>
 
+    <!-- 1-ROW COMPACT MULTI-FILTER FORM -->
+    <div class="p-3.5 rounded-2xl bg-bg/80 border border-amber-500/40 shadow-lg">
+        <form action="{{ route('user.reports.summary') }}" method="GET" class="flex flex-nowrap items-end gap-3 w-full overflow-x-auto text-xs font-sans pb-1">
+            
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">INCOME TYPE</label>
+                <select name="type" class="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
+                    <option value="">All Income Types</option>
+                    <option value="daily_roi" {{ request('type') == 'daily_roi' ? 'selected' : '' }}>Daily ROI</option>
+                    <option value="direct_commission" {{ request('type') == 'direct_commission' ? 'selected' : '' }}>Direct Commission</option>
+                    <option value="matching_income" {{ request('type') == 'matching_income' ? 'selected' : '' }}>Matching Income</option>
+                    <option value="referral_roi" {{ request('type') == 'referral_roi' ? 'selected' : '' }}>Referral ROI</option>
+                    <option value="matching_roi" {{ request('type') == 'matching_roi' ? 'selected' : '' }}>Matching ROI</option>
+                    <option value="upline_matching" {{ request('type') == 'upline_matching' ? 'selected' : '' }}>Upline Matching</option>
+                    <option value="salary_income" {{ request('type') == 'salary_income' ? 'selected' : '' }}>Salary Income</option>
+                </select>
+            </div>
+
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">FROM DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="start_date" value="{{ request('start_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">TO DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="end_date" value="{{ request('end_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">SEARCH TXN # / REMARK</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Txn #..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(243,202,82,0.5)] transition flex items-center justify-center gap-1.5 shrink-0">
+                    <i data-lucide="filter" class="w-3.5 h-3.5 text-black"></i> FILTER
+                </button>
+                <a href="{{ route('user.reports.summary') }}" class="py-2.5 px-4 rounded-xl bg-black/60 border border-white/60 text-white hover:bg-white/10 font-bold text-xs transition flex items-center justify-center shrink-0">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- RECENT INCOME PAYOUT AUDIT LOG -->
     <div class="bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30 space-y-4">
         <div class="flex items-center justify-between border-b border-amber-500/20 pb-3">
@@ -161,7 +214,7 @@
                     @empty
                     <tr>
                         <td colspan="7" class="p-8 text-center text-neutral-400 font-medium">
-                            No income transactions recorded yet.
+                            No income transactions recorded yet matching your criteria.
                         </td>
                     </tr>
                     @endforelse

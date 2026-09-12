@@ -52,6 +52,45 @@
         </div>
     </div>
 
+    <!-- 1-ROW COMPACT MULTI-FILTER FORM -->
+    <div class="p-3.5 rounded-2xl bg-bg/80 border border-amber-500/40 shadow-lg">
+        <form action="{{ route('user.reports.referral-roi') }}" method="GET" class="flex flex-nowrap items-end gap-3 w-full overflow-x-auto text-xs font-sans pb-1">
+            
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">FROM DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="start_date" value="{{ request('start_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">TO DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="end_date" value="{{ request('end_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">SEARCH TXN # / REMARK</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Txn #..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(243,202,82,0.5)] transition flex items-center justify-center gap-1.5 shrink-0">
+                    <i data-lucide="filter" class="w-3.5 h-3.5 text-black"></i> FILTER
+                </button>
+                <a href="{{ route('user.reports.referral-roi') }}" class="py-2.5 px-4 rounded-xl bg-black/60 border border-white/60 text-white hover:bg-white/10 font-bold text-xs transition flex items-center justify-center shrink-0">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- LOGS TABLE -->
     <div class="bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30 space-y-6">
         <div class="overflow-x-auto">
@@ -59,6 +98,7 @@
                 <thead class="bg-bg text-amber-400 uppercase text-xs font-bold font-heading tracking-wider border-b border-amber-500/30">
                     <tr>
                         <th class="p-4 rounded-l-xl">TXN NUMBER</th>
+                        <th class="p-4">SOURCE MEMBER (DOWNLINE)</th>
                         <th class="p-4">AMOUNT ($)</th>
                         <th class="p-4">POST BALANCE</th>
                         <th class="p-4">DESCRIPTION / REMARK</th>
@@ -70,6 +110,21 @@
                     @forelse($logs as $log)
                     <tr class="hover:bg-amber-500/10 transition">
                         <td class="p-4 font-mono font-bold text-amber-400 text-xs">{{ $log->txn_number }}</td>
+                        <td class="p-4">
+                            @if($log->source_member)
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">
+                                        {{ strtoupper(substr($log->source_member->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white text-xs">{{ $log->source_member->name }}</div>
+                                        <div class="text-[11px] text-amber-400 font-mono">{{ $log->source_member->referral_code }}</div>
+                                    </div>
+                                </div>
+                            @else
+                                <span class="text-neutral-400 text-xs font-mono">Direct Referral</span>
+                            @endif
+                        </td>
                         <td class="p-4 font-mono font-black text-emerald-400">+${{ number_format($log->amount, 2) }}</td>
                         <td class="p-4 font-mono text-neutral-300">${{ number_format($log->post_balance, 2) }}</td>
                         <td class="p-4 text-xs text-neutral-300 max-w-xs truncate">{{ $log->description }}</td>
@@ -82,8 +137,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-neutral-400 font-medium">
-                            No Referral ROI Income records found.
+                        <td colspan="7" class="p-8 text-center text-neutral-400 font-medium">
+                            No Referral ROI Income records found matching your filter parameters.
                         </td>
                     </tr>
                     @endforelse

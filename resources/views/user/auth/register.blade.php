@@ -70,31 +70,55 @@
                                 <label class="block text-xs font-bold text-amber-400 uppercase">Binary Position / Leg *</label>
                                 @if(isset($isLockedPosition) && $isLockedPosition)
                                     <span class="text-[10px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40 uppercase flex items-center gap-1">
-                                        ⚡ Selected via Link ({{ strtoupper($position ?? 'LEFT') }})
+                                        🔒 Selected via Referral Link ({{ strtoupper($position ?? 'LEFT') }})
                                     </span>
                                 @endif
                             </div>
+
+                            @if(isset($isLockedPosition) && $isLockedPosition)
+                                <input type="hidden" name="position" value="{{ $position }}">
+                            @endif
+
                             <div class="grid grid-cols-2 gap-3">
-                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group">
-                                    <input type="radio" name="position" value="left" {{ old('position', $position ?? 'left') === 'left' ? 'checked' : '' }} class="peer hidden">
-                                    <div class="flex items-center gap-2 text-white text-xs font-extrabold uppercase peer-checked:text-amber-300">
-                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center peer-checked:border-amber-400 peer-checked:bg-amber-400">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group pos-label {{ (isset($isLockedPosition) && $isLockedPosition) ? 'opacity-85 cursor-not-allowed' : '' }}">
+                                    <input type="radio" name="position" value="left" {{ old('position', $position ?? 'left') === 'left' ? 'checked' : '' }} {{ (isset($isLockedPosition) && $isLockedPosition) ? 'disabled' : '' }} class="peer hidden pos-radio">
+                                    <div class="flex items-center gap-2 text-neutral-400 text-xs font-extrabold uppercase pos-text">
+                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center pos-radio-circle">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-black pos-radio-dot"></div>
                                         </div>
                                         <span>Left Leg (Team A)</span>
                                     </div>
                                 </label>
-                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group">
-                                    <input type="radio" name="position" value="right" {{ old('position', $position ?? 'left') === 'right' ? 'checked' : '' }} class="peer hidden">
-                                    <div class="flex items-center gap-2 text-white text-xs font-extrabold uppercase peer-checked:text-amber-300">
-                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center peer-checked:border-amber-400 peer-checked:bg-amber-400">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                <label class="relative flex items-center justify-center p-3 rounded-xl border border-amber-500/40 bg-bg cursor-pointer hover:border-amber-400 transition group pos-label {{ (isset($isLockedPosition) && $isLockedPosition) ? 'opacity-85 cursor-not-allowed' : '' }}">
+                                    <input type="radio" name="position" value="right" {{ old('position', $position ?? 'left') === 'right' ? 'checked' : '' }} {{ (isset($isLockedPosition) && $isLockedPosition) ? 'disabled' : '' }} class="peer hidden pos-radio">
+                                    <div class="flex items-center gap-2 text-neutral-400 text-xs font-extrabold uppercase pos-text">
+                                        <div class="w-4 h-4 rounded-full border-2 border-neutral-500 flex items-center justify-center pos-radio-circle">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-black pos-radio-dot"></div>
                                         </div>
                                         <span>Right Leg (Team B)</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <style>
+                            .pos-radio:checked + .pos-text {
+                                color: #fcd34d !important;
+                                font-weight: 900 !important;
+                            }
+                            .pos-radio:checked + .pos-text .pos-radio-circle {
+                                border-color: #f59e0b !important;
+                                background-color: #f59e0b !important;
+                            }
+                            .pos-radio:checked + .pos-text .pos-radio-dot {
+                                background-color: #000000 !important;
+                            }
+                            .pos-label:has(.pos-radio:checked) {
+                                border-color: #f59e0b !important;
+                                background-color: rgba(245, 158, 11, 0.15) !important;
+                                box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+                            }
+                        </style>
 
                         <!-- Full Name & Email -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

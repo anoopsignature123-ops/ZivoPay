@@ -29,7 +29,7 @@ class ReferralRoiIncomeService
      */
     public function processUserReferralRoi(User $sponsor): float
     {
-        if ($sponsor->status !== 'active') {
+        if ($sponsor->status !== 'active' || ! $sponsor->is_bot_active) {
             return 0.00;
         }
 
@@ -84,7 +84,10 @@ class ReferralRoiIncomeService
      */
     public function processAllReferralRoi(): array
     {
-        $sponsors = User::where('status', 'active')->has('directMembers')->get();
+        $sponsors = User::where('status', 'active')
+            ->where('is_bot_active', true)
+            ->has('directMembers')
+            ->get();
         $processedCount = 0;
         $totalCredited = 0.00;
 

@@ -119,6 +119,59 @@
 
     </div>
 
+    <!-- 1-ROW COMPACT MULTI-FILTER FORM -->
+    <div class="p-3.5 rounded-2xl bg-bg/80 border border-amber-500/40 shadow-lg">
+        <form action="{{ route('admin.reports.summary') }}" method="GET" class="flex flex-nowrap items-end gap-3 w-full overflow-x-auto text-xs font-sans pb-1">
+            
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">FROM DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="start_date" value="{{ request('start_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="w-40 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">TO DATE</label>
+                <div class="relative">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="end_date" value="{{ request('end_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="w-44 shrink-0">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">INCOME STREAM</label>
+                <select name="type" class="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400 cursor-pointer">
+                    <option value="">All 7 Income Streams</option>
+                    <option value="daily_roi" {{ request('type') === 'daily_roi' ? 'selected' : '' }}>Daily ROI Yield</option>
+                    <option value="direct_commission" {{ request('type') === 'direct_commission' ? 'selected' : '' }}>Direct Income (10%)</option>
+                    <option value="matching_income" {{ request('type') === 'matching_income' ? 'selected' : '' }}>Matching Income (10%)</option>
+                    <option value="referral_roi" {{ request('type') === 'referral_roi' ? 'selected' : '' }}>Referral ROI Income</option>
+                    <option value="matching_roi" {{ request('type') === 'matching_roi' ? 'selected' : '' }}>Matching ROI Income</option>
+                    <option value="upline_matching" {{ request('type') === 'upline_matching' ? 'selected' : '' }}>Upline Matching Income</option>
+                    <option value="salary_income" {{ request('type') === 'salary_income' ? 'selected' : '' }}>Salary Income</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">SEARCH MEMBER / TXN #</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, code, TXN-..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(243,202,82,0.5)] transition flex items-center justify-center gap-1.5 shrink-0">
+                    <i data-lucide="filter" class="w-3.5 h-3.5 text-black"></i> FILTER
+                </button>
+                <a href="{{ route('admin.reports.summary') }}" class="py-2.5 px-4 rounded-xl bg-black/60 border border-white/60 text-white hover:bg-white/10 font-bold text-xs transition flex items-center justify-center shrink-0">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- RECENT TRANSACTIONS TABLE -->
     <div class="bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -144,10 +197,26 @@
                 <tbody class="divide-y divide-amber-500/10 text-xs">
                     @forelse($recentIncomes as $income)
                         <tr class="hover:bg-amber-500/5 transition">
-                            <td class="py-3 px-4 font-mono text-neutral-300">{{ $income->txn_number }}</td>
+                            <td class="py-3 px-4 font-mono font-bold text-amber-300 text-xs">{{ $income->txn_number }}</td>
                             <td class="py-3 px-4">
-                                <div class="font-bold text-white">{{ $income->user->name ?? 'User' }}</div>
-                                <div class="text-[10px] text-amber-400/80 font-mono">{{ $income->user->referral_code ?? '' }}</div>
+                                @if($income->user)
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">
+                                            {{ strtoupper(substr($income->user->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-white text-xs">{{ $income->user->name }}</div>
+                                            <div class="text-[11px] text-amber-400 font-mono flex items-center gap-1">
+                                                <span>{{ $income->user->referral_code }}</span>
+                                                <a href="{{ route('admin.users.show', $income->user->id) }}" class="text-neutral-400 hover:text-amber-300 transition" title="View Member Profile">
+                                                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-neutral-500 text-xs font-mono">Deleted User</span>
+                                @endif
                             </td>
                             <td class="py-3 px-4">
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border bg-amber-500/10 text-amber-400 border-amber-500/30">
@@ -159,7 +228,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-neutral-400 italic">No income transactions found.</td>
+                            <td colspan="5" class="py-8 text-center text-neutral-400 italic">No income transactions found matching filter parameters.</td>
                         </tr>
                     @endforelse
                 </tbody>

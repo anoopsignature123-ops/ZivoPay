@@ -227,6 +227,11 @@ class NetworkController extends Controller
         $leftCount = count($leftUserIds);
         $rightCount = count($rightUserIds);
 
+        $leftActiveCount = $leftMembers->where('status', 'active')->count();
+        $leftInactiveCount = $leftMembers->where('status', '!=', 'active')->count();
+        $rightActiveCount = $rightMembers->where('status', 'active')->count();
+        $rightInactiveCount = $rightMembers->where('status', '!=', 'active')->count();
+
         return [
             'root' => $root,
             'left_child' => $root->left_child,
@@ -235,6 +240,10 @@ class NetworkController extends Controller
             'right_business' => $rightBusiness,
             'left_count' => $leftCount,
             'right_count' => $rightCount,
+            'left_active' => $leftActiveCount,
+            'left_inactive' => $leftInactiveCount,
+            'right_active' => $rightActiveCount,
+            'right_inactive' => $rightInactiveCount,
             'total_team' => $leftCount + $rightCount,
             'total_business' => $leftBusiness + $rightBusiness,
         ];

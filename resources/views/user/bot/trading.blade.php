@@ -156,50 +156,50 @@
 
             <div class="w-full lg:w-auto flex items-center justify-start lg:justify-end shrink-0">
                 <a href="{{ route('user.bot.index') }}"
-                    class="px-5 py-3 rounded-xl bg-black/60 hover:bg-black text-amber-300 font-bold text-xs border border-amber-400/60 hover:border-amber-400 shadow-lg transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-arrow-left text-amber-400"></i>
+                    class="px-3.5 py-2 sm:px-5 sm:py-3 rounded-xl bg-black/60 hover:bg-black text-amber-300 font-bold text-[11px] sm:text-xs border border-amber-400/60 hover:border-amber-400 shadow-lg transition flex items-center justify-center gap-1.5 shrink-0">
+                    <i class="fa-solid fa-arrow-left text-amber-400 text-xs"></i>
                     <span>Back to Overview</span>
                 </a>
             </div>
         </div>
 
         @if($user->status !== 'active')
-            <div class="p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_20px_rgba(244,63,94,0.35)]">
+            <div class="p-3.5 sm:p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(244,63,94,0.35)] text-left">
                 <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0 animate-pulse"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-base sm:text-lg shrink-0 animate-pulse"></i>
                     <span>⚠️ Please activate your account first by purchasing an investment package before starting the Quant Trading BOT!</span>
                 </div>
-                <a href="{{ route('user.packages.index') }}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shrink-0 shadow transition whitespace-nowrap">
+                <a href="{{ route('user.packages.index') }}" class="px-3.5 py-2 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider shrink-0 shadow transition whitespace-nowrap">
                     Activate Account
                 </a>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(244,63,94,0.3)]">
+            <div class="p-3.5 sm:p-4 rounded-xl bg-rose-500/20 border border-rose-500/80 text-rose-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(244,63,94,0.3)] text-left">
                 <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400 text-base sm:text-lg shrink-0"></i>
                     <span>{{ session('error') }}</span>
                 </div>
-                <a href="{{ route('user.packages.index') }}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider shrink-0 shadow">
+                <a href="{{ route('user.packages.index') }}" class="px-3.5 py-2 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider shrink-0 shadow whitespace-nowrap">
                     Activate Account
                 </a>
             </div>
         @endif
 
         @if(session('success'))
-            <div class="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/80 text-emerald-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(0,230,118,0.3)]">
+            <div class="p-3.5 sm:p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/80 text-emerald-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(0,230,118,0.3)] text-left">
                 <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-circle-check text-emerald-400 text-lg shrink-0"></i>
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-base sm:text-lg shrink-0"></i>
                     <span>{{ session('success') }}</span>
                 </div>
             </div>
         @endif
 
         @if(session('info'))
-            <div class="p-4 rounded-xl bg-amber-500/20 border border-amber-500/80 text-amber-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(243,202,82,0.3)]">
+            <div class="p-3.5 sm:p-4 rounded-xl bg-amber-500/20 border border-amber-500/80 text-amber-300 text-xs sm:text-sm font-bold flex items-center justify-between shadow-[0_0_20px_rgba(243,202,82,0.3)] text-left">
                 <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-circle-info text-amber-400 text-lg shrink-0"></i>
+                    <i class="fa-solid fa-circle-info text-amber-400 text-base sm:text-lg shrink-0"></i>
                     <span>{{ session('info') }}</span>
                 </div>
             </div>
@@ -255,8 +255,8 @@
         </div>
 
         <!-- Bot Activation Control Box -->
-        <div class="bot-panel-animated w-full p-6 sm:p-7 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div class="space-y-2 text-left flex-1 max-w-3xl">
+        <div class="bot-panel-animated w-full p-5 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
+            <div class="space-y-2 text-left flex-1 min-w-0 w-full md:w-auto">
                 <div class="flex flex-wrap items-center gap-2.5">
                     <i class="fa-solid fa-microchip text-amber-400 text-sm animate-pulse"></i>
                     <span class="text-xs font-black text-amber-400 tracking-[2px] uppercase">QUANT ENGINE CONTROL</span>
@@ -286,27 +286,27 @@
                 </p>
             </div>
 
-            <div class="shrink-0 w-full lg:w-auto flex justify-start lg:justify-end">
+            <div class="shrink-0 w-full md:w-auto flex justify-center md:justify-end">
                 @if($user->is_bot_active)
                     <button type="button" disabled
-                        class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/80 text-emerald-300 font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,230,118,0.4)] flex items-center justify-center gap-2.5 cursor-not-allowed opacity-95">
-                        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                        class="w-full sm:w-auto px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/80 text-emerald-300 font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,230,118,0.4)] flex items-center justify-center gap-2 cursor-not-allowed opacity-95 whitespace-nowrap">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm sm:text-base"></i>
                         <span>BOT ACTIVE & MINING 24/7</span>
                     </button>
                 @elseif($user->status === 'active')
-                    <form action="{{ route('user.bot.activate') }}" method="POST" onsubmit="return confirm('Are you sure you want to START the Trading BOT? This will initiate automated ROI mining.');" class="w-full sm:w-auto">
+                    <form action="{{ route('user.bot.activate') }}" method="POST" onsubmit="return confirm('Are you sure you want to START the Trading BOT? This will initiate automated ROI mining.');" class="w-full md:w-auto">
                         @csrf
                         <button type="submit"
-                            class="btn-start-bot w-full sm:w-auto px-8 py-3.5 rounded-xl text-black font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer">
-                            <i class="fa-solid fa-bolt text-black text-base"></i>
+                            class="btn-start-bot w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-xl text-black font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
+                            <i class="fa-solid fa-bolt text-black text-sm sm:text-base"></i>
                             <span>START BOT</span>
                         </button>
                     </form>
                 @else
                     <button type="button" disabled
                         title="Account Activation Required: Purchase an investment package first to start BOT"
-                        class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-rose-500/20 border-2 border-rose-500/60 text-rose-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-not-allowed opacity-85 shadow">
-                        <i class="fa-solid fa-lock text-rose-400 text-base"></i>
+                        class="w-full sm:w-auto px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-xl bg-rose-500/20 border-2 border-rose-500/60 text-rose-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-not-allowed opacity-85 shadow whitespace-nowrap">
+                        <i class="fa-solid fa-lock text-rose-400 text-sm sm:text-base"></i>
                         <span>START BOT (DISABLED)</span>
                     </button>
                 @endif

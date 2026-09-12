@@ -98,6 +98,7 @@
                 <thead class="bg-bg text-amber-400 uppercase text-xs font-bold font-heading tracking-wider border-b border-amber-500/30">
                     <tr>
                         <th class="p-4 rounded-l-xl">TXN NUMBER</th>
+                        <th class="p-4">SOURCE MEMBER (PURCHASER)</th>
                         <th class="p-4">COMMISSION ($)</th>
                         <th class="p-4">POST BALANCE</th>
                         <th class="p-4">DESCRIPTION / REMARK</th>
@@ -109,6 +110,21 @@
                     @forelse($logs as $log)
                     <tr class="hover:bg-amber-500/10 transition">
                         <td class="p-4 font-mono font-bold text-amber-400 text-xs">{{ $log->txn_number }}</td>
+                        <td class="p-4">
+                            @if($log->source_member)
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">
+                                        {{ strtoupper(substr($log->source_member->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white text-xs">{{ $log->source_member->name }}</div>
+                                        <div class="text-[11px] text-amber-400 font-mono">{{ $log->source_member->referral_code }}</div>
+                                    </div>
+                                </div>
+                            @else
+                                <span class="text-neutral-400 text-xs font-mono">Direct Referral</span>
+                            @endif
+                        </td>
                         <td class="p-4 font-mono font-black text-emerald-400">+${{ number_format($log->amount, 2) }}</td>
                         <td class="p-4 font-mono text-neutral-300">${{ number_format($log->post_balance, 2) }}</td>
                         <td class="p-4 text-xs text-neutral-300 max-w-xs truncate">{{ $log->description }}</td>
@@ -121,7 +137,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-neutral-400 font-medium">
+                        <td colspan="7" class="p-8 text-center text-neutral-400 font-medium">
                             No Direct Income records found matching your filter parameters.
                         </td>
                     </tr>

@@ -26,9 +26,10 @@
 
         <div>
             <label class="block text-xs font-bold text-amber-400 uppercase mb-1.5">Sponsor Code / ID *</label>
-            <input type="text" name="sponsor_code" value="{{ old('sponsor_code', $user->sponsor_code ?? 'DEX-0000001') }}" required
-                placeholder="e.g. DEX-0000001"
+            <input type="text" id="adminSponsorInput" name="sponsor_code" value="{{ old('sponsor_code', $user->sponsor_code ?? '') }}" required
+                placeholder="Enter Sponsor Code (e.g. DEX-0000001)"
                 class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-sm focus:outline-none focus:border-amber-400">
+            <div id="adminSponsorInfoBox" class="mt-2 hidden p-3 rounded-xl border text-xs font-medium transition-all"></div>
         </div>
     </div>
 
@@ -106,4 +107,60 @@
             closedSvg.classList.add('hidden');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sponsorInput = document.getElementById('adminSponsorInput');
+        if (sponsorInput) {
+            const verifySponsor = () => {
+                const code = sponsorInput.value.trim();
+                const box = document.getElementById('adminSponsorInfoBox');
+
+                if (!code) {
+                    if (box) {
+                        box.classList.add('hidden');
+                        box.innerHTML = '';
+                    }
+                    return;
+                }
+
+                fetch(`{{ route('user.check-sponsor') }}?code=${encodeURIComponent(code)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!box) return;
+                        box.classList.remove('hidden');
+                        if (data.success) {
+                            box.className = 'mt-2 p-3 rounded-xl border bg-emerald-500/10 border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-between';
+                            box.innerHTML = `
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center shrink-0">
+                                        ${(data.name || 'S').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <span class="font-black uppercase tracking-wider text-white block">✓ VERIFIED SPONSOR</span>
+                                        <span class="text-emerald-300 font-bold">${data.name}</span>
+                                        <span class="text-neutral-400 font-mono text-[11px] block">${data.email}</span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-mono bg-black/60 px-2.5 py-1 rounded-lg text-amber-400 border border-amber-500/30 font-bold">${data.referral_code}</span>
+                            `;
+                        } else {
+                            box.className = 'mt-2 p-3 rounded-xl border bg-rose-500/10 border-rose-500/40 text-rose-300 text-xs font-semibold flex items-center gap-2';
+                            box.innerHTML = `
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                <span>${data.message || 'Invalid Sponsor Code! User not found.'}</span>
+                            `;
+                        }
+                    })
+                    .catch(() => {
+                        if (box) box.classList.add('hidden');
+                    });
+            };
+
+            sponsorInput.addEventListener('input', verifySponsor);
+            sponsorInput.addEventListener('change', verifySponsor);
+            if (sponsorInput.value.trim()) {
+                verifySponsor();
+            }
+        }
+    });
 </script>

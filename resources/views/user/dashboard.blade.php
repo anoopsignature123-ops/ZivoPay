@@ -113,33 +113,33 @@
         <!-- BOT STATUS ALERT BANNER -->
         <div class="relative z-10">
             @if(!$user->is_bot_active)
-                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl animate-pulse">
-                    <div class="flex items-center gap-3 text-center sm:text-left overflow-hidden">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 shrink-0">
+                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl animate-pulse">
+                    <div class="flex items-start sm:items-center gap-3 text-left w-full sm:w-auto">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 shrink-0 mt-0.5 sm:mt-0">
                             <i data-lucide="zap" class="w-5 h-5 text-amber-400 fill-amber-400"></i>
                         </div>
-                        <div class="overflow-hidden">
-                            <h4 class="text-xs sm:text-sm font-black text-amber-300 uppercase tracking-wider truncate">⚡ ATTENTION: TRADING BOT IS INACTIVE</h4>
-                            <p class="text-[11px] text-neutral-200 truncate">Daily ROI income is ONLY paid with an active Trading Bot.</p>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs sm:text-sm font-black text-amber-300 uppercase tracking-wider leading-snug">⚡ ATTENTION: TRADING BOT IS INACTIVE</h4>
+                            <p class="text-[11px] text-neutral-200 mt-0.5 leading-normal">Daily ROI income is ONLY paid with an active Trading Bot.</p>
                         </div>
                     </div>
-                    <a href="{{ route('user.bot.index') }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition shrink-0 flex items-center gap-1.5 border border-yellow-200 whitespace-nowrap">
+                    <a href="{{ route('user.bot.index') }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition shrink-0 flex items-center gap-1.5 border border-yellow-200 whitespace-nowrap self-start sm:self-auto">
                         <i data-lucide="play-circle" class="w-4 h-4 text-black fill-black"></i>
                         <span>START BOT</span>
                     </a>
                 </div>
             @else
-                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
-                    <div class="flex items-center gap-3 text-center sm:text-left overflow-hidden">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+                <div class="p-4 sm:p-5 rounded-3xl pdf-package-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+                    <div class="flex items-start sm:items-center gap-3 text-left w-full sm:w-auto">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 sm:mt-0">
                             <i data-lucide="cpu" class="w-5 h-5 text-emerald-400"></i>
                         </div>
-                        <div class="overflow-hidden">
-                            <h4 class="text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wider truncate">🚀 TRADING BOT IS ACTIVE & MINING</h4>
-                            <p class="text-[11px] text-neutral-200 truncate">Activated on <strong class="text-amber-300 font-mono">{{ $user->bot_activated_at?->format('M d, Y H:i') }}</strong>. Yield mining 24/7.</p>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wider leading-snug">🚀 TRADING BOT IS ACTIVE & MINING</h4>
+                            <p class="text-[11px] text-neutral-200 mt-0.5 leading-normal">Activated on <strong class="text-amber-300 font-mono">{{ $user->bot_activated_at?->format('M d, Y H:i') }}</strong>. Yield mining 24/7.</p>
                         </div>
                     </div>
-                    <a href="{{ route('user.bot.trading') }}" class="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 transition shrink-0 flex items-center gap-1.5 whitespace-nowrap">
+                    <a href="{{ route('user.bot.trading') }}" class="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 transition shrink-0 flex items-center gap-1.5 whitespace-nowrap self-start sm:self-auto">
                         <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
                         <span>TERMINAL</span>
                     </a>
@@ -206,7 +206,7 @@
                 </div>
                 <button
                     onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=left') }}'); showToast('Copied!', 'Left Leg (Team A) referral link copied.', 'success');"
-                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow">
+                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow self-start xl:self-auto">
                     <i data-lucide="copy" class="w-3.5 h-3.5 text-black"></i> Copy Left Link
                 </button>
             </div>
@@ -226,7 +226,7 @@
                 </div>
                 <button
                     onclick="navigator.clipboard.writeText('{{ url('/user/register?sponsor=' . $user->referral_code . '&position=right') }}'); showToast('Copied!', 'Right Leg (Team B) referral link copied.', 'success');"
-                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow">
+                    class="px-3.5 py-2.5 rounded-xl pdf-gold-ribbon hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow self-start xl:self-auto">
                     <i data-lucide="copy" class="w-3.5 h-3.5 text-black"></i> Copy Right Link
                 </button>
             </div>

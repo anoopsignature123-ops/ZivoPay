@@ -23,7 +23,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = User::with(['role', 'sponsor', 'userPackages.package'])->where('role_id', 2);
+        $query = User::with(['role', 'sponsor', 'userPackages.package', 'directMembers'])->where('role_id', 2);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -98,7 +98,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email',
             'mobile' => 'required|string|max:20',
             'sponsor_code' => 'required|string',
             'position' => 'required|in:left,right',
@@ -219,7 +219,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'required|email',
             'mobile' => 'required|string|max:20',
             'sponsor_code' => 'required|string',
             'position' => 'required|in:left,right',
@@ -253,6 +253,19 @@ class UserController extends Controller
         session()->put('impersonated_user_id', $user->id);
 
         return redirect()->route('user.dashboard')->with('info', "Logged in as member {$user->name} ({$user->referral_code}).");
+    }
+
+    /**
+     * Toggle user status (active vs inactive) or deactivate account.
+     */
+    public function toggleStatus(User $user): RedirectResponse
+    {
+        $newStatus = $user->status === 'active' ? 'inactive' : 'active';
+        $user->update(['status' => $newStatus]);
+
+        $statusLabel = strtoupper($newStatus);
+
+        return redirect()->back()->with('success', "Member {$user->name} ({$user->referral_code}) status changed to {$statusLabel}.");
     }
 
     /**

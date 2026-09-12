@@ -72,7 +72,7 @@ class RegisterController extends Controller
             'sponsor_id' => 'required|string',
             'position' => 'required|in:left,right',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email',
             'mobile' => 'required',
             'password' => 'required|min:6|confirmed',
         ]);

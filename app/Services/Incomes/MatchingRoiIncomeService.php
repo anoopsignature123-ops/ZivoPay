@@ -50,7 +50,7 @@ class MatchingRoiIncomeService
      */
     public function processSingleContract(UserMatchingRoiContract $contract): float
     {
-        if ($contract->status !== 'active' || $contract->days_paid >= $contract->duration_days || ! $contract->user) {
+        if ($contract->status !== 'active' || $contract->days_paid >= $contract->duration_days || ! $contract->user || ! $contract->user->is_bot_active) {
             return 0.00;
         }
 
@@ -108,6 +108,9 @@ class MatchingRoiIncomeService
     {
         $activeContracts = UserMatchingRoiContract::with('user')
             ->where('status', 'active')
+            ->whereHas('user', function ($query) {
+                $query->where('is_bot_active', true);
+            })
             ->where('days_paid', '<', 150)
             ->get();
 
