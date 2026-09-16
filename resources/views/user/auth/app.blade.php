@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>@yield('title', 'DEX TRADE - Auth Portal')</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=2" />
+    <title>@yield('title', 'ZIVO PAY - Auth Portal')</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=10" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <style>
         body.ng-auth-bg {
-            background-color: #020b06 !important;
+            background-color: #021c10 !important;
             background-image: 
-                linear-gradient(to bottom, rgba(2, 22, 13, 0.82), rgba(1, 10, 5, 0.92)),
-                url('{{ asset("images/auth_bg.jpg") }}') !important;
+                linear-gradient(to bottom, rgba(2, 28, 16, 0.25), rgba(1, 15, 9, 0.45)),
+                url('{{ asset("images/zivo_auth_bg.jpg") }}?v=6') !important;
             background-size: cover !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
@@ -26,26 +26,26 @@
         }
 
         .ng-auth-card-shadow {
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(243, 202, 82, 0.35);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.35);
         }
     </style>
     @stack('styles')
 </head>
 
-<body class="ng-auth-bg flex items-center justify-center p-4 sm:p-6 py-12 relative overflow-y-auto text-slate-100 font-sans min-h-screen">
+<body class="ng-auth-bg min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 py-6 sm:py-10 relative overflow-y-auto text-slate-100 font-sans">
 
-    <!-- High-Tech Ambient Glowing Orbs -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/15 blur-[160px]"></div>
-        <div class="absolute bottom-10 right-10 w-[450px] h-[450px] rounded-full bg-emerald-500/15 blur-[140px]"></div>
-    </div>
+    <!-- Live Animated Background & Ambient Aurora Engine -->
+    <div class="live-auth-bg-container"></div>
+    <div class="aurora-glow-orb-1"></div>
+    <div class="aurora-glow-orb-2"></div>
 
     <!-- Main Auth Content Area (Centered Vertically & Horizontally) -->
-    <div class="w-full max-w-md relative z-20 my-auto">
+    <div class="w-full max-w-md relative z-20 my-auto py-2">
         @yield('content')
     </div>
 
     <script src="{{ asset('js/app-validation.js') }}"></script>
+    <script src="{{ asset('js/pull-to-refresh.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             @if ($errors->any())

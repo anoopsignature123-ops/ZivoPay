@@ -15,13 +15,13 @@ class UserSeeder extends Seeder
     {
         // 1. Default Super Admin User
         User::updateOrCreate(
-            ['email' => 'admin@dextrade.com'],
+            ['email' => 'admin@zivopay.net'],
             [
                 'role_id' => 1,
                 'name' => 'Super Admin',
-                'email' => 'admin@dextrade.com',
+                'email' => 'admin@zivopay.net',
                 'mobile' => '1234567890',
-                'referral_code' => 'DEX-ADMIN01',
+                'referral_code' => 'ZIVO-ADMIN01',
                 'sponsor_code' => null,
                 'status' => 'active',
                 'password' => Hash::make('Admin@123'),
@@ -30,15 +30,15 @@ class UserSeeder extends Seeder
 
         // 2. Default Root Member User (Top Member)
         User::updateOrCreate(
-            ['email' => 'root@dextrade.com'],
+            ['email' => 'root@zivopay.net'],
             [
                 'role_id' => 2,
                 'name' => 'Root User',
-                'email' => 'root@dextrade.com',
+                'email' => 'root@zivopay.net',
                 'mobile' => '9876543210',
-                'referral_code' => 'DEX-0000001',
+                'referral_code' => 'ZIVO-0000001',
                 'sponsor_code' => null,
-                'status' => 'active',
+                'status' => 'inactive',
                 'deposit_wallet' => 0.00,
                 'earning_wallet' => 0.00,
                 'password' => Hash::make('Root@123'),

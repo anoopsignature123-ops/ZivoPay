@@ -1,26 +1,114 @@
-/* Dex Trade Premium Luxury Gold & Dark Forest Emerald Theme Overrides */
+/* ZIVO PAY Official Presentation Poster Theme Overrides - 100% Emerald Green & White (ZERO GOLD) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 :root {
-    --color-accent: #f3ca52 !important;
-    --color-emerald-500: #d4af37 !important;
-    --color-teal-500: #f3ca52 !important;
-    --color-border: rgba(212, 175, 55, 0.4) !important;
+    --color-zivo-dark: #021c10;
+    --color-zivo-emerald: #053522;
+    --color-zivo-accent-green: #10b981;
+    --color-zivo-navy: #1e3a8a;
+    --color-zivo-orange: #ea580c;
+    --color-accent: #10b981 !important;
+    --color-emerald-500: #10b981 !important;
+    --color-teal-500: #00e676 !important;
+    --color-border: rgba(16, 185, 129, 0.65) !important;
     --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* Background - Deep Emerald & Black Gradient from PDF Presentation */
+/* Background - Deep Dark Forest Emerald Fintech Mesh & Ambient Lighting */
 body, body#dashboard {
-    background-color: #010905 !important;
-    background-image: 
-        radial-gradient(circle at 10% 10%, rgba(243, 202, 82, 0.22) 0%, transparent 35%),
-        radial-gradient(circle at 90% 90%, rgba(0, 230, 118, 0.18) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(18, 64, 39, 0.3) 0%, transparent 60%),
-        linear-gradient(135deg, #062417 0%, #03140b 50%, #010905 100%) !important;
-    background-attachment: fixed !important;
+    background-color: #021c10 !important;
     color: #f1f5f9;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    overflow-x: hidden !important;
+}
+
+/* ========================================================
+   LIVE ANIMATED BACKGROUND MOTION & AMBIENT AURORA ENGINE
+   ======================================================== */
+
+@keyframes liveBackgroundMotion {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    33% {
+        transform: scale(1.05) translate(-14px, -10px);
+    }
+    66% {
+        transform: scale(1.08) translate(12px, -18px);
+    }
+    100% {
+        transform: scale(1) translate(0, 0);
+    }
+}
+
+.live-bg-container {
+    position: fixed;
+    inset: -40px;
+    z-index: -2;
+    background-color: #021c10 !important;
+    background-image: 
+        linear-gradient(to bottom, rgba(2, 28, 16, 0.92), rgba(1, 15, 9, 0.96)),
+        url('../images/zivo_dashboard_bg.jpg?v=8') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    animation: liveBackgroundMotion 28s ease-in-out infinite alternate;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.live-auth-bg-container {
+    position: fixed;
+    inset: -40px;
+    z-index: -2;
+    background-color: #021c10 !important;
+    background-image: 
+        linear-gradient(to bottom, rgba(2, 28, 16, 0.90), rgba(1, 15, 9, 0.95)),
+        url('../images/zivo_auth_bg.jpg?v=6') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    animation: liveBackgroundMotion 24s ease-in-out infinite alternate;
+    pointer-events: none;
+    will-change: transform;
+}
+
+@keyframes pulseAuroraGlow {
+    0%, 100% {
+        opacity: 0.35;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.65;
+        transform: scale(1.18);
+    }
+}
+
+.aurora-glow-orb-1 {
+    position: fixed;
+    top: 10%;
+    left: 20%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 70%);
+    filter: blur(80px);
+    z-index: -1;
+    pointer-events: none;
+    animation: pulseAuroraGlow 8s ease-in-out infinite;
+}
+
+.aurora-glow-orb-2 {
+    position: fixed;
+    bottom: 15%;
+    right: 15%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.22) 0%, transparent 70%);
+    filter: blur(90px);
+    z-index: -1;
+    pointer-events: none;
+    animation: pulseAuroraGlow 12s ease-in-out infinite reverse;
 }
 
 /* Typography & Headers */
@@ -59,7 +147,7 @@ h1, h2, h3 {
 .inner-content > *:nth-child(4) { animation-delay: 0.16s; }
 .inner-content > *:nth-child(5) { animation-delay: 0.20s; }
 
-/* 2. Gold Light Ray Sweep Animation */
+/* 2. Emerald Light Sweep Animation */
 @keyframes lightSweep {
     0% {
         transform: translateX(-150%) rotate(25deg);
@@ -69,13 +157,12 @@ h1, h2, h3 {
     }
 }
 
-.bg-panel:not(.absolute):not([class*="absolute"]), .gold-card-animated, .pdf-package-card, .ng-pkg-card, .btn-gold, .bg-amber-500 {
+.bg-panel:not(.absolute):not([class*="absolute"]), .pdf-package-card, .ng-pkg-card, .btn-emerald {
     position: relative;
     overflow: hidden;
 }
 
-
-.bg-panel::after, .gold-card-animated::after, .pdf-package-card::after, .ng-pkg-card::after {
+.bg-panel::after, .pdf-package-card::after, .ng-pkg-card::after {
     content: '';
     position: absolute;
     top: -50%;
@@ -85,41 +172,41 @@ h1, h2, h3 {
     background: linear-gradient(
         60deg,
         transparent 40%,
-        rgba(255, 255, 255, 0.12) 48%,
-        rgba(243, 202, 82, 0.25) 50%,
-        rgba(255, 255, 255, 0.12) 52%,
+        rgba(255, 255, 255, 0.15) 48%,
+        rgba(16, 185, 129, 0.35) 50%,
+        rgba(255, 255, 255, 0.15) 52%,
         transparent 60%
     );
     pointer-events: none;
     animation: lightSweep 7s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 3. Gold Shimmer Text & Buttons */
-@keyframes goldShimmer {
+/* 3. Emerald Shimmer Text & Buttons */
+@keyframes emeraldShimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
 
-.text-gold-gradient {
-    background: linear-gradient(135deg, #ffffff 0%, #fff5c0 25%, #f3ca52 50%, #d4af37 75%, #aa771c 100%);
+.text-emerald-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 35%, #34d399 70%, #10b981 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: goldShimmer 6s infinite linear;
+    animation: emeraldShimmer 6s infinite linear;
 }
 
-/* 4. Ambient Pulsing Gold Glow */
-@keyframes pulseGoldGlow {
+/* 4. Ambient Pulsing Emerald Glow */
+@keyframes pulseEmeraldGlow {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(243, 202, 82, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2);
     }
     50% {
-        box-shadow: 0 0 35px rgba(243, 202, 82, 0.5), 0 0 10px rgba(0, 230, 118, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.4);
     }
 }
 
 .pdf-package-card, .ng-banner-title {
-    animation: pulseGoldGlow 4s infinite ease-in-out;
+    animation: pulseEmeraldGlow 4s infinite ease-in-out;
 }
 
 /* 5. Smooth Floating Motion for Icons */
@@ -139,7 +226,6 @@ h1, h2, h3 {
 }
 
 .dropdown-menu:not(.hidden) {
-
     display: block !important;
     animation: fadeInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
@@ -155,12 +241,12 @@ h1, h2, h3 {
     }
 }
 
-/* Sidebar styling & Mobile Responsiveness - PDF DEEP EMERALD METALLIC & GOLD BEVEL THEME */
+/* Sidebar styling - POSTER DEEP EMERALD THEME */
 .sidebar {
     width: 270px !important;
-    background: linear-gradient(180deg, #063824 0%, #021d12 50%, #010a05 100%) !important;
-    border-right: 2px solid rgba(243, 202, 82, 0.7) !important;
-    box-shadow: 5px 0 30px rgba(243, 202, 82, 0.3), inset -1px 0 2px rgba(255, 255, 255, 0.15) !important;
+    background: linear-gradient(180deg, #053522 0%, #031c12 50%, #010d08 100%) !important;
+    border-right: 2px solid rgba(16, 185, 129, 0.6) !important;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.8), inset -1px 0 2px rgba(255, 255, 255, 0.15) !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
 }
 
@@ -234,161 +320,350 @@ body.sidebar-collapsed .sidebar .user-section {
 }
 
 .logo-section {
-    border-bottom: 2px solid rgba(243, 202, 82, 0.6) !important;
-    background: linear-gradient(180deg, rgba(243, 202, 82, 0.22) 0%, rgba(2, 29, 18, 0.5) 100%) !important;
+    border-bottom: 2px solid rgba(16, 185, 129, 0.5) !important;
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.2) 0%, rgba(2, 28, 16, 0.6) 100%) !important;
     padding: 16px 16px !important;
 }
 
 /* Header Area */
 header.glass {
-    background: linear-gradient(90deg, #063824 0%, #021d12 50%, #010905 100%) !important;
-    border-bottom: 2px solid rgba(243, 202, 82, 0.6) !important;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
+    background: #031c12 !important;
+    border-bottom: 2px solid rgba(16, 185, 129, 0.5) !important;
+    backdrop-filter: none !important;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.9);
 }
 
-/* Sidebar Active Nav Item - PDF METALLIC GOLD RIBBON WITH GLOW */
+/* Sidebar Active Nav Item - VIBRANT EMERALD GREEN */
 .nav-item.active, a.nav-item.active {
-    background: linear-gradient(90deg, #d4af37 0%, #f3ca52 50%, #d4af37 100%) !important;
-    color: #000000 !important;
+    background: linear-gradient(90deg, #10b981 0%, #059669 50%, #047857 100%) !important;
+    color: #ffffff !important;
     font-weight: 900 !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     font-size: 14px !important;
     border-right: none !important;
     border-radius: 14px !important;
-    box-shadow: 0 4px 18px rgba(243, 202, 82, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
     transition: all 0.3s ease !important;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .nav-item.active *, a.nav-item.active * {
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
-/* Sidebar Hover Item - GLOWING GOLD SHIMMER & 3D SLIDE EFFECT */
+/* Sidebar Hover Item */
 .nav-item:hover:not(.active) {
-    background: linear-gradient(90deg, rgba(243, 202, 82, 0.3) 0%, rgba(2, 29, 18, 0.7) 100%) !important;
-    color: #fff5c0 !important;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.35) 0%, #053522 100%) !important;
+    color: #a7f3d0 !important;
     transform: translateX(6px) scale(1.02) !important;
-    border-left: 3px solid #f3ca52 !important;
+    border-left: 3px solid #10b981 !important;
     border-radius: 12px !important;
-    box-shadow: 0 4px 18px rgba(243, 202, 82, 0.3) !important;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.25) !important;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .nav-item:hover:not(.active) * {
-    color: #fff5c0 !important;
+    color: #a7f3d0 !important;
 }
 
 /* Nav Section Titles */
 .nav-section-title {
-    color: #f3ca52 !important;
+    color: #a7f3d0 !important;
     font-weight: 900 !important;
     letter-spacing: 2px !important;
-    text-shadow: 0 0 10px rgba(243, 202, 82, 0.5) !important;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
 }
 
 .nav-item {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Badges Override - ALL GOLD */
+/* Badges Override */
 .bg-emerald-500\/20, .bg-emerald-500\/10, .bg-sky-500\/20, .bg-amber-500\/20, .bg-amber-500\/10 {
-    background: rgba(212, 175, 55, 0.22) !important;
-    border: 1px solid rgba(243, 202, 82, 0.5) !important;
-    color: #f3ca52 !important;
+    background: #042e1d !important;
+    border: 1px solid rgba(16, 185, 129, 0.55) !important;
+    color: #6ee7b7 !important;
 }
 
-/* Cards & Panels - PDF DEEP EMERALD METALLIC WITH GOLD BEVEL FRAME */
-.bg-panel, .gold-card-animated, .pdf-package-card, .ng-pkg-card {
-    background: linear-gradient(180deg, #063824 0%, #021d12 50%, #010905 100%) !important;
-    border: 2px solid rgba(243, 202, 82, 0.85) !important;
+/* Cards & Panels - POSTER METALLIC EMERALD WITH CRISP BORDERS (NO NAVY/SLATE BLUE) */
+.bg-panel, .gold-card-animated, .pdf-package-card, .ng-pkg-card,
+.bg-slate-900, .bg-slate-950, .bg-slate-800,
+[class*="bg-slate-900"], [class*="bg-slate-950"], [class*="bg-emerald-950"] {
+    background: linear-gradient(180deg, #042718 0%, #021a10 50%, #01120b 100%) !important;
+    border: 2px solid rgba(16, 185, 129, 0.8) !important;
     border-radius: 24px !important;
-    box-shadow: 0 0 30px rgba(243, 202, 82, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(16, 185, 129, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.15) !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .bg-panel:hover, .gold-card-animated:hover, .pdf-package-card:hover, .ng-pkg-card:hover {
-    transform: translateY(-5px) scale(1.015) !important;
-    border-color: #fff5c0 !important;
-    box-shadow: 0 0 40px rgba(243, 202, 82, 0.55), inset 0 1px 3px rgba(255, 255, 255, 0.35) !important;
+    transform: translateY(-4px) scale(1.015) !important;
+    border-color: #34d399 !important;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.95), 0 0 40px rgba(16, 185, 129, 0.45), inset 0 1px 3px rgba(255, 255, 255, 0.3) !important;
 }
 
-.ng-gold-ribbon {
-    background: linear-gradient(90deg, #d4af37 0%, #fff5c0 50%, #d4af37 100%) !important;
-    color: #000000 !important;
+.ng-gold-ribbon, .pdf-gold-ribbon, .zivo-emerald-pill {
+    background: linear-gradient(90deg, #059669 0%, #10b981 50%, #047857 100%) !important;
+    color: #ffffff !important;
     font-weight: 900 !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .ng-banner-title {
-    background: linear-gradient(180deg, #063824 0%, #021d12 50%, #010905 100%) !important;
-    border: 2px solid rgba(243, 202, 82, 0.85) !important;
+    background: linear-gradient(180deg, #042718 0%, #021a10 50%, #01120b 100%) !important;
+    border: 2px solid rgba(16, 185, 129, 0.8) !important;
     border-radius: 24px !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(243, 202, 82, 0.4) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 30px rgba(16, 185, 129, 0.35) !important;
 }
 
-/* Gold Shimmer Button */
+/* Poster Green Pill Banner */
+.zivo-pill-banner {
+    background: linear-gradient(90deg, #059669 0%, #10b981 50%, #047857 100%) !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Poster Table Styling (ZIVO PAY Deep Emerald Solid Theme) */
+.poster-clean-table {
+    background: #02180f !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.45) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95), inset 0 1px 2px rgba(255, 255, 255, 0.08) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.poster-clean-table th {
+    background: #042718 !important;
+    color: #a7f3d0 !important;
+    font-weight: 800 !important;
+    font-size: 11.5px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    padding: 14px 18px !important;
+    border-bottom: 2px solid rgba(16, 185, 129, 0.5) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+}
+
+.poster-clean-table td {
+    padding: 14px 18px !important;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.15) !important;
+    font-size: 13px !important;
+    color: #f1f5f9 !important;
+    font-weight: 600 !important;
+    background-color: #02180f !important;
+}
+
+.poster-clean-table tr:nth-child(even) td {
+    background-color: #032014 !important;
+}
+
+.poster-clean-table tr:hover td {
+    background-color: #053320 !important;
+}
+
+/* Reusable Poster Table Typography & Elements - ZIVO Metallic Card Dark Theme */
+.poster-table-title {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 13.5px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.poster-table-sub {
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+    font-size: 11.5px !important;
+}
+
+.poster-table-code {
+    color: #34d399 !important;
+    font-weight: 700 !important;
+    font-family: monospace !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
+}
+
+.poster-badge-active {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.5) !important;
+    font-weight: 800 !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 10.5px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25) !important;
+    display: inline-block !important;
+}
+
+.poster-badge-inactive {
+    background: rgba(244, 63, 94, 0.15) !important;
+    color: #fb7185 !important;
+    border: 1.5px solid rgba(244, 63, 94, 0.5) !important;
+    font-weight: 800 !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 10.5px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.25) !important;
+    display: inline-block !important;
+}
+
+.poster-badge-branch-left {
+    background: rgba(20, 184, 166, 0.15) !important;
+    color: #2dd4bf !important;
+    border: 1.5px solid rgba(20, 184, 166, 0.5) !important;
+    font-weight: 800 !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 10.5px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: inline-block !important;
+}
+
+.poster-badge-branch-right {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.5) !important;
+    font-weight: 800 !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 10.5px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: inline-block !important;
+}
+
+.poster-btn-action-view {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid #38bdf8 !important;
+    font-weight: 800 !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+    box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+.poster-btn-action-view:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+}
+
+.poster-btn-action-edit {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    font-weight: 800 !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+    transition: all 0.2s ease !important;
+}
+
+.poster-btn-action-edit:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+}
+
+.poster-btn-action-login {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4) !important;
+    transition: all 0.2s ease !important;
+}
+
+.poster-btn-action-login:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Emerald Shimmer Button */
 .bg-amber-500, .bg-emerald-500, .btn-gold, .pdf-gold-ribbon {
-    background: linear-gradient(90deg, #d4af37 0%, #f3ca52 35%, #fff5c0 50%, #f3ca52 65%, #aa771c 100%) !important;
-    background-size: 200% 100% !important;
-    animation: goldShimmer 4s infinite linear;
-    color: #000000 !important;
+    background: linear-gradient(90deg, #059669 0%, #10b981 50%, #047857 100%) !important;
+    color: #ffffff !important;
     font-weight: 900 !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
-    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.5) !important;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.5) !important;
     border: none !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .bg-amber-500 *, .bg-emerald-500 *, .btn-gold *, .pdf-gold-ribbon * {
-    color: #000000 !important;
+    color: #ffffff !important;
     font-weight: 900 !important;
 }
 
 .bg-amber-500:hover, .bg-emerald-500:hover, .btn-gold:hover, .pdf-gold-ribbon:hover {
     transform: translateY(-3px) scale(1.025);
-    box-shadow: 0 0 30px rgba(243, 202, 82, 0.7) !important;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.7) !important;
 }
 
 /* Card Titles & Headings */
-.text-amber-400, .text-emerald-400, .text-teal-400, .text-sky-400 {
-    color: #f3ca52 !important;
+.text-amber-400, .text-amber-300, .text-emerald-400, .text-teal-400, .text-sky-400 {
+    color: #34d399 !important;
 }
 
-/* Number Circle Badges like PDF */
+.pdf-gold-badge {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: 2px solid #a7f3d0 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.6) !important;
+    color: #ffffff !important;
+}
+
+.pdf-gold-badge * {
+    color: #ffffff !important;
+}
+
+/* Number Circle Badges like Poster */
 .pdf-num-badge {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #d4af37 0%, #f3ca52 50%, #aa771c 100%);
-    color: #000000;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
     font-weight: 900;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 16px rgba(243, 202, 82, 0.7);
-    border: 2px solid #fff5c0;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
+    border: 2px solid #a7f3d0;
 }
 
 /* Tables */
 .bg-bg {
-    background-color: rgba(1, 9, 5, 0.95) !important;
+    background-color: rgba(1, 15, 9, 0.95) !important;
 }
 
 thead th {
-    color: #f3ca52 !important;
+    color: #34d399 !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     font-size: 12px !important;
     font-weight: 800 !important;
     letter-spacing: 0.5px;
-    border-bottom: 1.5px solid rgba(212, 175, 55, 0.4) !important;
+    border-bottom: 1.5px solid rgba(16, 185, 129, 0.4) !important;
 }
 
 tbody tr {
@@ -396,21 +671,21 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background-color: rgba(243, 202, 82, 0.12) !important;
+    background-color: rgba(16, 185, 129, 0.1) !important;
 }
 
 /* Inputs & Form Controls */
 input[type="text"], input[type="email"], input[type="password"], input[type="number"], select {
-    background-color: rgba(1, 12, 6, 0.92) !important;
-    border: 1.5px solid rgba(212, 175, 55, 0.4) !important;
+    background-color: rgba(1, 15, 9, 0.92) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.45) !important;
     color: #ffffff !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     transition: all 0.25s ease !important;
 }
 
 input:focus, select:focus {
-    border-color: #f3ca52 !important;
-    box-shadow: 0 0 20px rgba(243, 202, 82, 0.5) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5) !important;
 }
 
 input.is-invalid, select.is-invalid {
@@ -435,17 +710,17 @@ input.is-valid, select.is-valid {
 .pagination-btn {
     padding: 6px 12px;
     border-radius: 8px;
-    background: rgba(1, 12, 6, 0.9);
-    border: 1px solid rgba(212, 175, 55, 0.35);
-    color: #f3ca52;
+    background: rgba(1, 15, 9, 0.9);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
     font-weight: 700;
     font-size: 12px;
     transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-    background: #f3ca52;
-    color: #000;
+    background: #10b981;
+    color: #ffffff;
 }
 
 .pagination-btn:disabled {
@@ -454,8 +729,8 @@ input.is-valid, select.is-valid {
 }
 
 .pagination-btn.active-page {
-    background: #f3ca52;
-    color: #000000;
+    background: #10b981;
+    color: #ffffff;
 }
 
 /* Global Toast Notification System */
@@ -476,9 +751,9 @@ input.is-valid, select.is-valid {
     max-width: 400px;
     padding: 14px 18px;
     border-radius: 14px;
-    background: linear-gradient(180deg, #093320 0%, #04190f 100%);
-    border: 1.5px solid #f3ca52;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(243, 202, 82, 0.4);
+    background: linear-gradient(180deg, #053522 0%, #031c12 100%);
+    border: 1.5px solid #10b981;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.4);
     color: #ffffff;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     font-size: 13px;
@@ -508,3 +783,342 @@ input.is-valid, select.is-valid {
         transform: translateX(0) scale(1);
     }
 }
+
+/* ========================================================
+   GLOBAL ZIVO EMERALD PRELOADER & PULL-TO-REFRESH ANIMATIONS
+   ======================================================== */
+
+/* 1. Fullscreen Global Page Loader Overlay */
+#globalPageLoader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 50%, rgba(5, 53, 34, 0.98) 0%, rgba(2, 28, 16, 0.98) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+}
+
+#globalPageLoader.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Dual Emerald Spinning Rings */
+.zivo-spinner-container {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zivo-spinner-outer {
+    position: absolute;
+    inset: 0;
+    border: 3px solid rgba(16, 185, 129, 0.15);
+    border-top: 3px solid #10b981;
+    border-right: 3px solid #34d399;
+    border-radius: 50%;
+    animation: spinOuter 1s linear infinite;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.zivo-spinner-inner {
+    position: absolute;
+    inset: 12px;
+    border: 3px solid rgba(16, 185, 129, 0.1);
+    border-bottom: 3px solid #059669;
+    border-left: 3px solid #a7f3d0;
+    border-radius: 50%;
+    animation: spinInner 0.75s linear infinite reverse;
+}
+
+.zivo-loader-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    animation: pulseLogo 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes spinOuter {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spinInner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseLogo {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8)); }
+}
+
+.zivo-loader-text {
+    margin-top: 18px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+.zivo-loader-sub {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6ee7b7;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* 2. Pull-To-Refresh Indicator Pill */
+#pullToRefreshIndicator {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    background: linear-gradient(135deg, #053522 0%, #031c12 100%);
+    border: 1.5px solid #10b981;
+    border-radius: 9999px;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.4);
+    transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#pullToRefreshIndicator.pull-visible {
+    top: 24px;
+    opacity: 1;
+}
+
+.pull-icon-container {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.pull-spinner-ring {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-top: 2px solid #34d399;
+    border-radius: 50%;
+    animation: spinOuter 0.8s linear infinite;
+}
+
+.pull-text {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Smooth Body Elastic Pull Effect */
+body.is-pulling {
+    touch-action: pan-x pan-y;
+}
+
+/* 3. Form & Card Glass Blur Effect on Action */
+.form-blur-loading, form.is-loading, .card-blur-loading {
+    filter: blur(5px) brightness(0.85) !important;
+    opacity: 0.7 !important;
+    pointer-events: none !important;
+    transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
+    user-select: none !important;
+}
+
+.relative-blur-container {
+    position: relative !important;
+}
+
+/* Localized Card/Form Spinner Overlay */
+.form-loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 28, 16, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Button Action Loader Spinner & Ripple Animations */
+button:not(.absolute):not([class*="absolute"]), .btn:not(.absolute):not([class*="absolute"]), .poster-btn-action-view, .poster-btn-action-edit, .poster-btn-action-login, input[type="submit"] {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Password Eye Toggle Buttons & Absolute Positioned Buttons Fix */
+button.absolute, button[class*="absolute"], .absolute-btn {
+    position: absolute !important;
+}
+
+.btn-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: btnSpinnerRotate 0.6s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+@keyframes btnSpinnerRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Button Ripple Wave Effect */
+.btn-ripple-wave {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    transform: scale(0);
+    animation: rippleEffect 0.55s cubic-bezier(0, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Dashboard 2-Column Side-by-Side Grid Layout Overrides (col-sm-6) */
+.grid-cols-2, .md\:grid-cols-2, .lg\:grid-cols-2, .grid-2-col {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+}
+
+@media (max-width: 768px) {
+    .grid-cols-2, .md\:grid-cols-2, .lg\:grid-cols-2, .grid-2-col {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+/* User Dashboard Glow & Animated Card Utility Overrides */
+.user-card-glow {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(3, 28, 18, 0.95) 100%) !important;
+    border: 2px solid rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.user-card-glow:hover {
+    border-color: rgba(16, 185, 129, 0.85) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.35) !important;
+    transform: translateY(-3px);
+}
+
+@keyframes pulseGlowBorder {
+    0%, 100% {
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+    }
+    50% {
+        border-color: rgba(16, 185, 129, 0.85);
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+    }
+}
+
+.pulse-border-glow {
+    animation: pulseGlowBorder 4s ease-in-out infinite;
+}
+
+/* Enhanced Interactive Animations & Card Hover Effects */
+.card-hover-scale {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
+}
+.card-hover-scale:hover {
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.35) !important;
+    border-color: rgba(52, 211, 153, 0.8) !important;
+}
+
+.btn-hover-lift {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-hover-lift:hover {
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+}
+.btn-hover-lift:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+/* Modal Entrance Scale Animation */
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#addFundModal > div, #approveModal > div, #rejectModal > div, .modal-animated {
+    animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Smooth Table Row Transition */
+table tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
+
+/* Responsive Table Wrapper Scrollbar Styling */
+.overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(16, 185, 129, 0.4) rgba(2, 28, 16, 0.8);
+}
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: rgba(2, 28, 16, 0.8);
+    border-radius: 9999px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.4);
+    border-radius: 9999px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.7);
+}
+
+

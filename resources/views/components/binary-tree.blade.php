@@ -21,25 +21,17 @@
         if (!$u) return [
             'sponsor_name' => 'N/A',
             'sponsor_code' => 'N/A',
-            'active_invest' => '$0.00',
+            'deposit_wallet' => '$0.00',
             'earning_wallet' => '$0.00',
-            'daily_roi' => '$0.00',
-            'direct_income' => '$0.00',
             'email' => 'N/A',
             'directs_count' => 0,
         ];
-
-        $activeInvest = $u->userPackages ? $u->userPackages->where('status', 'active')->sum('invested_amount') : 0;
-        $dailyRoi = $u->transactions ? $u->transactions->where('type', 'daily_roi')->sum('amount') : 0;
-        $directInc = $u->transactions ? $u->transactions->whereIn('type', ['direct_commission', 'direct_income'])->sum('amount') : 0;
         
         return [
             'sponsor_name' => $u->sponsor ? $u->sponsor->name : ($u->sponsor_code ? $u->sponsor_code : 'No Sponsor'),
             'sponsor_code' => $u->sponsor_code ?? 'N/A',
-            'active_invest' => '$' . number_format($activeInvest, 2),
+            'deposit_wallet' => '$' . number_format((float)($u->deposit_wallet ?? 0), 2),
             'earning_wallet' => '$' . number_format((float)($u->earning_wallet ?? 0), 2),
-            'daily_roi' => '$' . number_format($dailyRoi, 2),
-            'direct_income' => '$' . number_format($directInc, 2),
             'email' => $u->email ?? 'N/A',
             'directs_count' => \App\Models\User::where('sponsor_code', $u->referral_code)->count(),
         ];
@@ -89,13 +81,13 @@
     align-items: center;
 }
 
-/* Perfect Binary Tree Connector Lines (Dashed Yellow Lines matching Reference) */
+/* Perfect Binary Tree Connector Lines (Dashed Emerald Lines matching Poster) */
 .binary-tree-container li::before, .binary-tree-container li::after {
     content: '';
     position: absolute;
     top: 0;
     right: 50%;
-    border-top: 1.5px dashed #f3ca52;
+    border-top: 1.5px dashed #10b981;
     width: 50%;
     height: 20px;
 }
@@ -103,7 +95,7 @@
 .binary-tree-container li::after {
     right: auto;
     left: 50%;
-    border-left: 1.5px dashed #f3ca52;
+    border-left: 1.5px dashed #10b981;
 }
 
 .binary-tree-container li:only-child::after, .binary-tree-container li:only-child::before {
@@ -119,7 +111,7 @@
 }
 
 .binary-tree-container li:last-child::before {
-    border-right: 1.5px dashed #f3ca52;
+    border-right: 1.5px dashed #10b981;
     border-radius: 0 8px 0 0;
 }
 
@@ -132,7 +124,7 @@
     position: absolute;
     top: 0;
     left: 50%;
-    border-left: 1.5px dashed #f3ca52;
+    border-left: 1.5px dashed #10b981;
     width: 0;
     height: 20px;
 }
@@ -145,7 +137,7 @@
 .node-tooltip {
     position: absolute;
     background: linear-gradient(180deg, #051b11 0%, #010a06 100%);
-    border: 2px solid #f3ca52;
+    border: 2px solid #10b981;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95), 0 0 35px rgba(243, 202, 82, 0.45);
     border-radius: 1.25rem;
     padding: 1.35rem;
@@ -248,24 +240,26 @@
 </style>
 
 @php
-    $leftLink = url('/user/register?sponsor=' . ($root->referral_code ?? '') . '&position=left');
-    $rightLink = url('/user/register?sponsor=' . ($root->referral_code ?? '') . '&position=right');
+    $referralLink = url('/user/register?sponsor=' . ($root->referral_code ?? ''));
+    $totalDirects = $treeData['total_directs'] ?? ($root ? \App\Models\User::where('sponsor_code', $root->referral_code)->count() : 0);
+    $activeDirects = $treeData['active_directs'] ?? ($root ? \App\Models\User::where('sponsor_code', $root->referral_code)->where('status', 'active')->count() : 0);
+    $totalTeamCount = $treeData['total_team_count'] ?? ($root ? max(0, count($root->getBranchUserIds()) - 1) : 0);
 @endphp
 
 <div class="w-full space-y-4 select-none font-sans">
 
-    <!-- TOP 3 BINARY TEAM STATS CARDS (ALWAYS 1 ROW ON TABLET/DESKTOP, FULLY RESPONSIVE ON MOBILE) -->
+    <!-- TOP 3 TEAM STATS CARDS (ALWAYS 1 ROW ON TABLET/DESKTOP, FULLY RESPONSIVE ON MOBILE) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 items-stretch">
         
         <!-- CARD 1: COMBINED USER PROFILE & USER ID WITH COPY CODE -->
-        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Root User: {{ $root ? $root->name : 'N/A' }} ({{ $root ? $root->referral_code : 'N/A' }})">
-            <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-emerald-500/50 hover:border-emerald-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Root User: {{ $root ? $root->name : 'N/A' }} ({{ $root ? $root->referral_code : 'N/A' }})">
+            <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-emerald-500/20 pb-2">
                 <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(245,158,11,0.6)] border-2 border-yellow-200">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.6)] border-2 border-emerald-300">
                         {{ strtoupper(substr($root ? $root->name : 'U', 0, 1)) }}
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-sm font-black text-amber-300 font-heading truncate max-w-[120px] sm:max-w-[150px]">{{ $root ? $root->name : 'N/A' }}</h3>
+                        <h3 class="text-xs sm:text-sm font-black text-emerald-300 font-heading truncate max-w-[120px] sm:max-w-[150px]">{{ $root ? $root->name : 'N/A' }}</h3>
                         <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 flex items-center gap-1">
                             <span>👤</span> <span>USER PROFILE</span>
                         </span>
@@ -273,10 +267,10 @@
                 </div>
                 <div class="flex flex-col items-end shrink-0">
                     <div class="flex items-center gap-1">
-                        <span class="text-xs sm:text-sm font-black text-amber-300 font-mono">{{ $root ? $root->referral_code : 'N/A' }}</span>
+                        <span class="text-xs sm:text-sm font-black text-emerald-300 font-mono">{{ $root ? $root->referral_code : 'N/A' }}</span>
                         <button type="button" 
                                 onclick="copyReferralCode(event, '{{ $root ? $root->referral_code : '' }}')" 
-                                class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer"
+                                class="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer"
                                 title="Copy User ID Code">
                             📋 Copy
                         </button>
@@ -285,108 +279,89 @@
                 </div>
             </div>
             <div class="flex items-center justify-between pt-1.5 text-[9.5px] sm:text-[10px] font-mono font-bold text-neutral-300 flex-wrap gap-1">
-                <span class="flex items-center gap-1"><span class="text-amber-400">⚡</span> Status: <strong class="uppercase {{ ($root && $root->status === 'active') ? 'text-emerald-400' : 'text-amber-400' }}">{{ $root ? $root->status : 'N/A' }}</strong></span>
-                <span class="flex items-center gap-1"><span class="text-amber-400">📅</span> Root Tree View</span>
+                <span class="flex items-center gap-1"><span class="text-emerald-400">⚡</span> Status: <strong class="uppercase {{ ($root && $root->status === 'active') ? 'text-emerald-400' : 'text-rose-400' }}">{{ $root ? $root->status : 'N/A' }}</strong></span>
+                <span class="flex items-center gap-1"><span class="text-emerald-400">📅</span> Root Tree View</span>
             </div>
         </div>
 
-        <!-- CARD 2: LEFT BUSINESS & COPY LEFT REFERRAL LINK -->
-        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Left Leg Business: ${{ number_format($leftBusiness, 2) }} ({{ $leftActive }} Active, {{ $leftInactive }} Inactive, {{ $leftCount }} Total Members)">
-            <div class="flex items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+        <!-- CARD 2: DIRECT REFERRALS & COPY OFFICIAL REFERRAL LINK -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-emerald-500/50 hover:border-emerald-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Direct Referrals: {{ $totalDirects }} Total ({{ $activeDirects }} Active)">
+            <div class="flex items-center justify-between gap-1.5 border-b border-emerald-500/20 pb-2">
                 <div class="min-w-0">
-                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">${{ number_format($leftBusiness, 2) }}</h3>
-                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">👈 LEFT BUSINESS</span>
+                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">{{ $totalDirects }} Members</h3>
+                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">👥 DIRECT REFERRALS</span>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
-                    <span class="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[8.5px] font-mono font-bold">{{ $leftCount }} Total</span>
                     <button type="button" 
-                            onclick="copyReferralCode(event, '{{ $leftLink }}')" 
-                            class="px-2 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-[9px] sm:text-[9.5px] uppercase tracking-wider transition flex items-center gap-1 shadow cursor-pointer whitespace-nowrap"
-                            title="Copy Left Leg Referral Link">
-                        <span>📋</span> <span class="hidden sm:inline xl:inline">Copy</span> Left Link
+                            onclick="copyReferralCode(event, '{{ $referralLink }}')" 
+                            class="px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-white font-black text-[9px] sm:text-[9.5px] uppercase tracking-wider transition flex items-center gap-1 shadow cursor-pointer whitespace-nowrap"
+                            title="Copy Official Referral Link">
+                        <span>📋</span> <span>Copy Referral Link</span>
                     </button>
                 </div>
             </div>
             <div class="flex items-center justify-between pt-1.5 text-[8.5px] sm:text-[9.5px] font-mono font-bold flex-wrap gap-1">
                 <div class="flex items-center gap-1 flex-wrap">
                     <span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active: {{ $leftActive }}
-                    </span>
-                    <span class="px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inactive: {{ $leftInactive }}
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active: {{ $activeDirects }}
                     </span>
                 </div>
-                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-amber-300 shrink-0">TEAM A</span>
+                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-emerald-300 shrink-0">DIRECT SPONSOR</span>
             </div>
         </div>
 
-        <!-- CARD 3: RIGHT BUSINESS & COPY RIGHT REFERRAL LINK -->
-        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-amber-500/50 hover:border-amber-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Right Leg Business: ${{ number_format($rightBusiness, 2) }} ({{ $rightActive }} Active, {{ $rightInactive }} Inactive, {{ $rightCount }} Total Members)">
-            <div class="flex items-center justify-between gap-1.5 border-b border-amber-500/20 pb-2">
+        <!-- CARD 3: DOWNLINE NETWORK TEAM OVERVIEW -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#063824] to-[#021d12] border border-emerald-500/50 hover:border-emerald-400 hover:scale-[1.01] transition-all shadow-md flex flex-col justify-between h-full min-h-[80px]" title="Total Team Members: {{ $totalTeamCount }}">
+            <div class="flex items-center justify-between gap-1.5 border-b border-emerald-500/20 pb-2">
                 <div class="min-w-0">
-                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">${{ number_format($rightBusiness, 2) }}</h3>
-                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">RIGHT BUSINESS 👉</span>
+                    <h3 class="text-xs sm:text-sm font-black text-emerald-400 font-mono truncate">{{ $totalTeamCount }} Members</h3>
+                    <span class="text-[8.5px] sm:text-[9px] font-black uppercase text-neutral-400 block">🌐 TOTAL TEAM NETWORK</span>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
-                    <span class="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[8.5px] font-mono font-bold">{{ $rightCount }} Total</span>
-                    <button type="button" 
-                            onclick="copyReferralCode(event, '{{ $rightLink }}')" 
-                            class="px-2 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-[9px] sm:text-[9.5px] uppercase tracking-wider transition flex items-center gap-1 shadow cursor-pointer whitespace-nowrap"
-                            title="Copy Right Leg Referral Link">
-                        <span>📋</span> <span class="hidden sm:inline xl:inline">Copy</span> Right Link
-                    </button>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[8.5px] font-mono font-bold">Network Tree</span>
                 </div>
             </div>
             <div class="flex items-center justify-between pt-1.5 text-[8.5px] sm:text-[9.5px] font-mono font-bold flex-wrap gap-1">
-                <div class="flex items-center gap-1 flex-wrap">
-                    <span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active: {{ $rightActive }}
-                    </span>
-                    <span class="px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inactive: {{ $rightInactive }}
-                    </span>
-                </div>
-                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-emerald-300 shrink-0">TEAM B</span>
+                <span class="text-emerald-300 font-semibold">Total Downline Team Members</span>
+                <span class="text-[8.5px] sm:text-[9.5px] font-black uppercase text-emerald-300 shrink-0">UNILEVEL TEAM</span>
             </div>
         </div>
 
     </div>
 
     <!-- CANVAS HEADER TOOLBAR WITH DOWNLOAD IMAGE BUTTON & LEGEND -->
-    <div class="w-full flex flex-col md:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#042115] to-[#010c07] border border-amber-500/40 shadow-md">
+    <div class="w-full flex flex-col md:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-gradient-to-b from-[#042115] to-[#010c07] border border-emerald-500/40 shadow-md">
         <!-- Left Group: Title Badge & Legend -->
         <div class="flex items-center gap-2.5 flex-wrap justify-center md:justify-start">
-            <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-400/50 text-amber-300 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm whitespace-nowrap">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span>BINARY TREE</span>
+            <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/10 border border-emerald-400/50 text-emerald-300 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm whitespace-nowrap">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>TEAM HIERARCHY TREE</span>
             </span>
 
-            <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-black/60 border border-amber-500/30 text-xs font-bold text-amber-300 whitespace-nowrap">
-                <span class="text-amber-400 flex items-center gap-1">👈 Left Branch</span>
-                <span class="text-amber-500/40">|</span>
-                <span class="text-amber-400 flex items-center gap-1">Right Branch 👉</span>
+            <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-black/60 border border-emerald-500/30 text-xs font-bold text-emerald-300 whitespace-nowrap">
+                <span class="text-emerald-400 flex items-center gap-1">👥 Direct Downline Members</span>
             </div>
         </div>
 
         <!-- Right Group: Action Buttons & Zoom Controls -->
         <div class="flex items-center gap-2 shrink-0 flex-wrap justify-center w-full md:w-auto">
             <!-- Mobile/Desktop Zoom Controls -->
-            <div class="flex items-center gap-1 bg-black/80 p-1 rounded-xl border border-amber-500/40 shadow-sm">
-                <button type="button" onclick="zoomTree(0.85)" class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom Out">-</button>
-                <button type="button" onclick="zoomTree(1)" class="px-2 h-7 rounded-lg text-amber-300 font-mono font-bold text-[10px] sm:text-[11px] hover:bg-amber-500/20 active:scale-95 transition" title="Reset Zoom">100%</button>
-                <button type="button" onclick="zoomTree(1.15)" class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom In">+</button>
+            <div class="flex items-center gap-1 bg-black/80 p-1 rounded-xl border border-emerald-500/40 shadow-sm">
+                <button type="button" onclick="zoomTree(0.85)" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom Out">-</button>
+                <button type="button" onclick="zoomTree(1)" class="px-2 h-7 rounded-lg text-emerald-300 font-mono font-bold text-[10px] sm:text-[11px] hover:bg-emerald-500/20 active:scale-95 transition" title="Reset Zoom">100%</button>
+                <button type="button" onclick="zoomTree(1.15)" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 flex items-center justify-center font-black font-mono text-xs sm:text-sm active:scale-95 transition" title="Zoom In">+</button>
             </div>
 
             <button type="button" 
                     onclick="downloadTreeImage()" 
                     id="downloadTreeBtn"
-                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1 transition shadow cursor-pointer whitespace-nowrap active:scale-95">
+                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1 transition shadow cursor-pointer whitespace-nowrap active:scale-95">
                 <span>📸 Save</span>
             </button>
 
             <button type="button" 
                     onclick="centerTreeCanvas()" 
-                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-black/90 hover:bg-black border border-amber-500/50 text-amber-300 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition shadow whitespace-nowrap active:scale-95"
+                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-black/90 hover:bg-black border border-emerald-500/50 text-emerald-300 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition shadow whitespace-nowrap active:scale-95"
                     title="Recenter Tree View">
                 <span>🎯 Recenter</span>
             </button>
@@ -394,17 +369,17 @@
     </div>
 
     <!-- MOBILE HORIZONTAL SWIPE & TAP HINT BAR -->
-    <div class="md:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[10.5px] text-amber-300 font-mono shadow-sm">
+    <div class="md:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[10.5px] text-emerald-300 font-mono shadow-sm">
         <span class="flex items-center gap-1.5 font-bold">
-            <span class="text-amber-400 animate-pulse">↔️</span> <span>Swipe horizontally to view binary tree</span>
+            <span class="text-emerald-400 animate-pulse">↔️</span> <span>Swipe horizontally to view team network tree</span>
         </span>
-        <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-black text-[9.5px] uppercase border border-amber-400/40">
+        <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-black text-[9.5px] uppercase border border-emerald-400/40">
             Tap node for info
         </span>
     </div>
 
     <!-- MAIN LEFT / RIGHT BINARY TREE GRAPH CANVAS -->
-    <div id="treeCanvasContainer" class="w-full rounded-2xl bg-black/80 border border-amber-500/40 p-2 sm:p-4 relative overflow-hidden">
+    <div id="treeCanvasContainer" class="w-full rounded-2xl bg-black/80 border border-emerald-500/40 p-2 sm:p-4 relative overflow-hidden">
         
         <div class="genealogy-tree-wrapper">
             <div class="binary-tree-container">
@@ -418,22 +393,22 @@
 </div>
 
 <!-- DETAILED MOBILE MEMBER INFO MODAL OVERLAY -->
-<div id="mobileMemberModal" style="display: none;" class="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-    <div class="relative w-full max-w-[340px] sm:max-w-md p-5 rounded-3xl border-2 border-amber-400 shadow-[0_0_50px_rgba(243,202,82,0.45)] text-left space-y-3 text-xs animate-modal-pop" style="background: linear-gradient(180deg, #051b11 0%, #010a06 100%) !important;">
+<div id="mobileMemberModal" style="display: none;" class="fixed inset-0 z-[99999] bg-black/90 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="relative w-full max-w-[340px] sm:max-w-md p-5 rounded-3xl border-2 border-emerald-400 shadow-[0_0_50px_rgba(16,185,129,0.45)] text-left space-y-3 text-xs animate-modal-pop" style="background: linear-gradient(180deg, #051b11 0%, #010a06 100%) !important;">
         
         <!-- Header -->
-        <div class="flex justify-between items-center pb-3 border-b border-amber-500/30 gap-2">
+        <div class="flex justify-between items-center pb-3 border-b border-emerald-500/30 gap-2">
             <div class="flex items-center gap-2.5 min-w-0">
-                <div id="mobileModalAvatar" class="w-10 h-10 rounded-full font-black text-sm flex items-center justify-center shrink-0 shadow-md avatar-3d-gold">
+                <div id="mobileModalAvatar" class="w-10 h-10 rounded-full font-black text-sm flex items-center justify-center shrink-0 shadow-md bg-emerald-600 text-white">
                     U
                 </div>
                 <div class="min-w-0">
                     <h3 id="mobileModalName" class="font-black text-white text-sm sm:text-base font-heading truncate">Member Name</h3>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span id="mobileModalCode" class="text-[11px] sm:text-xs text-amber-400 font-mono font-bold">0000000</span>
+                        <span id="mobileModalCode" class="text-[11px] sm:text-xs text-emerald-400 font-mono font-bold">0000000</span>
                         <button type="button" 
                                 onclick="copyReferralCode(event, document.getElementById('mobileModalCode').textContent)" 
-                                class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer">
+                                class="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 text-[9px] font-bold uppercase transition flex items-center gap-0.5 cursor-pointer">
                             📋 Copy
                         </button>
                     </div>
@@ -446,33 +421,33 @@
 
         <!-- Details Rows with Icons & Subtle Dividers -->
         <div class="space-y-2 py-1">
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">👤</span> Sponsor:</span>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">👤</span> Sponsor:</span>
                 <span id="mobileModalSponsor" class="font-bold text-white font-mono truncate max-w-[160px]">ROOT</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">⚡</span> Status:</span>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">⚡</span> Status:</span>
                 <span id="mobileModalStatus" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-400/40">ACTIVE</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
                 <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">💰</span> Active Capital:</span>
                 <span id="mobileModalActiveInvest" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
                 <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">👛</span> Earning Wallet:</span>
                 <span id="mobileModalEarningWallet" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">📈</span> Daily ROI Income:</span>
-                <span id="mobileModalDailyRoi" class="font-mono text-amber-400 font-bold">$0.00</span>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">📈</span> Daily ROI Income:</span>
+                <span id="mobileModalDailyRoi" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-400">🎁</span> Direct Income:</span>
-                <span id="mobileModalDirectIncome" class="font-mono text-amber-400 font-bold">$0.00</span>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">🎁</span> Direct Income:</span>
+                <span id="mobileModalDirectIncome" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
-            <div class="flex justify-between items-center py-1 border-b border-amber-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-amber-300">👥</span> Downline Count:</span>
-                <span id="mobileModalDirects" class="font-bold text-amber-300 font-mono">0 Members</span>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-300">👥</span> Downline Count:</span>
+                <span id="mobileModalDirects" class="font-bold text-emerald-300 font-mono">0 Members</span>
             </div>
             <div class="flex justify-between items-center py-1">
                 <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-neutral-400">📅</span> Joined Date:</span>
@@ -481,7 +456,7 @@
         </div>
 
         <div class="pt-2 flex flex-col gap-2">
-            <a id="mobileModalNavBtn" href="#" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider text-center block shadow transition">
+            <a id="mobileModalNavBtn" href="#" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider text-center block shadow transition">
                 🔍 Inspect This Branch Subtree
             </a>
             <button type="button" onclick="closeMobileMemberModal()" class="w-full py-2 rounded-xl bg-black/80 hover:bg-black border border-white/30 text-neutral-300 font-bold text-xs uppercase tracking-wider transition">
@@ -575,7 +550,7 @@
             const image = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             const userCode = "{{ $root->referral_code ?? 'TREE' }}";
-            link.download = `Dex_Trade_Binary_Tree_${userCode}.png`;
+            link.download = `Zivo_Pay_Team_Tree_${userCode}.png`;
             link.href = image;
             link.click();
 

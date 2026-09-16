@@ -1,18 +1,14 @@
 <?php
 
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\User\ArbitrageController;
-use App\Http\Controllers\User\BotController;
 use App\Http\Controllers\User\DashboardController;
-use App\Http\Controllers\User\DepositController;
-use App\Http\Controllers\User\IncomeReportController;
+use App\Http\Controllers\User\IncomeController;
+use App\Http\Controllers\User\InvestmentController;
 use App\Http\Controllers\User\LoginController;
 use App\Http\Controllers\User\NetworkController as UserNetworkController;
-use App\Http\Controllers\User\PackageController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\RegisterController;
-use App\Http\Controllers\User\TicketController as UserTicketController;
-use App\Http\Controllers\User\TransactionController;
+use App\Http\Controllers\User\RewardController;
+use App\Http\Controllers\User\WalletController;
 use App\Http\Controllers\User\WithdrawalController;
 use App\Http\Middleware\UserAuth;
 use App\Http\Middleware\UserGuest;
@@ -20,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| User Member Routes & Security Middlewares
+| User Member Routes & Security Middlewares - ZIVO PAY
 |--------------------------------------------------------------------------
 */
 
@@ -29,12 +25,14 @@ Route::prefix('user')->name('user.')->group(function () {
     // Public Live Sponsor Check API Endpoint
     Route::get('check-sponsor', [RegisterController::class, 'checkSponsor'])->name('check-sponsor');
 
+    // Registration Routes (Accessible by both Guests and Authenticated Members for Downline Registration)
+    Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [RegisterController::class, 'register']);
+
     // Guest User Routes (Redirects to User Dashboard if already logged in)
     Route::middleware(UserGuest::class)->group(function () {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('login', [LoginController::class, 'login']);
-        Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-        Route::post('register', [RegisterController::class, 'register']);
     });
 
     // Authenticated User Routes (Requires User Authentication)
@@ -42,48 +40,16 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('/', [DashboardController::class, '__invoke']);
         Route::get('dashboard', [DashboardController::class, '__invoke'])->name('dashboard');
 
-        // Live Arbitrage Trading Dashboard Routes
-        Route::get('arbitrage', [ArbitrageController::class, 'index'])->name('arbitrage');
-        Route::get('arbitration', [ArbitrageController::class, 'index'])->name('arbitration');
+        // Stop Impersonating Route
+        Route::get('stop-impersonate', [\App\Http\Controllers\Admin\UserController::class, 'stopImpersonating'])->name('stop-impersonate');
 
-        // AI BOT Trading & One-Time Activation Routes
-        Route::get('bot', [BotController::class, 'index'])->name('bot.index');
-        Route::get('bot/trading', [BotController::class, 'tradingView'])->name('bot.trading');
-        Route::post('bot/activate', [BotController::class, 'activate'])->name('bot.activate');
+        // Fund & Wallet Transfer Routes
+        Route::get('wallet/transfer', [WalletController::class, 'showTransferForm'])->name('wallet.transfer');
+        Route::post('wallet/transfer', [WalletController::class, 'transfer'])->name('wallet.transfer.store');
 
-        // Add Fund / Deposit Wallet Routes
-        Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
-        Route::post('deposits', [DepositController::class, 'store'])->name('deposits.store');
-        Route::get('deposits/history', [DepositController::class, 'history'])->name('deposits.history');
-        Route::get('deposits/payment/{deposit}', [DepositController::class, 'paymentView'])->name('deposits.payment');
-        Route::get('deposits/{deposit}/check-status', [DepositController::class, 'checkStatus'])->name('deposits.check-status');
-        Route::post('deposits/{deposit}/simulate-payment', [DepositController::class, 'simulatePayment'])->name('deposits.simulate-payment');
-        Route::get('deposits/{deposit}', [DepositController::class, 'show'])->name('deposits.show');
-
-        // Earning Wallet Withdrawal Routes (PDF Slide 20: Min $10, 10% Deduction, USDT BEP20)
-        Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
-        Route::post('withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');
-        Route::get('withdrawals/history', [WithdrawalController::class, 'history'])->name('withdrawals.history');
-
-        // Buy Package & Investment History Routes
-        Route::get('packages', [PackageController::class, 'index'])->name('packages.index');
-        Route::post('packages/buy', [PackageController::class, 'buy'])->name('packages.buy');
-        Route::get('packages/history', [PackageController::class, 'history'])->name('packages.history');
-
-        // Detailed Financial Transaction Log Route
-        Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
-
-        // Comprehensive User Income Reports Routes
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('summary', [IncomeReportController::class, 'summary'])->name('summary');
-            Route::get('roi', [IncomeReportController::class, 'roi'])->name('roi');
-            Route::get('direct', [IncomeReportController::class, 'direct'])->name('direct');
-            Route::get('matching', [IncomeReportController::class, 'matching'])->name('matching');
-            Route::get('referral-roi', [IncomeReportController::class, 'referralRoi'])->name('referral-roi');
-            Route::get('matching-roi', [IncomeReportController::class, 'matchingRoi'])->name('matching-roi');
-            Route::get('upline-matching', [IncomeReportController::class, 'uplineMatching'])->name('upline-matching');
-            Route::get('salary', [IncomeReportController::class, 'salary'])->name('salary');
-        });
+        // Buy Package ₹3,000 Activation Routes
+        Route::get('package/buy', [WalletController::class, 'showBuyPackageForm'])->name('package.buy');
+        Route::post('package/buy', [WalletController::class, 'activateSubscription'])->name('wallet.subscription.activate');
 
         // My Network Module Routes
         Route::get('network/direct', [UserNetworkController::class, 'directMembers'])->name('network.direct');
@@ -94,15 +60,26 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::put('profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
         Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
 
-        Route::get('stop-impersonate', [AdminUserController::class, 'stopImpersonating'])->name('stop-impersonate');
+        // Investment Packages Plan Routes
+        Route::get('investment/plan', [InvestmentController::class, 'index'])->name('investment.index');
+        Route::post('investment/plan', [InvestmentController::class, 'store'])->name('investment.store');
 
-        // User Support Ticket System Routes
-        Route::get('tickets', [UserTicketController::class, 'index'])->name('tickets.index');
-        Route::get('tickets/create', [UserTicketController::class, 'create'])->name('tickets.create');
-        Route::post('tickets', [UserTicketController::class, 'store'])->name('tickets.store');
-        Route::get('tickets/{ticket}', [UserTicketController::class, 'show'])->name('tickets.show');
-        Route::post('tickets/{ticket}/reply', [UserTicketController::class, 'reply'])->name('tickets.reply');
-        Route::post('tickets/{ticket}/close', [UserTicketController::class, 'close'])->name('tickets.close');
+        // Income & Transaction Ledger Routes
+        Route::get('income', [IncomeController::class, 'index'])->name('income.index');
+        Route::get('reports/deposits', [IncomeController::class, 'depositHistory'])->name('reports.deposits');
+        Route::get('reports/package-history', [IncomeController::class, 'packageHistory'])->name('reports.package-history');
+        Route::get('reports/investments', [IncomeController::class, 'investmentHistory'])->name('reports.investments');
+        Route::get('income/subscription-direct', [IncomeController::class, 'subscriptionDirectIncome'])->name('income.subscription-direct');
+        Route::get('income/subscription-team', [IncomeController::class, 'subscriptionTeamIncome'])->name('income.subscription-team');
+        Route::get('income/roi', [IncomeController::class, 'roiIncome'])->name('income.roi');
+        Route::get('income/level-direct', [IncomeController::class, 'levelDirectIncome'])->name('income.level-direct');
+        Route::get('income/direct-business', [IncomeController::class, 'directBusinessIncome'])->name('income.direct-business');
+        Route::get('income/level-roi', [IncomeController::class, 'levelRoiIncome'])->name('income.level-roi');
+        Route::get('rewards', [RewardController::class, 'index'])->name('rewards.index');
+
+        // 24x7 Withdrawal Portal Routes
+        Route::get('withdrawal', [WithdrawalController::class, 'index'])->name('withdrawal.index');
+        Route::post('withdrawal', [WithdrawalController::class, 'store'])->name('withdrawal.store');
 
         // Logout Route
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');

@@ -1,182 +1,108 @@
 @extends('admin.layouts.app')
 
-@section('content')
-<style>
-.gold-3d-badge {
-    background: linear-gradient(180deg, #fef08a 0%, #f59e0b 50%, #b45309 100%) !important;
-    border: 2px solid #fef08a !important;
-    box-shadow: 0 4px 15px rgba(243, 202, 82, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.6) !important;
-}
-</style>
+@section('title', 'Add New Capital Package - ZIVO PAY Admin')
 
-<div class="w-full space-y-6">
+@section('content')
+<div class="w-full space-y-6 font-sans max-w-4xl mx-auto">
     <!-- Header Banner -->
-    <div class="ng-banner-title p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/95 border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.3)] flex items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="pdf-num-badge">AP</span>
-                <span class="text-xs text-amber-400 font-extrabold tracking-[3px] uppercase">DEX TRADE NETWORK</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">NEW PLAN</span>
+                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CONFIGURATION</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-gold-gradient font-heading">ADD NEW PACKAGE</h1>
-            <p class="text-xs text-neutral-300 mt-1">Configure a new investment tier for Dex Trade members.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">ADD NEW CAPITAL PACKAGE</h1>
+            <p class="text-xs text-neutral-300 mt-1">Define package name, min/max capital limit, daily ROI percentage return, and referral bonus rules.</p>
         </div>
 
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.packages.index') }}" class="px-5 py-3 rounded-xl bg-bg border border-amber-500/40 text-amber-300 font-bold text-xs hover:bg-amber-500/20 transition flex items-center gap-2">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Packages
-            </a>
-        </div>
+        <a href="{{ route('admin.packages.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 border border-emerald-500/30 text-neutral-300 text-xs font-bold hover:text-white transition">
+            Back to Packages
+        </a>
     </div>
 
-    <!-- 2-Column Split: Form (Left) & Live Preview (Right) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- LEFT: Form Input Container -->
-        <div class="lg:col-span-2 bg-panel p-6 sm:p-8 shadow-2xl rounded-2xl border border-amber-500/30">
-            <form action="{{ route('admin.packages.store') }}" method="POST" class="space-y-6">
-                @csrf
+    <!-- Form Container -->
+    <div class="bg-slate-900/90 p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl">
+        <form action="{{ route('admin.packages.store') }}" method="POST" class="space-y-6">
+            @csrf
 
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Package Name</label>
-                    <input type="text" name="name" id="inputName" value="{{ old('name') }}" placeholder="e.g. PACKAGE 6" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Package Name -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Package Plan Name</label>
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Starter Growth Kit" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('name') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Minimum Amount ($)</label>
-                        <input type="number" step="0.01" name="min_amount" id="inputMin" value="{{ old('min_amount') }}" placeholder="10.00" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Maximum Amount ($)</label>
-                        <input type="number" step="0.01" name="max_amount" id="inputMax" value="{{ old('max_amount') }}" placeholder="500.00" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
-                    </div>
+                <!-- Minimum Investment Amount -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Minimum Amount (₹)</label>
+                    <input type="number" step="0.01" name="min_amount" value="{{ old('min_amount', 1000) }}" placeholder="1000" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('min_amount') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Daily ROI (%)</label>
-                        <input type="number" step="0.01" name="daily_roi" id="inputRoi" value="{{ old('daily_roi') }}" placeholder="0.75" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Duration (Days)</label>
-                        <input type="number" name="duration_days" id="inputDuration" value="{{ old('duration_days', 200) }}" placeholder="200" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Return Multiplier</label>
-                        <input type="number" step="0.1" name="total_return_multiplier" id="inputMultiplier" value="{{ old('total_return_multiplier', 2.0) }}" placeholder="2.0" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400" required>
-                    </div>
+                <!-- Maximum Investment Amount -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Maximum Amount (₹)</label>
+                    <input type="number" step="0.01" name="max_amount" value="{{ old('max_amount', 99999) }}" placeholder="99999" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('max_amount') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Status</label>
-                    <select name="status" id="inputStatus" class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
+                <!-- Daily ROI Return Percentage -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Daily ROI Return Rate (%)</label>
+                    <input type="number" step="0.01" name="daily_roi_percentage" value="{{ old('daily_roi_percentage', 0.15) }}" placeholder="0.15" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    <p class="text-[10px] text-neutral-400 mt-1">Daily profit rate (e.g. 0.15% = ₹1.50 per day per ₹1,000).</p>
+                    @error('daily_roi_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Duration in Days -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Duration (Days)</label>
+                    <input type="number" name="duration_days" value="{{ old('duration_days', 730) }}" placeholder="730" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('duration_days') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Direct Level 1 Bonus Percentage -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 1 Direct Bonus (%)</label>
+                    <input type="number" step="0.01" name="direct_bonus_percentage" value="{{ old('direct_bonus_percentage', 5.00) }}" placeholder="5.00" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('direct_bonus_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Team Level 2-15 Bonus Percentage -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 2-15 Team Bonus (%)</label>
+                    <input type="number" step="0.01" name="level_income_percentage" value="{{ old('level_income_percentage', 0.50) }}" placeholder="0.50" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
+                    @error('level_income_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
                         <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
+                    @error('status') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-amber-400 uppercase tracking-wider">Description</label>
-                    <textarea name="description" id="inputDesc" rows="3" placeholder="Package description..." class="w-full px-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">{{ old('description') }}</textarea>
-                </div>
-
-                <div class="pt-4 border-t border-amber-500/20 flex items-center justify-end gap-3">
-                    <a href="{{ route('admin.packages.index') }}" class="px-6 py-3 rounded-xl bg-bg border border-amber-500/30 text-neutral-300 font-bold text-xs uppercase tracking-wider hover:bg-neutral-800 transition">
-                        CANCEL
-                    </a>
-                    <button type="submit" class="px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition flex items-center gap-2">
-                        <i data-lucide="check" class="w-4 h-4 text-black"></i> CREATE PACKAGE
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- RIGHT: Live Package Card Preview -->
-        <div class="space-y-4">
-            <div class="text-xs font-black text-amber-400 uppercase tracking-widest flex items-center gap-2">
-                <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i> LIVE CARD PREVIEW
-            </div>
-
-            <div class="p-6 rounded-3xl bg-bg border border-amber-500/40 space-y-4 relative overflow-hidden shadow-2xl">
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-2xl gold-3d-badge text-black flex items-center justify-center font-black text-lg shadow-md shrink-0">
-                            <i data-lucide="rocket" class="w-5 h-5"></i>
-                        </div>
-                        <span id="previewStatus" class="px-3 py-1 rounded-full text-[10px] font-black uppercase border border-amber-500/40 bg-amber-500/20 text-amber-300">
-                            ACTIVE
-                        </span>
-                    </div>
-
-                    <div>
-                        <div id="previewName" class="text-xs font-extrabold text-neutral-300 uppercase tracking-wider">NEW PACKAGE</div>
-                        <h3 id="previewRange" class="text-2xl font-black text-gold-gradient font-mono mt-1">$10 - $500</h3>
-                    </div>
-
-                    <div class="p-4 rounded-2xl bg-panel border border-amber-500/30 space-y-2 font-mono">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-neutral-400 font-sans font-bold">Daily ROI:</span>
-                            <span id="previewRoi" class="text-amber-300 font-black text-sm">0.75% / Day</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-neutral-400 font-sans font-bold">Duration:</span>
-                            <span id="previewDuration" class="text-white font-black text-sm">200 Days</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-neutral-400 font-sans font-bold">Total Return:</span>
-                            <span id="previewMultiplier" class="text-amber-300 font-black text-sm">0.0X Return</span>
-                        </div>
-                    </div>
-
-                    <p id="previewDesc" class="text-[11px] text-neutral-400 leading-relaxed italic">
-                        Official Dex Trade investment plan.
-                    </p>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-neutral-400">
-                    <span>Status</span>
-                    <span id="previewStatus" class="font-bold text-emerald-400 uppercase">ACTIVE</span>
+                <!-- Description -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Plan Description & Conditions</label>
+                    <textarea name="description" rows="3" placeholder="Brief details about package benefits and conditions..." class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400">{{ old('description') }}</textarea>
+                    @error('description') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
-        </div>
 
+            <div class="pt-4 border-t border-emerald-500/20 flex items-center justify-end gap-3">
+                <a href="{{ route('admin.packages.index') }}" class="px-5 py-2.5 rounded-xl bg-slate-800 text-neutral-300 font-bold text-xs hover:text-white transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition">
+                    Save Capital Package
+                </button>
+            </div>
+        </form>
     </div>
 </div>
-
-<script>
-    const inputName = document.getElementById('name');
-    const inputMin = document.getElementById('min_amount');
-    const inputMax = document.getElementById('max_amount');
-    const inputRoi = document.getElementById('daily_roi_percent');
-    const inputDuration = document.getElementById('duration_days');
-    const inputMultiplier = document.getElementById('capping_multiplier');
-    const inputStatus = document.getElementById('status');
-    const inputDesc = document.getElementById('description');
-
-    const previewName = document.getElementById('previewName');
-    const previewMin = document.getElementById('previewMin');
-    const previewMax = document.getElementById('previewMax');
-    const previewRoi = document.getElementById('previewRoi');
-    const previewDuration = document.getElementById('previewDuration');
-    const previewMultiplier = document.getElementById('previewMultiplier');
-    const previewStatus = document.getElementById('previewStatus');
-    const previewDesc = document.getElementById('previewDesc');
-
-    function updatePreview() {
-        if (previewName) previewName.innerText = inputName.value || 'Package Title';
-        if (previewMin) previewMin.innerText = '$' + (parseFloat(inputMin.value)||0).toFixed(2);
-        if (previewMax) previewMax.innerText = '$' + (parseFloat(inputMax.value)||0).toFixed(2);
-        if (previewRoi) previewRoi.innerText = (parseFloat(inputRoi.value)||0).toFixed(2) + '% Daily';
-        if (previewDuration) previewDuration.innerText = (inputDuration.value||0) + ' Days';
-        if (previewMultiplier) previewMultiplier.innerText = (parseFloat(inputMultiplier.value)||0).toFixed(1) + 'X Return';
-        if (previewStatus) previewStatus.innerText = (inputStatus.value || 'active').toUpperCase();
-        if (previewDesc) previewDesc.innerText = inputDesc.value || 'Official Dex Trade investment plan.';
-    }
-
-    [inputName, inputMin, inputMax, inputRoi, inputDuration, inputMultiplier, inputStatus, inputDesc].forEach(el => {
-        if (el) el.addEventListener('input', updatePreview);
-        if (el) el.addEventListener('change', updatePreview);
-    });
-});
-</script>
 @endsection

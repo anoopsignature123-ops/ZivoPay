@@ -4,7 +4,6 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -12,240 +11,75 @@ use Illuminate\View\View;
 class NetworkController extends Controller
 {
     /**
-     * Display listing of direct members for current logged-in user.
+     * Direct Members Directory with Filtering & Stats.
      */
     public function directMembers(Request $request): View
     {
         $user = Auth::user();
+
         $query = User::where('sponsor_code', $user->referral_code);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim((string) $request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('referral_code', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('mobile', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('position')) {
-            $query->where('position', $request->position);
-        }
-
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = strtolower((string) $request->input('status'));
+            if (in_array($status, ['active', 'inactive'])) {
+                $query->where('status', $status);
+            }
         }
 
-        $directs = $query->latest()->paginate(10)->withQueryString();
+        $directs = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
+        $allDirects = User::where('sponsor_code', $user->referral_code)->get();
 
         $stats = [
-            'total' => User::where('sponsor_code', $user->referral_code)->count(),
-            'active' => User::where('sponsor_code', $user->referral_code)->where('status', 'active')->count(),
-            'left' => User::where('sponsor_code', $user->referral_code)->where('position', 'left')->count(),
-            'right' => User::where('sponsor_code', $user->referral_code)->where('position', 'right')->count(),
+            'total' => $allDirects->count(),
+            'active' => $allDirects->where('status', 'active')->count(),
+            'inactive' => $allDirects->where('status', 'inactive')->count(),
         ];
 
         return view('user.network.direct', compact('directs', 'stats'));
     }
 
     /**
-     * Display Visual Binary Team Tree for member.
+     * Direct Network Unilevel Downline Tree View.
      */
     public function treeView(Request $request): View
     {
         $currentUser = Auth::user();
-        $searchCode = $request->query('code');
+        $code = trim((string) $request->input('code'));
 
-        if ($searchCode) {
-            $targetUser = User::where('referral_code', $searchCode)->first();
-            // Ensure member can view root or downline tree
-            if ($targetUser) {
-                $rootUser = $targetUser;
+        if (! empty($code)) {
+            $targetUser = User::where('referral_code', $code)->first();
+
+            if ($targetUser && ($targetUser->id === $currentUser->id || in_array($targetUser->id, $currentUser->getBranchUserIds()))) {
+                $root = $targetUser;
             } else {
-                $rootUser = $currentUser;
+                return redirect()->route('user.network.tree')->with('error', 'Referral code not found in your downline tree.');
             }
         } else {
-            $rootUser = $currentUser;
+            $root = $currentUser;
         }
 
-        $treeData = $this->buildBinaryTreeData($rootUser);
-        $directMembers = User::where('sponsor_code', $rootUser->referral_code)->latest()->get();
+        $root->load(['sponsor', 'directs']);
 
-        return view('user.network.tree', compact('rootUser', 'treeData', 'directMembers'));
-    }
+        $directMembers = User::where('sponsor_code', $root->referral_code)->with('directs')->get();
 
-    /**
-     * Build dynamic binary genealogy team tree structure for visual display.
-     */
-    private function buildBinaryTreeData(User $root): array
-    {
-        // Helper closure to fetch all downline members for a direct leg in creation order
-        $getLegMembers = function (User $rootUser, string $position) {
-            $directs = User::where('sponsor_code', $rootUser->referral_code)
-                ->where('position', $position)
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            if ($directs->isEmpty() && $position === 'left') {
-                $directs = User::where('sponsor_code', $rootUser->referral_code)
-                    ->where(function ($q) {
-                        $q->whereNull('position')->orWhere('position', 'left');
-                    })
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-            }
-
-            $allLegUserIds = [];
-            foreach ($directs as $direct) {
-                $allLegUserIds = array_merge($allLegUserIds, $direct->getBranchUserIds());
-            }
-
-            $allLegUserIds = array_values(array_unique($allLegUserIds));
-
-            if (empty($allLegUserIds)) {
-                return collect();
-            }
-
-            return User::whereIn('id', $allLegUserIds)
-                ->with(['sponsor', 'userPackages', 'transactions'])
-                ->orderBy('created_at', 'asc')
-                ->get();
-        };
-
-        $leftMembers = $getLegMembers($root, 'left');
-        $rightMembers = $getLegMembers($root, 'right');
-
-        $assignedLeftIds = [];
-        $assignedRightIds = [];
-
-        // Helper to populate children recursively for a node up to depth 3
-        $populateNodeChildren = function (User $node, string $leg, int $depth) use (&$populateNodeChildren, &$assignedLeftIds, &$assignedRightIds, $leftMembers, $rightMembers): void {
-            if ($depth >= 4) {
-                return;
-            }
-
-            if ($leg === 'left') {
-                $legPool = $leftMembers;
-                $assignedIds = &$assignedLeftIds;
-            } else {
-                $legPool = $rightMembers;
-                $assignedIds = &$assignedRightIds;
-            }
-
-            // Left Child for $node:
-            // 1. Direct referral of $node (position left or null)
-            // 2. Or next available in leg pool
-            $leftChild = User::where('sponsor_code', $node->referral_code)
-                ->whereNotIn('id', $assignedIds)
-                ->where('id', '!=', $node->id)
-                ->where(function ($q) {
-                    $q->where('position', 'left')->orWhereNull('position');
-                })
-                ->oldest()
-                ->first()
-                ?? $legPool->whereNotIn('id', array_merge($assignedIds, [$node->id]))->first();
-
-            if ($leftChild) {
-                $leftChild->load(['sponsor', 'userPackages', 'transactions']);
-                $assignedIds[] = $leftChild->id;
-                $node->left_child = $leftChild;
-                $populateNodeChildren($leftChild, $leg, $depth + 1);
-            } else {
-                $node->left_child = null;
-            }
-
-            // Right Child for $node:
-            // 1. Direct referral of $node (position right)
-            // 2. Or next available in leg pool
-            $rightChild = User::where('sponsor_code', $node->referral_code)
-                ->whereNotIn('id', $assignedIds)
-                ->where('id', '!=', $node->id)
-                ->where('position', 'right')
-                ->oldest()
-                ->first()
-                ?? $legPool->whereNotIn('id', array_merge($assignedIds, [$node->id]))->first();
-
-            if ($rightChild) {
-                $rightChild->load(['sponsor', 'userPackages', 'transactions']);
-                $assignedIds[] = $rightChild->id;
-                $node->right_child = $rightChild;
-                $populateNodeChildren($rightChild, $leg, $depth + 1);
-            } else {
-                $node->right_child = null;
-            }
-        };
-
-        $root->load(['sponsor', 'userPackages', 'transactions']);
-
-        // First Left Direct / Member of Root
-        $firstLeft = User::where('sponsor_code', $root->referral_code)
-            ->where(function ($q) {
-                $q->where('position', 'left')->orWhereNull('position');
-            })
-            ->oldest()
-            ->first()
-            ?? $leftMembers->first();
-
-        if ($firstLeft) {
-            $firstLeft->load(['sponsor', 'userPackages', 'transactions']);
-            $assignedLeftIds[] = $firstLeft->id;
-            $root->left_child = $firstLeft;
-            $populateNodeChildren($firstLeft, 'left', 1);
-        } else {
-            $root->left_child = null;
-        }
-
-        // First Right Direct / Member of Root
-        $firstRight = User::where('sponsor_code', $root->referral_code)
-            ->where('position', 'right')
-            ->oldest()
-            ->first()
-            ?? $rightMembers->first();
-
-        if ($firstRight) {
-            $firstRight->load(['sponsor', 'userPackages', 'transactions']);
-            $assignedRightIds[] = $firstRight->id;
-            $root->right_child = $firstRight;
-            $populateNodeChildren($firstRight, 'right', 1);
-        } else {
-            $root->right_child = null;
-        }
-
-        // Calculate Business Volumes and Total Downline Counts
-        $leftUserIds = $leftMembers->pluck('id')->toArray();
-        $rightUserIds = $rightMembers->pluck('id')->toArray();
-
-        $leftBusiness = ! empty($leftUserIds)
-            ? (float) UserPackage::whereIn('user_id', $leftUserIds)->where('status', 'active')->sum('invested_amount')
-            : 0.00;
-
-        $rightBusiness = ! empty($rightUserIds)
-            ? (float) UserPackage::whereIn('user_id', $rightUserIds)->where('status', 'active')->sum('invested_amount')
-            : 0.00;
-
-        $leftCount = count($leftUserIds);
-        $rightCount = count($rightUserIds);
-
-        $leftActiveCount = $leftMembers->where('status', 'active')->count();
-        $leftInactiveCount = $leftMembers->where('status', '!=', 'active')->count();
-        $rightActiveCount = $rightMembers->where('status', 'active')->count();
-        $rightInactiveCount = $rightMembers->where('status', '!=', 'active')->count();
-
-        return [
+        $treeData = [
             'root' => $root,
-            'left_child' => $root->left_child,
-            'right_child' => $root->right_child,
-            'left_business' => $leftBusiness,
-            'right_business' => $rightBusiness,
-            'left_count' => $leftCount,
-            'right_count' => $rightCount,
-            'left_active' => $leftActiveCount,
-            'left_inactive' => $leftInactiveCount,
-            'right_active' => $rightActiveCount,
-            'right_inactive' => $rightInactiveCount,
-            'total_team' => $leftCount + $rightCount,
-            'total_business' => $leftBusiness + $rightBusiness,
+            'direct_members' => $directMembers,
+            'total_directs' => $directMembers->count(),
+            'active_directs' => $directMembers->where('status', 'active')->count(),
+            'total_team_count' => max(0, count($root->getBranchUserIds()) - 1),
         ];
+
+        return view('user.network.tree', compact('treeData'));
     }
 }

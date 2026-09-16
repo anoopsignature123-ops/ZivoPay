@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Deposit;
-use App\Models\SupportTicket;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +21,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = User::with(['role', 'sponsor', 'userPackages.package', 'directMembers'])->where('role_id', 2);
+        $query = User::with(['role', 'sponsor', 'directMembers'])->where('role_id', 2);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -101,7 +99,6 @@ class UserController extends Controller
             'email' => 'required|email',
             'mobile' => 'required|string|max:20',
             'sponsor_code' => 'required|string',
-            'position' => 'required|in:left,right',
             'password' => 'required|min:6|confirmed',
         ]);
 
@@ -114,8 +111,8 @@ class UserController extends Controller
             'mobile' => $request->mobile,
             'referral_code' => $referralCode,
             'sponsor_code' => $request->sponsor_code,
-            'position' => strtolower($request->input('position', 'left')),
-            'status' => 'inactive', // Default inactive until package investment
+            'position' => 'direct',
+            'status' => 'active',
             'password' => Hash::make($request->password),
         ]);
 
@@ -130,78 +127,54 @@ class UserController extends Controller
         $user->load([
             'role',
             'sponsor',
-            'userPackages.package',
-            'transactions' => function ($q) {
-                $q->latest()->take(10);
-            },
-            'deposits' => function ($q) {
-                $q->latest()->take(5);
-            },
-            'withdrawals' => function ($q) {
-                $q->latest()->take(5);
-            },
+            'directMembers',
         ]);
 
-        $totalInvested = (float) $user->userPackages()->where('status', 'active')->sum('invested_amount');
-        $totalEarnings = (float) $user->transactions()->where('type', 'credit')->sum('amount');
         $directCount = User::where('sponsor_code', $user->referral_code)->count();
-        $supportTickets = SupportTicket::where('user_id', $user->id)->latest()->take(5)->get();
 
-        return view('admin.users.show', compact('user', 'totalInvested', 'totalEarnings', 'directCount', 'supportTickets'));
+        return view('admin.users.show', compact('user', 'directCount'));
     }
 
     /**
-     * Direct Add Fund to User's Deposit Wallet or Earning Wallet by Admin.
+     * Direct Add or Deduct Fund from User's Deposit Wallet or Earning Wallet by Admin.
      */
     public function addFund(Request $request, User $user): RedirectResponse
     {
         $request->validate([
             'wallet_type' => 'required|in:deposit_wallet,earning_wallet',
+            'action' => 'nullable|in:add,deduct',
             'amount' => 'required|numeric|min:0.01',
             'remark' => 'nullable|string|max:255',
         ]);
 
         $walletType = $request->wallet_type;
+        $action = $request->input('action', 'add');
         $amount = (float) $request->amount;
         $userRemark = $request->input('remark');
-        $remark = $userRemark ? "{$userRemark} (Credited by Admin)" : 'Directly Credited by Admin';
+        $remark = $userRemark ? "{$userRemark} (Processed by Admin)" : 'Processed by Admin';
 
-        DB::transaction(function () use ($user, $walletType, $amount, $remark) {
-            // Increment selected wallet balance
-            $user->increment($walletType, $amount);
-
-            $deposit = null;
-            if ($walletType === 'deposit_wallet') {
-                $deposit = Deposit::create([
-                    'user_id' => $user->id,
-                    'amount' => $amount,
-                    'payment_gateway' => 'Admin Direct Credit',
-                    'txn_hash' => 'ADM-'.strtoupper(Str::random(10)),
-                    'status' => 'approved',
-                    'admin_notes' => $remark,
-                    'approved_at' => now(),
-                ]);
+        DB::transaction(function () use ($user, $walletType, $action, $amount, $remark) {
+            if ($action === 'deduct') {
+                $user->decrement($walletType, $amount);
+                $trxType = 'admin_debit';
+            } else {
+                $user->increment($walletType, $amount);
+                $trxType = 'admin_credit';
             }
 
-            // Create transaction log with detailed remark
             Transaction::create([
                 'user_id' => $user->id,
-                'txn_number' => 'TXN-'.rand(10000000, 99999999),
-                'wallet_type' => $walletType,
                 'amount' => $amount,
-                'charge' => 0.00,
-                'post_balance' => $user->fresh()->{$walletType},
-                'trx_type' => '+',
-                'type' => $walletType === 'deposit_wallet' ? 'deposit' : 'admin_add_fund',
-                'description' => "Direct Fund Credit by Admin: {$remark}".($deposit ? " (Ref: {$deposit->deposit_ref})" : ''),
-                'reference_id' => $deposit ? $deposit->id : ('ADMIN-'.(Auth::id() ?? 1)),
-                'status' => 'completed',
+                'wallet_type' => $walletType,
+                'type' => $trxType,
+                'description' => "Admin {$action}: {$remark}",
+                'trx_id' => 'ADM-'.strtoupper(Str::random(10)),
             ]);
         });
 
-        $walletLabel = $walletType === 'deposit_wallet' ? 'Deposit Wallet' : 'Earning Wallet';
+        $walletLabel = $walletType === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet';
 
-        return redirect()->back()->with('success', "\${$amount} successfully added to {$user->name}'s {$walletLabel}. Remark: {$remark}");
+        return redirect()->back()->with('success', "₹{$amount} successfully {$action}ed in {$user->name}'s {$walletLabel}. Remark: {$remark}");
     }
 
     /**

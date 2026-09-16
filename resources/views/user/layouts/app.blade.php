@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>DEX TRADE - User Member Portal</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/favicon.png') }}?v=2" />
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=2" />
+    <title>ZIVO PAY - User Member Portal</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/fav.png') }}?v=10" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=10" />
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -16,6 +16,11 @@
 </head>
 
 <body id="dashboard" class="relative overflow-x-hidden min-h-screen text-slate-100">
+    <!-- Live Animated Background & Ambient Aurora Engine -->
+    <div class="live-bg-container"></div>
+    <div class="aurora-glow-orb-1"></div>
+    <div class="aurora-glow-orb-2"></div>
+
     <!-- User Sidebar -->
     @include('user.layouts.sidebar')
 
@@ -34,6 +39,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('js/app-validation.js') }}"></script>
+    <script src="{{ asset('js/pull-to-refresh.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (window.lucide) {

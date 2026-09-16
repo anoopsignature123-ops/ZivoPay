@@ -1,24 +1,26 @@
 @extends('user.auth.app')
 
-@section('title', 'DEX TRADE - Member Portal Login')
+@section('title', 'ZIVO PAY - Member Portal Login')
 
 @section('content')
     <div class="space-y-6">
         <!-- Brand Logo -->
-        <div class="text-center space-y-3">
-            <a href="{{ url('/') }}" class="inline-block">
-                <img src="{{ asset('images/dextrade_logo.png') }}" alt="DEX TRADE Logo" class="h-16 sm:h-20 w-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(243,202,82,0.8)] hover:scale-105 transition duration-300">
+        <div class="text-center">
+            <a href="{{ url('/') }}" class="inline-block group">
+                <div class="flex items-center justify-center p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-emerald-900/90 to-emerald-950/90 border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.35)]">
+                    <img src="{{ asset('images/logo_full.png') }}?v=1000" alt="ZIVO PAY" class="h-20 sm:h-24 w-auto max-w-[260px] sm:max-w-[300px] object-contain drop-shadow-[0_4px_20px_rgba(16,185,129,0.7)]">
+                </div>
             </a>
         </div>
 
         <!-- Login Form Card -->
-        <div class="ng-pkg-card p-8 border-2 border-amber-400 ng-auth-card-shadow space-y-6 relative backdrop-blur-xl">
+        <div class="ng-pkg-card p-8 border-2 border-emerald-500/60 ng-auth-card-shadow space-y-6 relative bg-slate-900 rounded-3xl">
             <div class="text-center space-y-1">
                 <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
                     MEMBER PORTAL
                 </span>
                 <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">MEMBER LOGIN</h2>
-                <p class="text-xs text-neutral-400">Log in to view earnings, packages, and binary team network</p>
+                <p class="text-xs text-neutral-400">Log in to view earnings, packages, and team network</p>
             </div>
 
             <!-- Form -->
@@ -26,37 +28,37 @@
                 @csrf
                 <!-- User ID / Email Field -->
                 <div>
-                    <label class="block text-xs font-bold text-amber-400 uppercase mb-1.5">Referral Code / Registered Email</label>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Referral Code / Registered Email</label>
                     <div class="relative">
-                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none">
+                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
                                 <circle cx="12" cy="7" r="4"/>
                             </svg>
                         </div>
-                        <input type="text" name="email" value="{{ old('email') }}" required placeholder="Enter referral code or email..." class="w-full pl-11 pr-4 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-sm focus:outline-none focus:border-amber-400">
+                        <input type="text" name="email" value="{{ old('email') }}" required placeholder="Enter referral code or email..." class="w-full pl-11 pr-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
                     </div>
                 </div>
 
                 <!-- Password Field -->
                 <div>
-                    <label class="block text-xs font-bold text-amber-400 uppercase mb-1.5">Password</label>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Password</label>
                     <div class="relative">
-                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none">
+                        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-emerald-400 pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                             </svg>
                         </div>
 
-                        <input type="password" id="userPassword" name="password" required placeholder="Enter your password..." class="w-full pl-11 pr-12 py-3 rounded-xl bg-bg border border-amber-500/40 text-white font-semibold text-sm focus:outline-none focus:border-amber-400">
+                        <input type="password" id="userPassword" name="password" required placeholder="Enter your password..." class="w-full pl-11 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
 
-                        <button type="button" onclick="toggleUserPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-amber-400 hover:text-amber-300 transition focus:outline-none" aria-label="Toggle Password Visibility">
+                        <button type="button" onclick="toggleUserPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center p-0 m-0 border-0 bg-transparent text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer z-10" style="position: absolute !important; right: 14px !important; top: 50% !important; transform: translateY(-44%) !important;" aria-label="Toggle Password Visibility">
                             <svg id="userEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
-                            <svg id="userEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg id="userEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
                                 <line x1="2" y1="2" x2="22" y2="22"/>
                             </svg>
@@ -67,15 +69,15 @@
                 <!-- Options -->
                 <div class="flex items-center justify-between text-xs pt-1">
                     <label class="flex items-center gap-2 cursor-pointer text-neutral-300">
-                        <input type="checkbox" name="remember" checked class="w-4 h-4 rounded accent-amber-500">
+                        <input type="checkbox" name="remember" checked class="w-4 h-4 rounded accent-emerald-500">
                         <span>Remember me</span>
                     </label>
-                    <a href="javascript:void(0)" onclick="alert('Password reset link sent to registered email.');" class="text-amber-400 font-bold hover:underline">Forgot password?</a>
+                    <a href="javascript:void(0)" onclick="alert('Password reset link sent to registered email.');" class="text-emerald-400 font-bold hover:underline">Forgot password?</a>
                 </div>
 
                 <!-- Login Button -->
-                <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-500 text-black font-black text-sm uppercase tracking-wider shadow-xl hover:scale-102 transition flex items-center justify-center gap-2 mt-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm uppercase tracking-wider shadow-xl hover:from-emerald-400 hover:to-teal-500 transition flex items-center justify-center gap-2 mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
                         <line x1="15" x2="3" y1="12" y2="12"/>
@@ -84,13 +86,13 @@
                 </button>
             </form>
 
-            <div class="text-center pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs">
+            <div class="text-center pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
                 <p class="text-neutral-400">
                     Don't have an account? 
-                    <a href="{{ route('user.register') }}" class="text-amber-400 font-black hover:underline ml-1">REGISTER</a>
+                    <a href="{{ route('user.register') }}" class="text-emerald-400 font-black hover:underline ml-1">REGISTER</a>
                 </p>
-                <a href="{{ url('/') }}" class="text-neutral-300 font-bold hover:text-amber-400 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <a href="{{ url('/') }}" class="text-neutral-300 font-bold hover:text-emerald-400 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     Back to Home
                 </a>
             </div>

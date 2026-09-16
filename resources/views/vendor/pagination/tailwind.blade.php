@@ -5,11 +5,11 @@
         <div class="text-xs text-neutral-400 font-medium">
             @if ($paginator->firstItem())
                 <span>Showing</span>
-                <span class="font-bold text-amber-400">{{ $paginator->firstItem() }}</span>
+                <span class="font-bold text-emerald-400">{{ $paginator->firstItem() }}</span>
                 <span>to</span>
-                <span class="font-bold text-amber-400">{{ $paginator->lastItem() }}</span>
+                <span class="font-bold text-emerald-400">{{ $paginator->lastItem() }}</span>
                 <span>of</span>
-                <span class="font-bold text-amber-400">{{ $paginator->total() }}</span>
+                <span class="font-bold text-emerald-400">{{ $paginator->total() }}</span>
                 <span>results</span>
             @else
                 {{ __('Showing') }} {{ $paginator->count() }} {{ __('results') }}
@@ -27,7 +27,7 @@
                     </span>
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="{{ __('pagination.previous') }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-amber-500/40 text-amber-400 font-bold text-xs inline-flex items-center gap-1 hover:bg-amber-500/20 hover:border-amber-400 transition duration-200">
+                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="{{ __('pagination.previous') }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-emerald-500/40 text-emerald-400 font-bold text-xs inline-flex items-center gap-1 hover:bg-emerald-500/20 hover:border-emerald-400 transition duration-200">
                     ‹ Prev
                 </a>
             @endif
@@ -48,12 +48,12 @@
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
                             <span aria-current="page">
-                                <span class="px-3.5 py-1.5 rounded-lg bg-amber-500 text-black font-black text-xs shadow-[0_0_12px_rgba(243,202,82,0.4)]">
+                                <span class="px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black font-black text-xs shadow-[0_0_12px_rgba(16,185,129,0.4)]">
                                     {{ $page }}
                                 </span>
                             </span>
                         @else
-                            <a href="{{ $url }}" aria-label="{{ __('Go to page :page', ['page' => $page]) }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-amber-500/30 text-amber-400 font-bold text-xs hover:bg-amber-500/20 hover:border-amber-400 hover:text-amber-300 transition duration-200">
+                            <a href="{{ $url }}" aria-label="{{ __('Go to page :page', ['page' => $page]) }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-emerald-500/30 text-emerald-400 font-bold text-xs hover:bg-emerald-500/20 hover:border-emerald-400 hover:text-emerald-300 transition duration-200">
                                 {{ $page }}
                             </a>
                         @endif
@@ -63,7 +63,7 @@
 
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="{{ __('pagination.next') }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-amber-500/40 text-amber-400 font-bold text-xs inline-flex items-center gap-1 hover:bg-amber-500/20 hover:border-amber-400 transition duration-200">
+                <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="{{ __('pagination.next') }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-emerald-500/40 text-emerald-400 font-bold text-xs inline-flex items-center gap-1 hover:bg-emerald-500/20 hover:border-emerald-400 transition duration-200">
                     Next ›
                 </a>
             @else

@@ -12,26 +12,24 @@ class Withdrawal extends Model
 
     protected $fillable = [
         'user_id',
-        'trx_number',
         'amount',
         'charge',
-        'net_amount',
-        'usdt_address',
-        'wallet_type',
+        'final_amount',
+        'payment_method',
+        'account_details',
+        'trx_id',
         'status',
-        'admin_remark',
-        'txn_hash',
+        'admin_remarks',
+        'processed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'charge' => 'decimal:2',
-        'net_amount' => 'decimal:2',
+        'final_amount' => 'decimal:2',
+        'processed_at' => 'datetime',
     ];
 
-    /**
-     * Get the user that owns the withdrawal request.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

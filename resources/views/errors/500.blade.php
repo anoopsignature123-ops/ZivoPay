@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>500 - Server Disruption | DEX TRADE</title>
-    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}" />
+    <title>500 - Server Disruption | ZIVO PAY</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/fav.png') }}?v=10" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
@@ -68,24 +68,24 @@
 
         <!-- Compact Proportioned Action Buttons -->
         <div class="pt-4 max-w-md mx-auto flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button onclick="window.location.reload()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-amber-500 text-black font-black text-xs uppercase tracking-wider hover:scale-105 transition shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            <button onclick="window.location.reload()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider hover:scale-105 transition shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
                 RETRY / REFRESH PAGE
             </button>
 
-            <a href="{{ url('/') }}" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-neutral-900 border border-amber-500/40 text-amber-400 font-bold text-xs uppercase tracking-wider hover:bg-neutral-800 transition flex items-center justify-center gap-2 shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <a href="{{ url('/') }}" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-neutral-900 border border-emerald-500/40 text-emerald-400 font-bold text-xs uppercase tracking-wider hover:bg-neutral-800 transition flex items-center justify-center gap-2 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 RETURN TO HOME
             </a>
         </div>
 
         <!-- Public Quick Links ONLY -->
         <div class="pt-6 border-t border-emerald-500/20 flex flex-wrap items-center justify-center gap-6 text-xs text-neutral-400 font-semibold">
-            <a href="{{ route('user.login') }}" class="hover:text-amber-400 transition flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Member Login
+            <a href="{{ route('user.login') }}" class="hover:text-emerald-400 transition flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Member Login
             </a>
-            <a href="{{ route('user.register') }}" class="hover:text-amber-400 transition flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Register Account
+            <a href="{{ route('user.register') }}" class="hover:text-emerald-400 transition flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Register Account
             </a>
         </div>
 
@@ -94,7 +94,7 @@
     <!-- Footer -->
     <footer class="w-full max-w-5xl py-4 text-center border-t border-emerald-500/20">
         <p class="text-xs text-neutral-400 font-semibold font-mono">
-            DEX TRADE SERVER CLUSTER • ALL RIGHTS RESERVED © {{ date('Y') }}
+            ZIVO PAY SERVER CLUSTER • ALL RIGHTS RESERVED © {{ date('Y') }}
         </p>
     </footer>
 

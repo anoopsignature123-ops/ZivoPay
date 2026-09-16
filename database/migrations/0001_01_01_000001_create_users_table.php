@@ -19,8 +19,12 @@ return new class extends Migration
             $table->string('mobile')->nullable();
             $table->string('referral_code')->unique();
             $table->string('sponsor_code')->nullable();
-            $table->enum('position', ['left', 'right'])->nullable();
+            $table->string('position')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
+            $table->boolean('is_subscription_active')->default(false);
+            $table->timestamp('subscription_activated_at')->nullable();
+            $table->boolean('is_bot_active')->default(false);
+            $table->timestamp('bot_activated_at')->nullable();
             $table->decimal('deposit_wallet', 15, 2)->default(0.00);
             $table->decimal('earning_wallet', 15, 2)->default(0.00);
             $table->timestamp('email_verified_at')->nullable();

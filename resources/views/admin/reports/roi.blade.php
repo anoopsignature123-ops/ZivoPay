@@ -1,185 +1,100 @@
 @extends('admin.layouts.app')
 
-@section('title', 'ROI Income Report')
+@section('title', 'Daily ROI Payouts Audit Log - Admin ZIVO PAY')
 
 @section('content')
-<div class="space-y-6">
-
-    <!-- PAGE HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30">
+<div class="w-full space-y-6 font-sans">
+    <!-- Header Banner -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/95 border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.3)] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-widest mb-1">
-                <i data-lucide="trending-up" class="w-4 h-4 text-amber-400"></i>
-                <span>Income Reports Audit</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">AUDIT LOG</span>
+                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY DAILY ROI</span>
             </div>
-            <h1 class="text-2xl font-black font-heading text-white uppercase tracking-wider">
-                Daily ROI Income Report
-            </h1>
-            <p class="text-xs text-neutral-400 mt-1">Track and monitor all daily return on investment yields distributed across active contracts</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">DAILY ROI PAYOUTS REPORT</h1>
+            <p class="text-xs text-neutral-300 mt-1">Audit log of 0.15% to 0.30% daily returns distributed across member active capital investments.</p>
+        </div>
+
+        <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
+            <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Total Volume</span>
+            <span class="text-xl sm:text-2xl font-black text-white">₹{{ number_format($totalAmount, 2) }}</span>
         </div>
     </div>
 
-    <!-- SUMMARY KPI CARDS (SINGLE ROW 3 COLUMNS) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-panel p-5 rounded-2xl border border-amber-500/30 shadow-xl flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-                <i data-lucide="coins" class="w-6 h-6 text-amber-400"></i>
+    <!-- Filter Form -->
+    <div class="bg-slate-900/90 p-4 rounded-3xl border border-emerald-500/30">
+        <form action="{{ route('admin.reports.roi') }}" method="GET" class="flex flex-wrap items-center gap-3">
+            <div>
+                <label class="block text-[10px] text-emerald-400 font-bold uppercase mb-1">Search User / TRX</label>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="TRX ID, User, Code..." class="px-3 py-2 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
             </div>
             <div>
-                <p class="text-[11px] font-bold text-amber-400/80 uppercase">Total ROI Yield Paid</p>
-                <p class="text-2xl font-black text-white font-mono mt-0.5">${{ number_format($totalAmount, 2) }}</p>
-            </div>
-        </div>
-
-        <div class="bg-panel p-5 rounded-2xl border border-amber-500/30 shadow-xl flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-                <i data-lucide="receipt" class="w-6 h-6 text-amber-400"></i>
+                <label class="block text-[10px] text-emerald-400 font-bold uppercase mb-1">From Date</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}" class="px-3 py-2 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
             </div>
             <div>
-                <p class="text-[11px] font-bold text-amber-400/80 uppercase">Total ROI Transactions</p>
-                <p class="text-2xl font-black text-white font-mono mt-0.5">{{ number_format($totalCount) }}</p>
+                <label class="block text-[10px] text-emerald-400 font-bold uppercase mb-1">To Date</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}" class="px-3 py-2 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
             </div>
-        </div>
-
-        <div class="bg-panel p-5 rounded-2xl border border-amber-500/30 shadow-xl flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-                <i data-lucide="activity" class="w-6 h-6 text-amber-400"></i>
-            </div>
-            <div>
-                <p class="text-[11px] font-bold text-amber-400/80 uppercase">Audit Filter Status</p>
-                <p class="text-sm font-bold text-emerald-400 mt-1">
-                    {{ request('search') || request('start_date') ? 'Filtered View' : 'All Historical Data' }}
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1-ROW COMPACT MULTI-FILTER FORM -->
-    <div class="p-3.5 rounded-2xl bg-bg/80 border border-amber-500/40 shadow-lg">
-        <form action="{{ route('admin.reports.roi') }}" method="GET" class="flex flex-nowrap items-end gap-3 w-full overflow-x-auto text-xs font-sans pb-1">
-            
-            <div class="w-40 shrink-0">
-                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">FROM DATE</label>
-                <div class="relative">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
-                    <input type="text" name="start_date" value="{{ request('start_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
-                </div>
-            </div>
-
-            <div class="w-40 shrink-0">
-                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">TO DATE</label>
-                <div class="relative">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"></i>
-                    <input type="text" name="end_date" value="{{ request('end_date') }}" placeholder="YYYY-MM-DD" class="datepicker w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-mono text-xs focus:outline-none focus:border-amber-400">
-                </div>
-            </div>
-
-            <div class="flex-1 min-w-[200px]">
-                <label class="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-1">SEARCH MEMBER / TXN #</label>
-                <div class="relative">
-                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, code, TXN-..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold text-xs focus:outline-none focus:border-amber-400">
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(243,202,82,0.5)] transition flex items-center justify-center gap-1.5 shrink-0">
-                    <i data-lucide="filter" class="w-3.5 h-3.5 text-black"></i> FILTER
+            <div class="pt-5 flex items-center gap-2">
+                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs rounded-xl uppercase tracking-wider transition">
+                    Filter
                 </button>
-                <a href="{{ route('admin.reports.roi') }}" class="py-2.5 px-4 rounded-xl bg-black/60 border border-white/60 text-white hover:bg-white/10 font-bold text-xs transition flex items-center justify-center shrink-0">
+                <a href="{{ route('admin.reports.roi') }}" class="px-3 py-2 bg-bg border border-emerald-500/30 text-neutral-400 text-xs rounded-xl hover:text-white transition">
                     Reset
                 </a>
             </div>
         </form>
     </div>
 
-    <!-- LOGS TABLE -->
-    <div class="bg-panel p-6 shadow-2xl rounded-2xl border border-amber-500/30 space-y-6">
+    <!-- Table -->
+    <div class="bg-slate-900/90 rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-bg text-amber-400 uppercase text-xs font-bold font-heading tracking-wider border-b border-amber-500/30">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950/90 text-emerald-400 font-extrabold uppercase tracking-wider border-b border-emerald-500/30">
                     <tr>
-                        <th class="p-4 rounded-l-xl">TXN NUMBER</th>
-                        <th class="p-4">MEMBER DETAILS</th>
-                        <th class="p-4">SPONSOR DETAILS</th>
-                        <th class="p-4">AMOUNT ($)</th>
-                        <th class="p-4">POST BALANCE</th>
-                        <th class="p-4">DESCRIPTION / REMARK</th>
-                        <th class="p-4">DATE & TIME</th>
-                        <th class="p-4 rounded-r-xl">STATUS</th>
+                        <th class="px-5 py-4">Transaction ID</th>
+                        <th class="px-5 py-4">Member Details</th>
+                        <th class="px-5 py-4">Amount</th>
+                        <th class="px-5 py-4">Description</th>
+                        <th class="px-5 py-4">Date & Time</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-amber-500/20 text-neutral-200">
-                    @forelse($logs as $log)
-                    <tr class="hover:bg-amber-500/10 transition">
-                        <td class="p-4 font-mono font-bold text-amber-400 text-xs">{{ $log->txn_number }}</td>
-                        <td class="p-4">
-                            @if($log->user)
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">
-                                        {{ strtoupper(substr($log->user->name, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-white text-xs">{{ $log->user->name }}</div>
-                                        <div class="text-[11px] text-amber-400 font-mono flex items-center gap-1">
-                                            <span>{{ $log->user->referral_code }}</span>
-                                            <a href="{{ route('admin.users.show', $log->user->id) }}" class="text-neutral-400 hover:text-amber-300 transition" title="View Member Profile">
-                                                <i data-lucide="external-link" class="w-3 h-3"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <span class="text-neutral-500 text-xs font-mono">Deleted Member</span>
-                            @endif
-                        </td>
-                        <td class="p-4">
-                            @if($log->user && $log->user->sponsor)
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">
-                                        {{ strtoupper(substr($log->user->sponsor->name, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-white text-xs">{{ $log->user->sponsor->name }}</div>
-                                        <div class="text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
-                                            <span>{{ $log->user->sponsor->referral_code }}</span>
-                                            <a href="{{ route('admin.users.show', $log->user->sponsor->id) }}" class="text-neutral-400 hover:text-amber-300 transition" title="View Member Profile">
-                                                <i data-lucide="external-link" class="w-3 h-3"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <span class="text-neutral-500 text-xs font-mono">No Sponsor</span>
-                            @endif
-                        </td>
-                        <td class="p-4 font-mono font-black text-emerald-400">+${{ number_format($log->amount, 2) }}</td>
-                        <td class="p-4 font-mono text-neutral-300">${{ number_format($log->post_balance, 2) }}</td>
-                        <td class="p-4 text-xs text-neutral-300 max-w-xs truncate">{{ $log->description }}</td>
-                        <td class="p-4 text-xs text-neutral-400 font-mono">{{ $log->created_at->format('M d, Y h:i A') }}</td>
-                        <td class="p-4">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase">
-                                Completed
-                            </span>
-                        </td>
-                    </tr>
+                <tbody class="divide-y divide-emerald-500/10 text-neutral-200 font-medium">
+                    @forelse($rois as $roi)
+                        <tr class="hover:bg-emerald-500/5 transition">
+                            <td class="px-5 py-4 font-mono font-bold text-emerald-300">{{ $roi->trx_id }}</td>
+                            <td class="px-5 py-4">
+                                @if($roi->user)
+                                    <p class="font-bold text-white">{{ $roi->user->name }}</p>
+                                    <p class="text-[11px] text-neutral-400">{{ $roi->user->email }} ({{ $roi->user->referral_code }})</p>
+                                @else
+                                    <span class="text-neutral-500 italic">User Deleted</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 font-bold text-emerald-400 text-sm">₹{{ number_format($roi->amount, 2) }}</td>
+                            <td class="px-5 py-4 text-neutral-300 max-w-xs truncate">{{ $roi->description }}</td>
+                            <td class="px-5 py-4">
+                                <p class="text-white font-bold">{{ $roi->created_at->format('d M Y') }}</p>
+                                <p class="text-[10px] text-neutral-400 font-mono">{{ $roi->created_at->format('h:i:s A') }}</p>
+                            </td>
+                        </tr>
                     @empty
-                    <tr>
-                        <td colspan="8" class="p-8 text-center text-neutral-400 font-medium">
-                            No ROI Income records found matching your filter parameters.
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="5" class="px-5 py-8 text-center text-neutral-400 font-bold">
+                                No daily ROI payout records found.
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        @if($logs->hasPages())
-        <div class="pt-4 border-t border-amber-500/20">
-            {{ $logs->links() }}
-        </div>
+        @if($rois->hasPages())
+            <div class="p-4 border-t border-emerald-500/20">
+                {{ $rois->withQueryString()->links() }}
+            </div>
         @endif
     </div>
-
 </div>
 @endsection

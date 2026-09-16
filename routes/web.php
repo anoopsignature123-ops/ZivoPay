@@ -1,16 +1,17 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes Configuration
+| Web Routes Configuration - ZIVO PAY
 |--------------------------------------------------------------------------
 */
 
-// Public Root Coming Soon Page
-Route::get('/', HomeController::class)->name('home');
+// Public Root Renders Website Landing Page
+Route::get('/', function () {
+    return view('landing');
+})->name('home');
 
 // Load Modular Admin & User Route Files
 require __DIR__.'/admin.php';

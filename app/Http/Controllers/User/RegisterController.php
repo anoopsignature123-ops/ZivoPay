@@ -15,14 +15,15 @@ class RegisterController extends Controller
     public function showRegistrationForm(Request $request): View
     {
         $sponsor = $request->query('sponsor', null);
-        $position = strtolower($request->query('position', 'left'));
-        if (! in_array($position, ['left', 'right'])) {
-            $position = 'left';
-        }
-        $isLockedSponsor = $request->has('sponsor');
-        $isLockedPosition = $request->has('position');
 
-        return view('user.auth.register', compact('sponsor', 'position', 'isLockedSponsor', 'isLockedPosition'));
+        // If user is logged in and no explicit sponsor is passed, default sponsor to logged-in user's referral code
+        if (Auth::check() && empty($sponsor)) {
+            $sponsor = Auth::user()->referral_code;
+        }
+
+        $isLockedSponsor = $request->has('sponsor') || Auth::check();
+
+        return view('user.auth.register', compact('sponsor', 'isLockedSponsor'));
     }
 
     /**
@@ -51,12 +52,12 @@ class RegisterController extends Controller
         }
 
         // System default admin fallback code
-        if ($code === 'DEX-0000001') {
+        if (in_array($code, ['ZIVO-0000001', 'DEX-0000001'])) {
             return response()->json([
                 'success' => true,
-                'name' => 'Dex Trade System Admin',
-                'email' => 'admin@dextrade.com',
-                'referral_code' => 'DEX-0000001',
+                'name' => 'Zivo Pay System Admin',
+                'email' => 'admin@zivopay.net',
+                'referral_code' => $code,
             ]);
         }
 
@@ -70,17 +71,26 @@ class RegisterController extends Controller
     {
         $request->validate([
             'sponsor_id' => 'required|string',
-            'position' => 'required|in:left,right',
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'mobile' => 'required',
-            'password' => 'required|min:6|confirmed',
+            'email' => 'required|email|max:255|unique:users,email',
+            'mobile' => 'required|string|max:20',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'sponsor_id.required' => 'Please enter a valid Sponsor Code.',
+            'name.required' => 'Please enter member full name.',
+            'email.required' => 'Please enter email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'This email address is already registered in the system.',
+            'mobile.required' => 'Please enter mobile phone number.',
+            'password.required' => 'Please enter account password.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         $sponsorCode = trim($request->sponsor_id);
         $sponsorUser = User::where('referral_code', $sponsorCode)->first();
 
-        if (! $sponsorUser && $sponsorCode !== 'DEX-0000001') {
+        if (! $sponsorUser && ! in_array($sponsorCode, ['ZIVO-0000001', 'DEX-0000001'])) {
             return redirect()->back()->withInput()->withErrors(['sponsor_id' => 'Invalid Sponsor Code! Member not found in system.']);
         }
 
@@ -95,17 +105,19 @@ class RegisterController extends Controller
             'mobile' => $request->mobile,
             'referral_code' => $referralCode,
             'sponsor_code' => $sponsorCode,
-            'position' => strtolower($request->position),
+            'position' => 'direct',
             'status' => 'inactive',
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::login($user);
+        // If guest (not logged in), automatically log in as the newly registered user
+        if (! Auth::check()) {
+            Auth::login($user);
+        }
 
         $registeredUser = [
             'user_id' => $user->referral_code,
             'sponsor_id' => $user->sponsor_code,
-            'position' => strtoupper($user->position),
             'name' => $user->name,
             'email' => $user->email,
             'mobile' => $user->mobile,
@@ -114,9 +126,7 @@ class RegisterController extends Controller
 
         return view('user.auth.register', [
             'sponsor' => $user->sponsor_code,
-            'position' => $user->position,
             'isLockedSponsor' => false,
-            'isLockedPosition' => false,
             'registeredUser' => $registeredUser,
             'showModal' => true,
         ]);

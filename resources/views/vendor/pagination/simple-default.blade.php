@@ -6,7 +6,7 @@
                     ‹ Previous
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-amber-500/40 text-amber-400 font-bold text-xs hover:bg-amber-500/20 hover:border-amber-400 transition duration-200">
+                <a href="{{ $paginator->previousPageUrl() }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-emerald-500/40 text-emerald-400 font-bold text-xs hover:bg-emerald-500/20 hover:border-emerald-400 transition duration-200">
                     ‹ Previous
                 </a>
             @endif
@@ -14,7 +14,7 @@
 
         <div>
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-amber-500/40 text-amber-400 font-bold text-xs hover:bg-amber-500/20 hover:border-amber-400 transition duration-200">
+                <a href="{{ $paginator->nextPageUrl() }}" class="px-3.5 py-1.5 rounded-lg bg-black/80 border border-emerald-500/40 text-emerald-400 font-bold text-xs hover:bg-emerald-500/20 hover:border-emerald-400 transition duration-200">
                     Next ›
                 </a>
             @else

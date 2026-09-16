@@ -3,88 +3,100 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Deposit;
-use App\Models\Transaction;
 use App\Models\User;
-use App\Models\UserPackage;
-use App\Models\Withdrawal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function __invoke(): View
     {
+        /** @var User $user */
         $user = Auth::user();
-        $today = now()->startOfDay();
 
-        // 1. Personal Investment & Capping Stats
-        $totalInvested = UserPackage::where('user_id', $user->id)->sum('invested_amount');
-        $activeInvestmentsCount = UserPackage::where('user_id', $user->id)->where('status', 'active')->count();
-
-        $activeInvestmentAmount = $user->total_active_investment;
-        $workingCap = $user->working_income_cap;
-        $nonWorkingCap = $user->non_working_income_cap;
-
-        $workingEarned = $user->total_working_earned;
-        $nonWorkingEarned = $user->total_non_working_earned;
-
-        $remainingWorkingCap = $user->remaining_working_cap;
-        $remainingNonWorkingCap = $user->remaining_non_working_cap;
-
-        // 2. Personal Income Summaries Across All 7 Dex Trade Incomes
-        $totalRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->sum('amount');
-        $todayRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalDirectEarned = Transaction::where('user_id', $user->id)->where('type', 'direct_commission')->sum('amount');
-        $todayDirectEarned = Transaction::where('user_id', $user->id)->where('type', 'direct_commission')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalMatchingEarned = Transaction::where('user_id', $user->id)->where('type', 'matching_income')->sum('amount');
-        $todayMatchingEarned = Transaction::where('user_id', $user->id)->where('type', 'matching_income')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalReferralRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'referral_roi')->sum('amount');
-        $todayReferralRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'referral_roi')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalMatchingRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'matching_roi')->sum('amount');
-        $todayMatchingRoiEarned = Transaction::where('user_id', $user->id)->where('type', 'matching_roi')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalUplineMatchingEarned = Transaction::where('user_id', $user->id)->where('type', 'upline_matching')->sum('amount');
-        $todayUplineMatchingEarned = Transaction::where('user_id', $user->id)->where('type', 'upline_matching')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalSalaryEarned = Transaction::where('user_id', $user->id)->where('type', 'salary_income')->sum('amount');
-        $todaySalaryEarned = Transaction::where('user_id', $user->id)->where('type', 'salary_income')->where('created_at', '>=', $today)->sum('amount');
-
-        $totalIncomeEarned = $totalRoiEarned + $totalDirectEarned + $totalMatchingEarned + $totalReferralRoiEarned + $totalMatchingRoiEarned + $totalUplineMatchingEarned + $totalSalaryEarned;
-
-        // 3. Withdrawal & Wallet Stats
-        $totalWithdrawn = Withdrawal::where('user_id', $user->id)->whereIn('status', ['approved', 'completed'])->sum('net_amount');
-
-        // 4. Direct Network & Leg Volume Stats
+        // Direct Network & Downline Stats
         $directMembersCount = User::where('sponsor_code', $user->referral_code)->count();
         $activeDirectMembersCount = User::where('sponsor_code', $user->referral_code)->where('status', 'active')->count();
+        $inactiveDirectMembersCount = max(0, $directMembersCount - $activeDirectMembersCount);
 
-        $legStats = $user->leg_volume_stats;
+        $recentDirects = User::where('sponsor_code', $user->referral_code)->latest()->take(5)->get();
 
-        // 5. Recent Collections
-        $activePackages = UserPackage::with('package')->where('user_id', $user->id)->latest()->take(5)->get();
-        $recentTransactions = Transaction::where('user_id', $user->id)->latest()->take(5)->get();
-        $recentDeposits = Deposit::where('user_id', $user->id)->latest()->take(5)->get();
+        // Team Unilevel Network Statistics
+        $totalTeamUserIds = $user->getBranchUserIds();
+        $downlineIds = array_diff($totalTeamUserIds, [$user->id]);
+        $totalTeamCount = count($downlineIds);
+
+        if ($totalTeamCount > 0) {
+            $totalActiveTeamCount = User::whereIn('id', $downlineIds)->where('status', 'active')->count();
+            $totalInactiveTeamCount = User::whereIn('id', $downlineIds)->where('status', 'inactive')->count();
+            $totalTeamBusiness = DB::table('user_investments')
+                ->whereIn('user_id', $downlineIds)
+                ->where('status', 'active')
+                ->sum('amount');
+        } else {
+            $totalActiveTeamCount = 0;
+            $totalInactiveTeamCount = 0;
+            $totalTeamBusiness = 0;
+        }
+
+        $activeNetworkRatio = $totalTeamCount > 0 ? round(($totalActiveTeamCount / $totalTeamCount) * 100, 1) : 0;
+
+        // Wallet Balances & Investment Metrics
+        $totalInvested = $user->investments()->where('status', 'active')->sum('amount');
+        $totalWithdrawals = $user->withdrawals()->where('status', 'approved')->sum('amount');
+        $activeInvestments = $user->investments()->where('status', 'active')->latest()->take(5)->get();
+        $recentTransactions = $user->transactions()->latest()->take(5)->get();
+
+        // Comprehensive Income Breakdown (Today & Total)
+        $todayRoi = $user->transactions()->where('type', 'daily_roi')->whereDate('created_at', now())->sum('amount');
+        $totalRoiIncome = $user->transactions()->where('type', 'daily_roi')->sum('amount');
+
+        $todayDirect = $user->transactions()->where('type', 'direct_bonus')->whereDate('created_at', now())->sum('amount');
+        $totalDirectIncome = $user->transactions()->where('type', 'direct_bonus')->sum('amount');
+
+        $todaySubLevel = $user->transactions()->whereIn('type', ['subscription_level', 'level_income'])->whereDate('created_at', now())->sum('amount');
+        $totalSubLevelIncome = $user->transactions()->whereIn('type', ['subscription_level', 'level_income'])->sum('amount');
+
+        $todayLevelRoi = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
+        $totalLevelRoiIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
+
+        $todayDirectReward = $user->transactions()->where('type', 'direct_reward')->whereDate('created_at', now())->sum('amount');
+        $totalDirectReward = $user->transactions()->where('type', 'direct_reward')->sum('amount');
+
+        $todayTeamReward = $user->transactions()->where('type', 'team_reward')->whereDate('created_at', now())->sum('amount');
+        $totalTeamReward = $user->transactions()->where('type', 'team_reward')->sum('amount');
+
+        $totalIncomeEarned = $totalRoiIncome + $totalDirectIncome + $totalSubLevelIncome + $totalLevelRoiIncome + $totalDirectReward + $totalTeamReward;
 
         return view('user.dashboard', compact(
             'user',
-            'totalInvested', 'activeInvestmentsCount', 'activeInvestmentAmount',
-            'workingCap', 'nonWorkingCap', 'workingEarned', 'nonWorkingEarned',
-            'remainingWorkingCap', 'remainingNonWorkingCap',
-            'totalRoiEarned', 'todayRoiEarned',
-            'totalDirectEarned', 'todayDirectEarned',
-            'totalMatchingEarned', 'todayMatchingEarned',
-            'totalReferralRoiEarned', 'todayReferralRoiEarned',
-            'totalMatchingRoiEarned', 'todayMatchingRoiEarned',
-            'totalUplineMatchingEarned', 'todayUplineMatchingEarned',
-            'totalSalaryEarned', 'todaySalaryEarned',
-            'totalIncomeEarned', 'totalWithdrawn',
-            'directMembersCount', 'activeDirectMembersCount', 'legStats',
-            'activePackages', 'recentTransactions', 'recentDeposits'
+            'directMembersCount',
+            'activeDirectMembersCount',
+            'inactiveDirectMembersCount',
+            'recentDirects',
+            'totalTeamCount',
+            'totalActiveTeamCount',
+            'totalInactiveTeamCount',
+            'totalTeamBusiness',
+            'activeNetworkRatio',
+            'totalInvested',
+            'totalWithdrawals',
+            'activeInvestments',
+            'recentTransactions',
+            'todayRoi',
+            'totalRoiIncome',
+            'todayDirect',
+            'totalDirectIncome',
+            'todaySubLevel',
+            'totalSubLevelIncome',
+            'todayLevelRoi',
+            'totalLevelRoiIncome',
+            'todayDirectReward',
+            'totalDirectReward',
+            'todayTeamReward',
+            'totalTeamReward',
+            'totalIncomeEarned'
         ));
     }
 }
