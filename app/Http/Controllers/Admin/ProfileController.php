@@ -25,7 +25,10 @@ class ProfileController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$admin->id,
-            'mobile' => 'required|string|max:20',
+            'mobile' => 'required|string|max:20|unique:users,mobile,'.$admin->id,
+        ], [
+            'email.unique' => 'This email address is already in use by another user account.',
+            'mobile.unique' => 'This mobile number is already in use by another user account.',
         ]);
 
         $admin->update([

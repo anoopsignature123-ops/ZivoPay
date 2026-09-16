@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\IncomeController;
 use App\Http\Controllers\User\InvestmentController;
 use App\Http\Controllers\User\LoginController;
@@ -41,7 +43,11 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('dashboard', [DashboardController::class, '__invoke'])->name('dashboard');
 
         // Stop Impersonating Route
-        Route::get('stop-impersonate', [\App\Http\Controllers\Admin\UserController::class, 'stopImpersonating'])->name('stop-impersonate');
+        Route::get('stop-impersonate', [UserController::class, 'stopImpersonating'])->name('stop-impersonate');
+
+        // User Add Fund / Deposit Wallet Routes
+        Route::get('deposit', [DepositController::class, 'index'])->name('deposit.index');
+        Route::post('deposit', [DepositController::class, 'store'])->name('deposit.store');
 
         // Fund & Wallet Transfer Routes
         Route::get('wallet/transfer', [WalletController::class, 'showTransferForm'])->name('wallet.transfer');

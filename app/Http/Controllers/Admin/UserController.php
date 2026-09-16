@@ -96,10 +96,13 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'mobile' => 'required|string|max:20',
+            'email' => 'required|email|max:255|unique:users,email',
+            'mobile' => 'required|string|max:20|unique:users,mobile',
             'sponsor_code' => 'required|string',
             'password' => 'required|min:6|confirmed',
+        ], [
+            'email.unique' => 'This email address is already registered in the system.',
+            'mobile.unique' => 'This mobile number is already registered in the system.',
         ]);
 
         $referralCode = User::generateReferralCode();
@@ -192,11 +195,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'mobile' => 'required|string|max:20',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'mobile' => 'required|string|max:20|unique:users,mobile,'.$user->id,
             'sponsor_code' => 'required|string',
-            'position' => 'required|in:left,right',
+            'position' => 'required|in:left,right,direct',
             'password' => 'nullable|min:6|confirmed',
+        ], [
+            'email.unique' => 'This email address is already in use by another user account.',
+            'mobile.unique' => 'This mobile number is already in use by another user account.',
         ]);
 
         $data = [

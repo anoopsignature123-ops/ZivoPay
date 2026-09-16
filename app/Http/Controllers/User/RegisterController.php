@@ -73,7 +73,7 @@ class RegisterController extends Controller
             'sponsor_id' => 'required|string',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'mobile' => 'required|string|max:20',
+            'mobile' => 'required|string|max:20|unique:users,mobile',
             'password' => 'required|string|min:6|confirmed',
         ], [
             'sponsor_id.required' => 'Please enter a valid Sponsor Code.',
@@ -82,6 +82,7 @@ class RegisterController extends Controller
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email address is already registered in the system.',
             'mobile.required' => 'Please enter mobile phone number.',
+            'mobile.unique' => 'This mobile number is already registered in the system.',
             'password.required' => 'Please enter account password.',
             'password.min' => 'Password must be at least 6 characters.',
             'password.confirmed' => 'Password confirmation does not match.',

@@ -31,8 +31,10 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
+            'mobile' => 'required|string|max:20|unique:users,mobile,'.$user->id,
             'wallet_address' => 'nullable|string|max:255',
+        ], [
+            'mobile.unique' => 'This mobile number is already registered to another user account.',
         ]);
 
         $user->update([

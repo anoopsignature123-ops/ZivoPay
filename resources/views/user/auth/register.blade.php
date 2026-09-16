@@ -77,6 +77,7 @@
                                     id="sponsorInput"
                                     name="sponsor_id" 
                                     value="{{ old('sponsor_id', $sponsor ?? '') }}" 
+                                    required
                                     {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'readonly' : '' }}
                                     placeholder="Enter Sponsor Code (e.g. ZIVO-0000001)" 
                                     class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400 {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'opacity-85 cursor-not-allowed bg-emerald-500/10' : '' }}">

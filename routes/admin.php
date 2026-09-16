@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepositAdminController;
 use App\Http\Controllers\Admin\InvestmentAdminController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
@@ -44,6 +45,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::post('users/{user}/add-fund', [UserController::class, 'addFund'])->name('users.add-fund');
+
+        // User Add Fund Management Routes
+        Route::get('deposits/manage', [DepositAdminController::class, 'index'])->name('deposits.index');
+        Route::post('deposits/{deposit}/approve', [DepositAdminController::class, 'approve'])->name('deposits.approve');
+        Route::post('deposits/{deposit}/reject', [DepositAdminController::class, 'reject'])->name('deposits.reject');
 
         // Impersonate / Login as User Route
         Route::get('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');

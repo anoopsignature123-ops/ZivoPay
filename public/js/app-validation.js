@@ -1,5 +1,5 @@
 /**
- * Dex Trade Global Toast & Real-Time Form Validation Helper
+ * Dex Trade / Zivo Pay Global Toast & Real-Time Form Validation Helper
  */
 
 // Global Toast Notification Function
@@ -40,23 +40,96 @@ function showToast(title, message, type = 'success') {
     }, 4500);
 }
 
-// Real-Time Input Validation Handler
-document.addEventListener("DOMContentLoaded", function() {
-    const inputs = document.querySelectorAll("form input, form select");
+// Function to update submit button state for a given form
+function updateFormSubmitButtonState(form) {
+    if (!form) return;
 
-    inputs.forEach(input => {
-        ['input', 'blur'].forEach(eventType => {
-            input.addEventListener(eventType, function() {
-                validateField(input);
-            });
-        });
+    // Find submit button(s) in form
+    const submitBtns = form.querySelectorAll('button[type="submit"], input[type="submit"], button:not([type])');
+    if (!submitBtns || submitBtns.length === 0) return;
+
+    // Get all required inputs
+    const requiredInputs = form.querySelectorAll("input[required], select[required], textarea[required]");
+    
+    let isAllValid = true;
+
+    // 1. Check if required fields have values
+    requiredInputs.forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            if (!input.checked) {
+                isAllValid = false;
+            }
+        } else {
+            const val = input.value ? input.value.trim() : '';
+            if (val === '') {
+                isAllValid = false;
+            }
+        }
     });
 
+    // 2. Also check if any input has active validation errors or invalid format
+    const allInputs = form.querySelectorAll("input, select, textarea");
+    allInputs.forEach(input => {
+        if (input.classList.contains("is-invalid")) {
+            isAllValid = false;
+        }
+
+        // Email regex check if value filled
+        if (input.type === "email" && input.value && input.value.trim() !== "") {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(input.value.trim())) {
+                isAllValid = false;
+            }
+        }
+
+        // Confirm password match check if value filled
+        if (input.name === "password_confirmation" && input.value && input.value.trim() !== "") {
+            const passInput = form.querySelector('input[name="password"]');
+            if (passInput && input.value !== passInput.value) {
+                isAllValid = false;
+            }
+        }
+    });
+
+    // 3. Update button disabled status and visual styles
+    submitBtns.forEach(btn => {
+        if (!isAllValid) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "not-allowed";
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+    });
+}
+
+// Real-Time Input Validation Handler
+document.addEventListener("DOMContentLoaded", function() {
     const forms = document.querySelectorAll("form");
+
     forms.forEach(form => {
+        // Initial button state check
+        updateFormSubmitButtonState(form);
+
+        // Attach real-time validation and button state listeners
+        const formInputs = form.querySelectorAll("input, select, textarea");
+        formInputs.forEach(input => {
+            ['input', 'change', 'keyup', 'blur', 'click'].forEach(eventType => {
+                input.addEventListener(eventType, function() {
+                    validateField(input);
+                    updateFormSubmitButtonState(form);
+                });
+            });
+        });
+
+        // Form submit listener
         form.addEventListener("submit", function(e) {
             let isValid = true;
-            const formInputs = form.querySelectorAll("input[required], select[required]");
+            const formInputs = form.querySelectorAll("input[required], select[required], textarea[required]");
 
             formInputs.forEach(input => {
                 if (!validateField(input)) {
@@ -66,26 +139,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (!isValid) {
                 e.preventDefault();
-                showToast("Validation Error", "Please correct the highlighted fields before submitting.", "error");
+                showToast("Validation Error", "Please fill in all required fields accurately before submitting.", "error");
             }
         });
     });
+
+    // Re-check after short delay to handle browser autofill & dynamic values
+    setTimeout(function() {
+        forms.forEach(form => updateFormSubmitButtonState(form));
+    }, 300);
 });
 
 function validateField(input) {
-    if (!input || input.type === 'hidden' || input.type === 'submit' || input.type === 'checkbox') return true;
+    if (!input || input.type === 'hidden' || input.type === 'submit' || input.type === 'button') return true;
 
-    const val = input.value.trim();
+    const val = input.value ? input.value.trim() : '';
     let errorMsg = "";
     let isValid = true;
 
     // Required Check
-    if (input.hasAttribute("required") && val === "") {
-        isValid = false;
-        errorMsg = "This field is required.";
-    } 
+    if (input.hasAttribute("required")) {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            if (!input.checked) {
+                isValid = false;
+                errorMsg = "This field is required.";
+            }
+        } else if (val === "") {
+            isValid = false;
+            errorMsg = "This field is required.";
+        }
+    }
+
     // Email Check
-    else if (input.type === "email" && val !== "") {
+    if (isValid && input.type === "email" && val !== "") {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(val)) {
             isValid = false;
@@ -93,14 +179,14 @@ function validateField(input) {
         }
     } 
     // Password Min Length Check
-    else if (input.type === "password" && input.name === "password" && val !== "") {
+    else if (isValid && input.type === "password" && input.name === "password" && val !== "") {
         if (val.length < 6) {
             isValid = false;
             errorMsg = "Password must be at least 6 characters.";
         }
     }
     // Confirm Password Check
-    else if (input.name === "password_confirmation" && val !== "") {
+    else if (isValid && input.name === "password_confirmation" && val !== "") {
         const passInput = input.form ? input.form.querySelector('input[name="password"]') : null;
         if (passInput && val !== passInput.value) {
             isValid = false;
@@ -108,7 +194,7 @@ function validateField(input) {
         }
     }
     // Mobile Check
-    else if (input.name === "mobile" && val !== "") {
+    else if (isValid && input.name === "mobile" && val !== "") {
         if (val.length < 8) {
             isValid = false;
             errorMsg = "Enter a valid mobile phone number.";
@@ -116,17 +202,17 @@ function validateField(input) {
     }
 
     // UI Helper Feedback
-    let errorContainer = input.parentElement.querySelector(".input-error-msg");
+    let errorContainer = input.parentElement ? input.parentElement.querySelector(".input-error-msg") : null;
     if (!isValid) {
         input.classList.add("is-invalid");
         input.classList.remove("is-valid");
 
-        if (!errorContainer) {
+        if (!errorContainer && input.parentElement && input.type !== 'checkbox' && input.type !== 'radio') {
             errorContainer = document.createElement("span");
             errorContainer.className = "input-error-msg";
             input.parentElement.appendChild(errorContainer);
         }
-        errorContainer.innerText = errorMsg;
+        if (errorContainer) errorContainer.innerText = errorMsg;
     } else if (val !== "") {
         input.classList.remove("is-invalid");
         input.classList.add("is-valid");

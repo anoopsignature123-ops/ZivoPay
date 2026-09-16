@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Deposit;
 use App\Models\Transaction;
 use App\Models\UserInvestment;
 use App\Models\UserReward;
@@ -45,19 +46,35 @@ class IncomeController extends Controller
     public function depositHistory(Request $request)
     {
         $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->whereIn('type', ['deposit', 'admin_credit', 'investment']);
+        $query = Deposit::where('user_id', $user->id);
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('deposit_ref', 'like', "%{$search}%")
+                    ->orWhere('trx_hash', 'like', "%{$search}%")
+                    ->orWhere('payment_method', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
+            $query->where('status', $request->status);
+        }
 
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
-        $totalAmount = (clone $query)->sum('amount');
+        $deposits = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
+        $totalApproved = (float) Deposit::where('user_id', $user->id)->where('status', 'approved')->sum('final_amount');
+        $totalPending = (float) Deposit::where('user_id', $user->id)->where('status', 'pending')->sum('amount');
+        $totalCount = Deposit::where('user_id', $user->id)->count();
 
-        return view('user.reports.deposits', compact('user', 'transactions', 'totalAmount'));
+        return view('user.reports.deposits', compact('user', 'deposits', 'totalApproved', 'totalPending', 'totalCount'));
     }
 
     public function packageHistory(Request $request)
