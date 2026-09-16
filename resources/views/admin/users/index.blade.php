@@ -185,7 +185,7 @@
                                     </button>
 
                                     <!-- Login as User (External Link Icon) -->
-                                    <a href="{{ route('admin.users.impersonate', $user) }}" 
+                                    <a href="{{ route('admin.users.impersonate', $user) }}" target="_blank" 
                                         title="Login as User ({{ $user->name }})"
                                         aria-label="Login as User"
                                         class="w-9 h-8 rounded-2xl bg-[#02180f] border border-amber-500/60 text-amber-300 hover:bg-amber-400 hover:text-black hover:border-amber-400 font-bold transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.15)] hover:scale-105 shrink-0">
