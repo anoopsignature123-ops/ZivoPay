@@ -22,6 +22,45 @@
         </div>
     </div>
 
+    <!-- Official Filter Bar Component -->
+    <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl">
+        <form action="{{ route('user.reports.package-history') }}" method="GET" class="zivo-filter-bar">
+            <!-- FROM DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <!-- TO DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">TO DATE</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <!-- SEARCH REF / TRX -->
+            <div class="zivo-filter-field-search">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">SEARCH REF / TRX ID</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="TRX ID, Description..."
+                        class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="zivo-filter-actions">
+                <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
+                </button>
+                <a href="{{ route('user.reports.package-history') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- Report Table -->
     <div class="bg-[#042718] rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
@@ -56,7 +95,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                No package purchase history found. Please purchase the mandatory ₹3,000 Zivo Family Kit to activate your account.
+                                No package purchase records found matching your filter.
                             </td>
                         </tr>
                     @endforelse

@@ -22,7 +22,24 @@ class IncomeController extends Controller
             $query->where('type', $request->type);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
 
         // Income Totals Summary
         $totalRoi = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->sum('amount');
@@ -82,7 +99,23 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->where('type', 'subscription');
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
 
         return view('user.reports.package_history', compact('user', 'transactions'));
     }
@@ -90,7 +123,26 @@ class IncomeController extends Controller
     public function investmentHistory(Request $request)
     {
         $user = Auth::user();
-        $investments = UserInvestment::where('user_id', $user->id)->orderBy('id', 'desc')->paginate(20);
+        $query = UserInvestment::where('user_id', $user->id);
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where('plan_name', 'like', "%{$search}%");
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['active', 'completed', 'cancelled'])) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $investments = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (float) UserInvestment::where('user_id', $user->id)->sum('amount');
 
         return view('user.reports.investment_history', compact('user', 'investments', 'totalAmount'));
@@ -101,14 +153,23 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['subscription_level', 'subscription']);
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
 
         return view('user.income.subscription', compact('user', 'transactions', 'totalAmount'));
@@ -119,14 +180,23 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->where('type', 'daily_roi');
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
 
         return view('user.income.roi', compact('user', 'transactions', 'totalAmount'));
@@ -137,14 +207,23 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['direct_bonus', 'level_income']);
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
 
         return view('user.income.level_direct', compact('user', 'transactions', 'totalAmount'));
@@ -155,14 +234,23 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
 
         return view('user.income.level_roi', compact('user', 'transactions', 'totalAmount'));
@@ -193,6 +281,14 @@ class IncomeController extends Controller
                     ->orWhere('description', 'like', '%Direct%');
             });
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
@@ -200,7 +296,7 @@ class IncomeController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
         $reportTitle = 'Direct Bonus Referral Income';
 
@@ -217,6 +313,14 @@ class IncomeController extends Controller
                     ->where('description', 'like', '%Level%');
             });
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
@@ -224,7 +328,7 @@ class IncomeController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
         $reportTitle = 'Team Bonus Referral Income';
 
@@ -236,6 +340,14 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->where('type', 'direct_bonus');
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
@@ -243,7 +355,7 @@ class IncomeController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $transactions = $query->orderBy('id', 'desc')->paginate(20);
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
         $reportTitle = 'Direct Business Income';
 

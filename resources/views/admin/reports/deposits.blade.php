@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Deposit Fund History - Admin ZIVO PAY')
+@section('title', 'Fund Wallet History - Admin ZIVO PAY')
 
 @section('content')
 <div class="w-full space-y-6 font-sans">
@@ -11,7 +11,7 @@
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">REPORTS</span>
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY FINANCIALS</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">DEPOSIT FUND HISTORY</h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">FUND WALLET HISTORY</h1>
             <p class="text-xs text-neutral-300 mt-1">Audit log of all user deposits, admin fund credits, and capital additions.</p>
         </div>
 
@@ -22,38 +22,41 @@
     </div>
 
     <!-- Filter Form Bar -->
-    <div class="bg-slate-900/90 p-5 rounded-3xl border border-emerald-500/30 shadow-xl">
-        <form action="{{ route('admin.reports.deposits') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Search User / TRX</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="TRX ID, Name, Email, Code..." class="w-full px-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
+    <div class="bg-slate-900/90 p-4 sm:p-5 rounded-3xl border border-emerald-500/30 shadow-xl">
+        <form action="{{ route('admin.reports.deposits') }}" method="GET" class="flex flex-wrap items-end gap-3">
+            <div class="w-36 sm:w-40 shrink-0">
+                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">From Date</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}" class="w-full px-3 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
             </div>
 
-            <div>
+            <div class="w-36 sm:w-40 shrink-0">
+                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">To Date</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}" class="w-full px-3 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
+            </div>
+
+            <div class="w-40 sm:w-48 shrink-0">
                 <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Deposit Type</label>
                 <select name="type" class="w-full px-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
                     <option value="">All Types</option>
-                    <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>Direct Deposit</option>
+                    <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>Direct Add Fund</option>
                     <option value="admin_credit" {{ request('type') == 'admin_credit' ? 'selected' : '' }}>Admin Fund Credit</option>
                     <option value="investment" {{ request('type') == 'investment' ? 'selected' : '' }}>Investment Capital</option>
                 </select>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">From Date</label>
-                <input type="date" name="from_date" value="{{ request('from_date') }}" class="w-full px-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Search User / TRX</label>
+                <div class="relative">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="TRX ID, Name, Email, Code..." class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
+                    <i data-lucide="search" class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">To Date</label>
-                <input type="date" name="to_date" value="{{ request('to_date') }}" class="w-full px-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400">
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-md">
-                    <i data-lucide="filter" class="w-4 h-4"></i> Filter Results
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-md">
+                    <i data-lucide="filter" class="w-4 h-4"></i> Filter
                 </button>
-                <a href="{{ route('admin.reports.deposits') }}" class="px-3 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-neutral-400 hover:text-white text-xs font-bold transition">
+                <a href="{{ route('admin.reports.deposits') }}" class="px-3.5 py-2.5 rounded-xl bg-bg border border-emerald-500/30 text-neutral-400 hover:text-white text-xs font-bold transition">
                     Reset
                 </a>
             </div>

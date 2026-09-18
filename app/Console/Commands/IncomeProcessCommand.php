@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Services\Incomes\MatchingIncomeService;
-use App\Services\Incomes\SalaryIncomeService;
+use App\Models\UserInvestment;
+use App\Services\MLMIncomeService;
 use Illuminate\Console\Command;
 
 class IncomeProcessCommand extends Command
@@ -21,15 +21,13 @@ class IncomeProcessCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Process and distribute Dex Trade incomes (10% Binary Matching and 17-Level Salary Plan)';
+    protected $description = 'Process and calculate ZIVO PAY incomes, level matching, and milestone rewards';
 
     /**
      * Execute the console command.
      */
-    public function handle(
-        MatchingIncomeService $matchingService,
-        SalaryIncomeService $salaryService
-    ): int {
+    public function handle(MLMIncomeService $incomeService): int
+    {
         $userInput = $this->argument('user');
 
         if ($userInput) {
@@ -42,39 +40,44 @@ class IncomeProcessCommand extends Command
         }
 
         if ($users->isEmpty()) {
-            $this->error('No active users found matching your selection criteria.');
+            $this->error('No active users found matching selection criteria.');
 
             return Command::FAILURE;
         }
 
-        $this->info('Starting Dex Trade Income Processing Cycle for '.$users->count().' user(s)...');
+        $this->info('Starting ZIVO PAY Income & Reward Calculation for '.$users->count().' user(s)...');
 
         $rows = [];
 
         foreach ($users as $user) {
-            $legStats = $user->leg_volume_stats;
+            // Evaluate milestone rewards
+            $incomeService->checkUserRewardAchievements($user);
 
-            $powerLeg = (float) ($legStats['power_leg'] ?? 0);
-            $weakerLeg = (float) ($legStats['remaining_leg'] ?? 0);
+            // Process daily ROI for user's active investments
+            $userInvestments = UserInvestment::where('user_id', $user->id)
+                ->where('status', 'active')
+                ->get();
 
-            // Process Incomes
-            $matchingPaid = $matchingService->processUserMatching($user, $powerLeg, $weakerLeg);
-            $salaryPaid = $salaryService->processUserSalaryPayout($user);
+            $roiProcessed = 0;
+            foreach ($userInvestments as $investment) {
+                $incomeService->distributeDailyROI($investment);
+                $roiProcessed++;
+            }
 
             $rows[] = [
                 'user' => $user->name.' ('.$user->referral_code.')',
-                'matching' => '$'.number_format($matchingPaid, 2),
-                'salary' => '$'.number_format($salaryPaid, 2),
-                'earning_wallet' => '$'.number_format((float) $user->fresh()->earning_wallet, 2),
+                'active_investments' => $userInvestments->count(),
+                'roi_processed' => $roiProcessed,
+                'earning_wallet' => '₹'.number_format((float) $user->fresh()->earning_wallet, 2),
             ];
         }
 
         $this->table(
-            ['User / Referral', '10% Matching Income', '17-Level Salary Income', 'Earning Wallet'],
+            ['User / Referral', 'Active Contracts', 'ROI Cycles Processed', 'Earning Wallet'],
             $rows
         );
 
-        $this->info('Dex Trade Income Distribution Cycle Completed Successfully!');
+        $this->info('ZIVO PAY Income & Reward Distribution Completed Successfully!');
 
         return Command::SUCCESS;
     }

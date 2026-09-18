@@ -1117,8 +1117,49 @@ table tbody tr {
     background: rgba(16, 185, 129, 0.4);
     border-radius: 9999px;
 }
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-    background: rgba(16, 185, 129, 0.7);
+
+/* ZIVO Filter Bar Official 1-Row Layout Rules */
+.zivo-filter-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-end !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+}
+
+.zivo-filter-field-date {
+    flex: 0 0 145px !important;
+    width: 145px !important;
+    max-width: 100% !important;
+}
+
+.zivo-filter-field-select {
+    flex: 0 0 165px !important;
+    width: 165px !important;
+    max-width: 100% !important;
+}
+
+.zivo-filter-field-search {
+    flex: 1 1 200px !important;
+    min-width: 180px !important;
+}
+
+.zivo-filter-actions {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+@media (max-width: 640px) {
+    .zivo-filter-field-date,
+    .zivo-filter-field-select,
+    .zivo-filter-field-search,
+    .zivo-filter-actions {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
 }
 
 

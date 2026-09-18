@@ -53,6 +53,7 @@ class WalletController extends Controller
     public function transfer(Request $request)
     {
         $request->validate([
+            'direction' => 'nullable|string|in:earning_to_fund,fund_to_earning',
             'amount' => 'required|numeric|min:10',
         ], [
             'amount.min' => 'Minimum transfer amount is ₹10.',
@@ -60,36 +61,56 @@ class WalletController extends Controller
 
         $user = Auth::user();
         $amount = (float) $request->amount;
+        $direction = $request->input('direction', 'earning_to_fund');
 
-        if ($user->earning_wallet < $amount) {
-            return back()->withErrors(['amount' => 'Insufficient Earning Wallet balance. Available: ₹'.number_format($user->earning_wallet, 2)]);
+        if ($direction === 'fund_to_earning') {
+            if ($user->deposit_wallet < $amount) {
+                return back()->withErrors(['amount' => 'Insufficient Fund Wallet balance. Available: ₹'.number_format($user->deposit_wallet, 2)]);
+            }
+
+            $user->deposit_wallet -= $amount;
+            $user->earning_wallet += $amount;
+            $user->save();
+
+            $fromWalletKey = 'deposit_wallet';
+            $toWalletKey = 'earning_wallet';
+            $desc = 'Internal Wallet Transfer: Fund Wallet -> Earning Wallet';
+            $msg = 'Successfully transferred ₹'.number_format($amount, 2).' from Fund Wallet to Earning Wallet!';
+        } else {
+            if ($user->earning_wallet < $amount) {
+                return back()->withErrors(['amount' => 'Insufficient Earning Wallet balance. Available: ₹'.number_format($user->earning_wallet, 2)]);
+            }
+
+            $user->earning_wallet -= $amount;
+            $user->deposit_wallet += $amount;
+            $user->save();
+
+            $fromWalletKey = 'earning_wallet';
+            $toWalletKey = 'deposit_wallet';
+            $desc = 'Internal Wallet Transfer: Earning Wallet -> Fund Wallet';
+            $msg = 'Successfully transferred ₹'.number_format($amount, 2).' from Earning Wallet to Fund Wallet!';
         }
-
-        // Perform instant transfer: Earning Wallet -> Fund Wallet
-        $user->earning_wallet -= $amount;
-        $user->deposit_wallet += $amount;
-        $user->save();
 
         $trxId = 'TRF-'.strtoupper(Str::random(10));
 
         WalletTransfer::create([
             'user_id' => $user->id,
             'amount' => $amount,
-            'from_wallet' => 'earning_wallet',
-            'to_wallet' => 'deposit_wallet',
+            'from_wallet' => $fromWalletKey,
+            'to_wallet' => $toWalletKey,
             'trx_id' => $trxId,
         ]);
 
         Transaction::create([
             'user_id' => $user->id,
             'amount' => $amount,
-            'wallet_type' => 'earning',
+            'wallet_type' => $fromWalletKey === 'deposit_wallet' ? 'fund' : 'earning',
             'type' => 'wallet_transfer',
             'trx_type' => '-',
-            'description' => 'Internal Wallet Transfer: Earning Wallet -> Fund Wallet',
+            'description' => $desc,
             'trx_id' => $trxId,
         ]);
 
-        return back()->with('success', 'Successfully transferred ₹'.number_format($amount, 2).' from Earning Wallet to Fund Wallet!');
+        return back()->with('success', $msg);
     }
 }

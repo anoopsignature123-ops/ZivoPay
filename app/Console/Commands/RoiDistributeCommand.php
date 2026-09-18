@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Services\IncomeEngineService;
+use App\Models\UserInvestment;
+use App\Services\MLMIncomeService;
 use Illuminate\Console\Command;
 
 class RoiDistributeCommand extends Command
@@ -19,21 +20,30 @@ class RoiDistributeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Distribute daily ROI yield (0.5%), Referral ROI (0.5%), and Matching ROI (0.5%) under Dex Trade capping limits';
+    protected $description = 'Distribute ZIVO PAY daily ROI yield (0.15% - 0.30%) and 15-level ROI matching income';
 
     /**
      * Execute the console command.
      */
-    public function handle(IncomeEngineService $engine): int
+    public function handle(MLMIncomeService $incomeService): int
     {
-        $this->info('Starting Daily Dex Trade ROI Yield & Passive Distributions...');
+        $this->info('Starting ZIVO PAY Daily ROI Yield & 15-Level Distribution...');
 
-        $results = $engine->runAllDailyIncomes();
+        $activeInvestments = UserInvestment::where('status', 'active')
+            ->where('days_completed', '<', 730)
+            ->where(function ($q) {
+                $q->whereNull('last_payout_at')
+                    ->orWhere('last_payout_at', '<=', now()->subHours(20));
+            })
+            ->get();
 
-        $this->info('Daily ROI Distribution Complete!');
-        $this->line("- Daily ROI Contracts: {$results['daily_roi']['processed_contracts']} | Total: \$".number_format($results['daily_roi']['total_roi_amount'], 2));
-        $this->line("- Referral ROI Sponsors: {$results['referral_roi']['sponsors_processed']} | Total: \$".number_format($results['referral_roi']['total_referral_roi_amount'], 2));
-        $this->line("- Matching ROI Contracts: {$results['matching_roi']['processed_contracts']} | Total: \$".number_format($results['matching_roi']['total_matching_roi_amount'], 2));
+        $count = 0;
+        foreach ($activeInvestments as $investment) {
+            $incomeService->distributeDailyROI($investment);
+            $count++;
+        }
+
+        $this->info("Successfully processed Daily ROI & 15-Level Income for {$count} active contracts.");
 
         return Command::SUCCESS;
     }

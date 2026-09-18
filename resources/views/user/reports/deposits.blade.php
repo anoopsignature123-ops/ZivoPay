@@ -1,16 +1,16 @@
 @extends('user.layouts.app')
 
-@section('title', 'Add Fund & Deposit History - ZIVO PAY')
+@section('title', 'Add Fund & Fund Wallet History - ZIVO PAY')
 
 @section('content')
-<div class="space-y-6 font-sans">
+<div class="max-w-6xl mx-auto space-y-5 font-sans">
     <!-- Header Banner -->
     <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.25)] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
             <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
                 FUND WALLET AUDIT LOG
             </span>
-            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">ADD FUND & DEPOSIT HISTORY</h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">ADD FUND & FUND WALLET HISTORY</h1>
             <p class="text-xs text-neutral-300 mt-1">Detailed audit report of all Fund Wallet deposits, UTR references, payment methods, and credit statuses.</p>
         </div>
 
@@ -51,38 +51,49 @@
     </div>
 
     <!-- Search & Filter Form Bar -->
-    <div class="bg-[#042718] p-5 rounded-3xl border border-emerald-500/30 shadow-xl">
-        <form action="{{ route('user.reports.deposits') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Search Ref / UTR / Method</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Ref ID, UTR Number, UPI..." class="w-full px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
+    <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl">
+        <form action="{{ route('user.reports.deposits') }}" method="GET" class="zivo-filter-bar">
+            <!-- FROM DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
             </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Status</label>
-                <select name="status" class="w-full px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
-                    <option value="" class="bg-[#042718]">All Statuses</option>
-                    <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }} class="bg-[#042718]">Approved</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }} class="bg-[#042718]">Pending</option>
-                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }} class="bg-[#042718]">Rejected</option>
+            <!-- TO DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">TO DATE</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <!-- STATUS -->
+            <div class="zivo-filter-field-select">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">STATUS</label>
+                <select name="status" class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                    <option value="">All Statuses</option>
+                    <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">From Date</label>
-                <input type="date" name="from_date" value="{{ request('from_date') }}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
+            <!-- SEARCH REF / UTR / METHOD -->
+            <div class="zivo-filter-field-search">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">SEARCH REF / UTR / METHOD</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Ref ID, UTR Number, UPI..."
+                        class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">To Date</label>
-                <input type="date" name="to_date" value="{{ request('to_date') }}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-md">
-                    <i data-lucide="filter" class="w-4 h-4"></i> Filter
+            <!-- ACTION BUTTONS -->
+            <div class="zivo-filter-actions">
+                <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
                 </button>
-                <a href="{{ route('user.reports.deposits') }}" class="px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-neutral-400 hover:text-white text-xs font-bold transition">
+                <a href="{{ route('user.reports.deposits') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
                     Reset
                 </a>
             </div>

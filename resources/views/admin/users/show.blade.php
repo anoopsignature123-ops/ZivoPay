@@ -101,24 +101,20 @@
         </div>
     </div>
 
-    <!-- Direct Add Fund Form Card -->
-    <div class="p-6 rounded-3xl bg-panel border border-emerald-500/30 shadow-2xl space-y-4">
-        <div class="flex items-center gap-3 border-b border-emerald-500/20 pb-3">
-            <div class="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md shrink-0">
-                💳
-            </div>
-            <div>
-                <h3 class="text-base font-black text-white font-heading uppercase">DIRECT FUND CREDIT TO MEMBER WALLET</h3>
-                <p class="text-xs text-neutral-300">Credit Deposit Wallet or Earning Wallet directly</p>
-            </div>
+    <!-- Admin Add/Deduct Wallet Direct Controls -->
+    <div class="p-6 rounded-3xl bg-[#042718] border border-emerald-500/30 space-y-4 shadow-xl">
+        <div class="flex items-center gap-2 border-b border-emerald-500/20 pb-3">
+            <i data-lucide="wallet-cards" class="w-5 h-5 text-emerald-400"></i>
+            <h2 class="text-base font-black text-white uppercase tracking-tight font-heading">ADMIN DIRECT WALLET ADJUSTMENT</h2>
         </div>
+        <p class="text-xs text-neutral-300">Credit Fund Wallet or Earning Wallet directly for member {{ $user->name }}</p>
 
         <form action="{{ route('admin.users.add-fund', $user) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
             @csrf
             <div>
-                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Target Wallet *</label>
-                <select name="wallet_type" class="w-full px-4 py-2.5 rounded-xl bg-black border border-emerald-500/40 text-white font-bold text-xs focus:outline-none cursor-pointer">
-                    <option value="deposit_wallet">Deposit Wallet</option>
+                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Select Target Wallet *</label>
+                <select name="wallet_type" required class="w-full px-4 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
+                    <option value="deposit_wallet">Fund Wallet</option>
                     <option value="earning_wallet">Earning Wallet</option>
                 </select>
             </div>

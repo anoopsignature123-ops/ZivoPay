@@ -60,7 +60,7 @@
 
                     <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
                         <span class="text-slate-300 font-semibold flex items-center gap-1.5">
-                            <span class="text-teal-400">💳</span> Deposit Wallet:
+                            <span class="text-teal-400">💳</span> Fund Wallet:
                         </span>
                         <span class="text-teal-300 font-mono font-bold">{{ $depositWallet }}</span>
                     </div>

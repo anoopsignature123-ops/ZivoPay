@@ -8,7 +8,7 @@
     <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.3)] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">DEPOSITS</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">FUND WALLET</span>
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY GATEWAY</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">USER ADD FUND MANAGEMENT</h1>

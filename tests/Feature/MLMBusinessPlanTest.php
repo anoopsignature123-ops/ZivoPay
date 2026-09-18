@@ -163,4 +163,79 @@ class MLMBusinessPlanTest extends TestCase
         $this->assertEquals('Mobile Phone (स्मार्टफोन)', $reward->reward_item);
         $this->assertEquals('achieved', $reward->status);
     }
+
+    public function test_dual_wallet_withdrawals(): void
+    {
+        $user = User::create([
+            'role_id' => $this->roleId,
+            'name' => 'Withdrawal Tester',
+            'email' => 'wth_tester@zivopay.com',
+            'referral_code' => 'ZIVO-WTH01',
+            'deposit_wallet' => 2000.00,
+            'earning_wallet' => 5000.00,
+            'status' => 'active',
+        ]);
+
+        $this->actingAs($user);
+
+        // 1. Withdraw ₹1,000 from Earning Wallet
+        $responseEarning = $this->post(route('user.withdrawal.store'), [
+            'from_wallet' => 'earning_wallet',
+            'amount' => 1000,
+            'payment_method' => 'Bank Transfer',
+            'account_details' => 'ICICI Bank 123456789 IFSC ICIC0001234',
+        ]);
+        $responseEarning->assertRedirect(route('user.withdrawal.index'));
+
+        $this->assertEquals(4000.00, $user->fresh()->earning_wallet);
+        $this->assertDatabaseHas('withdrawals', [
+            'user_id' => $user->id,
+            'amount' => 1000.00,
+            'final_amount' => 950.00,
+        ]);
+
+        // 2. Withdraw ₹1,000 from Fund Wallet
+        $responseFund = $this->post(route('user.withdrawal.store'), [
+            'from_wallet' => 'deposit_wallet',
+            'amount' => 1000,
+            'payment_method' => 'UPI',
+            'account_details' => 'test@upi',
+        ]);
+        $responseFund->assertRedirect(route('user.withdrawal.index'));
+
+        $this->assertEquals(1000.00, $user->fresh()->deposit_wallet);
+    }
+
+    public function test_bidirectional_inter_wallet_transfers(): void
+    {
+        $user = User::create([
+            'role_id' => $this->roleId,
+            'name' => 'Transfer Tester',
+            'email' => 'trf_tester@zivopay.com',
+            'referral_code' => 'ZIVO-TRF01',
+            'deposit_wallet' => 1000.00,
+            'earning_wallet' => 2000.00,
+            'status' => 'active',
+        ]);
+
+        $this->actingAs($user);
+
+        // 1. Earning -> Fund Transfer ₹500
+        $response1 = $this->post(route('user.wallet.transfer.store'), [
+            'direction' => 'earning_to_fund',
+            'amount' => 500,
+        ]);
+        $response1->assertSessionHasNoErrors();
+        $this->assertEquals(1500.00, $user->fresh()->earning_wallet);
+        $this->assertEquals(1500.00, $user->fresh()->deposit_wallet);
+
+        // 2. Fund -> Earning Transfer ₹300
+        $response2 = $this->post(route('user.wallet.transfer.store'), [
+            'direction' => 'fund_to_earning',
+            'amount' => 300,
+        ]);
+        $response2->assertSessionHasNoErrors();
+        $this->assertEquals(1800.00, $user->fresh()->earning_wallet);
+        $this->assertEquals(1200.00, $user->fresh()->deposit_wallet);
+    }
 }

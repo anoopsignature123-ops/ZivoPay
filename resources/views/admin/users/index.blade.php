@@ -263,7 +263,7 @@
             <div>
                 <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Select Wallet:</label>
                 <select name="wallet_type" required class="w-full px-4 py-2.5 rounded-xl border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
-                    <option value="deposit_wallet" class="bg-[#042718] text-white">Fund Wallet (Deposit Wallet)</option>
+                    <option value="deposit_wallet" class="bg-[#042718] text-white">Fund Wallet</option>
                     <option value="earning_wallet" class="bg-[#042718] text-white">Earning Wallet</option>
                 </select>
             </div>

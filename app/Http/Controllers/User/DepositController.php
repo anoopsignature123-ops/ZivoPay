@@ -21,11 +21,28 @@ class DepositController extends Controller
 
         $query = Deposit::where('user_id', $user->id);
 
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('deposit_ref', 'like', "%{$search}%")
+                    ->orWhere('trx_hash', 'like', "%{$search}%")
+                    ->orWhere('payment_method', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
             $query->where('status', $request->status);
         }
 
-        $deposits = $query->orderBy('id', 'desc')->paginate(15);
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $deposits = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
         $stats = [
             'total_approved' => (float) Deposit::where('user_id', $user->id)->where('status', 'approved')->sum('final_amount'),

@@ -53,17 +53,17 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Add Fund (Deposit Wallet)</span>
+            <span class="nav-text">Add Fund (Fund Wallet)</span>
         </a>
 
-        {{-- <a class='nav-item {{ request()->routeIs("user.wallet.transfer*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+        <a class='nav-item {{ request()->routeIs("user.wallet.transfer*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.wallet.transfer") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Internal Wallet Transfer</span>
-            </a> --}}
+        </a>
 
         <a class='nav-item {{ request()->routeIs("user.reports.deposits") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.reports.deposits") }}'>
@@ -71,7 +71,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="history" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Deposit Fund History</span>
+            <span class="nav-text">Fund Wallet History</span>
         </a>
 
         <!-- BUY PACKAGE ₹3,000 -->
@@ -250,6 +250,24 @@
             </div>
             <span class="nav-text">My Network Tree</span>
         </a>
+
+        <!-- MY PARENT / SPONSOR SECTION -->
+        <div class="mx-3 my-2 p-3 rounded-xl bg-[#02180f] border border-emerald-500/30 space-y-1">
+            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">My Parent / Sponsor:</span>
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-white truncate">
+                        {{ Auth::user() && Auth::user()->sponsor ? Auth::user()->sponsor->name : 'System Direct / Root' }}
+                    </p>
+                    <p class="text-[10px] font-mono text-teal-300 truncate">
+                        Code: {{ Auth::user() && Auth::user()->sponsor_code ? Auth::user()->sponsor_code : 'Direct' }}
+                    </p>
+                </div>
+            </div>
+        </div>
 
 
         <!-- MY ACCOUNT -->

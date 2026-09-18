@@ -3,7 +3,7 @@
 @section('title', 'ZIVO PAY - 24x7 Withdrawal Portal')
 
 @section('content')
-<div class="space-y-6 font-sans">
+<div class="max-w-6xl mx-auto space-y-5 font-sans">
 
     <!-- Top Banner & Wallet Balance Header -->
     <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.25)] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
@@ -86,10 +86,10 @@
         </div>
     </div>
 
-    <!-- Request Form & Guidelines Section (50% / 50% Equal Columns) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <!-- Form Area (6 Cols - 50%) -->
-        <div class="lg:col-span-6 p-6 sm:p-8 rounded-3xl bg-[#042718] border border-emerald-500/30 shadow-2xl space-y-5 flex flex-col justify-between">
+    <!-- Request Form & Guidelines Section (50% / 50% Equal Columns - Single Row) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <!-- Form Area (50% Column) -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border border-emerald-500/30 shadow-2xl space-y-5 flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between border-b border-emerald-500/20 pb-4 mb-4">
                     <h2 class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
@@ -101,6 +101,15 @@
                 <form action="{{ route('user.withdrawal.store') }}" method="POST" class="space-y-4">
                     @csrf
 
+                    <!-- Select Source Wallet Field -->
+                    <div>
+                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Select Source Wallet *</label>
+                        <select id="fromWallet" name="from_wallet" required onchange="updateWalletBalance(this.value)" class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                            <option value="earning_wallet" {{ old('from_wallet', 'earning_wallet') === 'earning_wallet' ? 'selected' : '' }}>Earning Wallet (Available: ₹{{ number_format($user->earning_wallet, 2) }})</option>
+                            <option value="deposit_wallet" {{ old('from_wallet') === 'deposit_wallet' ? 'selected' : '' }}>Fund Wallet (Available: ₹{{ number_format($user->deposit_wallet, 2) }})</option>
+                        </select>
+                    </div>
+
                     <!-- Amount Field -->
                     <div>
                         <div class="flex items-center justify-between mb-1">
@@ -109,14 +118,14 @@
                         </div>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold text-lg font-mono">₹</span>
-                            <input type="number" id="wthAmount" name="amount" min="500" max="{{ $user->earning_wallet }}" step="50" required value="{{ old('amount') }}" placeholder="e.g. 1000"
+                            <input type="number" id="wthAmount" name="amount" min="500" step="50" required value="{{ old('amount') }}" placeholder="e.g. 1000"
                                 class="w-full pl-10 pr-20 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono font-bold text-base focus:outline-none focus:border-emerald-400 transition"
                                 oninput="calculateFee(this.value)">
-                            <button type="button" onclick="setMaxAmount({{ $user->earning_wallet }})" class="absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 font-bold text-[10px] border border-emerald-500/30 transition">
+                            <button type="button" id="maxBtn" onclick="setMaxAmountCurrent()" class="absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 font-bold text-[10px] border border-emerald-500/30 transition">
                                 MAX
                             </button>
                         </div>
-                        <p class="text-[11px] text-neutral-400 mt-1">Available Earning Wallet: <strong class="text-emerald-400">₹{{ number_format($user->earning_wallet, 2) }}</strong></p>
+                        <p class="text-[11px] text-neutral-400 mt-1" id="walletBalanceHint">Available Balance: <strong class="text-emerald-400" id="availBalDisplay">₹{{ number_format($user->earning_wallet, 2) }}</strong></p>
                     </div>
 
                     <!-- Payment Method Field -->
@@ -166,8 +175,8 @@
             </div>
         </div>
 
-        <!-- Rules & Payout Guidelines (6 Cols - 50%) -->
-        <div class="lg:col-span-6 p-6 sm:p-8 rounded-3xl bg-[#042718] border border-emerald-500/30 shadow-2xl space-y-6 flex flex-col justify-between">
+        <!-- Rules & Payout Guidelines (50% Column) -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border border-emerald-500/30 shadow-2xl space-y-6 flex flex-col justify-between">
             <div class="space-y-4">
                 <div class="flex items-center gap-2 border-b border-emerald-500/20 pb-3">
                     <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
@@ -220,28 +229,62 @@
         </div>
     </div>
 
+    <!-- Official Filter Bar Component -->
+    <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl">
+        <form action="{{ route('user.withdrawal.index') }}" method="GET" class="zivo-filter-bar">
+            <!-- FROM DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <!-- TO DATE -->
+            <div class="zivo-filter-field-date">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">TO DATE</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}"
+                    class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <!-- STATUS -->
+            <div class="zivo-filter-field-select">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">STATUS</label>
+                <select name="status" class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                    <option value="">All Statuses</option>
+                    <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                </select>
+            </div>
+
+            <!-- SEARCH REF / UTR / ACCOUNT -->
+            <div class="zivo-filter-field-search">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">SEARCH REF / UTR / ACCOUNT</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Ref ID, Account Details, Method..."
+                        class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="zivo-filter-actions">
+                <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
+                </button>
+                <a href="{{ route('user.withdrawal.index') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- Payout History Table -->
     <div class="p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-2xl space-y-4">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-emerald-500/20 pb-4">
             <h2 class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
                 <i data-lucide="history" class="w-5 h-5 text-emerald-400"></i> My Withdrawal History
             </h2>
-
-            <!-- Filter Tabs -->
-            <div class="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 shrink-0">
-                <a href="{{ route('user.withdrawal.index') }}" class="whitespace-nowrap px-3 py-1.5 rounded-lg {{ !request('status') ? 'bg-emerald-500 text-black font-bold' : 'bg-emerald-500/10 text-neutral-300 hover:bg-emerald-500/20' }}">
-                    All Requests
-                </a>
-                <a href="{{ route('user.withdrawal.index', ['status' => 'pending']) }}" class="whitespace-nowrap px-3 py-1.5 rounded-lg {{ request('status') === 'pending' ? 'bg-teal-500 text-black font-bold' : 'bg-emerald-500/10 text-neutral-300 hover:bg-emerald-500/20' }}">
-                    Pending
-                </a>
-                <a href="{{ route('user.withdrawal.index', ['status' => 'approved']) }}" class="whitespace-nowrap px-3 py-1.5 rounded-lg {{ request('status') === 'approved' ? 'bg-emerald-500 text-black font-bold' : 'bg-emerald-500/10 text-neutral-300 hover:bg-emerald-500/20' }}">
-                    Approved
-                </a>
-                <a href="{{ route('user.withdrawal.index', ['status' => 'rejected']) }}" class="whitespace-nowrap px-3 py-1.5 rounded-lg {{ request('status') === 'rejected' ? 'bg-rose-500 text-white font-bold' : 'bg-emerald-500/10 text-neutral-300 hover:bg-emerald-500/20' }}">
-                    Rejected
-                </a>
-            </div>
         </div>
 
         @if($withdrawals->count() > 0)
@@ -300,9 +343,12 @@
         @endif
     </div>
 
-</div>
-
 <script>
+var walletBalances = {
+    earning_wallet: {{ (float) $user->earning_wallet }},
+    deposit_wallet: {{ (float) $user->deposit_wallet }}
+};
+
 function calculateFee(val) {
     var amount = parseFloat(val) || 0;
     var fee = Math.round((amount * 0.05) * 100) / 100;
@@ -313,7 +359,14 @@ function calculateFee(val) {
     document.getElementById('displayNet').innerText = '₹' + net.toFixed(2);
 }
 
-function setMaxAmount(maxVal) {
+function updateWalletBalance(walletType) {
+    var bal = walletBalances[walletType] || 0;
+    document.getElementById('availBalDisplay').innerText = '₹' + bal.toFixed(2);
+}
+
+function setMaxAmountCurrent() {
+    var walletType = document.getElementById('fromWallet').value;
+    var maxVal = walletBalances[walletType] || 0;
     var el = document.getElementById('wthAmount');
     el.value = maxVal;
     calculateFee(maxVal);

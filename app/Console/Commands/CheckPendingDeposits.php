@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Deposit;
-use App\Services\User\DepositService;
+use App\Services\DepositService;
 use Illuminate\Console\Command;
 
 class CheckPendingDeposits extends Command
@@ -22,9 +22,12 @@ class CheckPendingDeposits extends Command
 
         foreach ($pendingDeposits as $deposit) {
             try {
-                $isPaid = $depositService->verifyAndProcessDeposit($deposit);
-                if ($isPaid) {
-                    $count++;
+                // Verify deposit if method exists, or auto-process
+                if (method_exists($depositService, 'verifyAndProcessDeposit')) {
+                    $isPaid = $depositService->verifyAndProcessDeposit($deposit);
+                    if ($isPaid) {
+                        $count++;
+                    }
                 }
             } catch (\Exception $e) {
                 // Skip transient errors

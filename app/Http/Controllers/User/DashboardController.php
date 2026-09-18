@@ -69,8 +69,18 @@ class DashboardController extends Controller
 
         $totalIncomeEarned = $totalRoiIncome + $totalDirectIncome + $totalSubLevelIncome + $totalLevelRoiIncome + $totalDirectReward + $totalTeamReward;
 
+        // Sponsor Info
+        $sponsor = User::where('referral_code', $user->sponsor_code)->first();
+
+        // Pending Withdrawals Stats
+        $pendingWithdrawalsAmount = $user->withdrawals()->where('status', 'pending')->sum('amount');
+        $pendingWithdrawalsCount = $user->withdrawals()->where('status', 'pending')->count();
+
         return view('user.dashboard', compact(
             'user',
+            'sponsor',
+            'pendingWithdrawalsAmount',
+            'pendingWithdrawalsCount',
             'directMembersCount',
             'activeDirectMembersCount',
             'inactiveDirectMembersCount',

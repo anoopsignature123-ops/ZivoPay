@@ -145,47 +145,54 @@
             @endif
         </div>
 
-        <!-- Section B: Internal Wallet Transfer (Earning -> Fund) -->
+        <!-- Section B: Internal Wallet Transfer (Bidirectional) -->
         <div class="p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-xl space-y-4">
             <div class="flex items-center gap-3 border-b border-emerald-500/20 pb-4">
                 <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold">
                     <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h2 class="text-lg font-black text-white uppercase">EARNING TO FUND WALLET TRANSFER</h2>
-                    <p class="text-xs text-neutral-400">Convert earned income to Fund Wallet balance for re-investment.</p>
+                    <h2 class="text-lg font-black text-white uppercase">BIDIRECTIONAL INTERNAL WALLET TRANSFER</h2>
+                    <p class="text-xs text-neutral-400">Transfer funds instantly between Earning Wallet and Fund Wallet.</p>
                 </div>
             </div>
 
             <form action="{{ route('user.wallet.transfer.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Transfer Amount (₹)</label>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Select Transfer Direction *</label>
+                    <select name="direction" id="transferDirection" onchange="updateTransferHint(this.value)" class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                        <option value="earning_to_fund" {{ old('direction') === 'earning_to_fund' ? 'selected' : '' }}>Earning Wallet → Fund Wallet (Available: ₹{{ number_format($user->earning_wallet, 2) }})</option>
+                        <option value="fund_to_earning" {{ old('direction') === 'fund_to_earning' ? 'selected' : '' }}>Fund Wallet → Earning Wallet (Available: ₹{{ number_format($user->deposit_wallet, 2) }})</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Transfer Amount (₹) *</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold">₹</span>
                         <input type="number" step="0.01" min="10" name="amount" placeholder="Minimum ₹10" required class="w-full pl-9 pr-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white font-bold text-sm focus:outline-none focus:border-emerald-400">
                     </div>
-                    <span class="text-[10px] text-neutral-400 mt-1 block">Available Earning Balance: ₹{{ number_format($user->earning_wallet, 2) }}</span>
+                    <span class="text-[10px] text-neutral-400 mt-1 block" id="transferBalanceHint">Available Earning Balance: ₹{{ number_format($user->earning_wallet, 2) }}</span>
                 </div>
 
                 <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/20 text-[11px] text-neutral-300 space-y-1">
                     <div class="flex justify-between">
                         <span>From:</span>
-                        <span class="font-bold text-teal-300">Earning Wallet</span>
+                        <span class="font-bold text-teal-300" id="fromDisplay">Earning Wallet</span>
                     </div>
                     <div class="flex justify-between">
                         <span>To:</span>
-                        <span class="font-bold text-emerald-400">Fund Wallet</span>
+                        <span class="font-bold text-emerald-400" id="toDisplay">Fund Wallet</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Transfer Fee:</span>
-                        <span class="font-bold text-emerald-400">₹0.00 (Instant & Free)</span>
+                        <span class="font-bold text-emerald-400">FREE (₹0.00)</span>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-[1.02] transition flex items-center justify-center gap-2">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                    CONFIRM INSTANT TRANSFER
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
+                    <i data-lucide="send" class="w-4 h-4"></i> EXECUTE INSTANT TRANSFER
                 </button>
             </form>
         </div>
@@ -217,12 +224,12 @@
                             </td>
                             <td class="px-5 py-4">
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                                    {{ str_replace('_', ' ', $transfer->from_wallet) }}
+                                    {{ $transfer->from_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}
                                 </span>
                             </td>
                             <td class="px-5 py-4">
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                                    {{ str_replace('_', ' ', $transfer->to_wallet) }}
+                                    {{ $transfer->to_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}
                                 </span>
                             </td>
                             <td class="px-5 py-4 font-bold text-white text-sm">
@@ -252,4 +259,21 @@
         @endif
     </div>
 </div>
+
+<script>
+function updateTransferHint(direction) {
+    var earningBal = '₹{{ number_format($user->earning_wallet, 2) }}';
+    var fundBal = '₹{{ number_format($user->deposit_wallet, 2) }}';
+
+    if (direction === 'fund_to_earning') {
+        document.getElementById('transferBalanceHint').innerText = 'Available Fund Balance: ' + fundBal;
+        document.getElementById('fromDisplay').innerText = 'Fund Wallet';
+        document.getElementById('toDisplay').innerText = 'Earning Wallet';
+    } else {
+        document.getElementById('transferBalanceHint').innerText = 'Available Earning Balance: ' + earningBal;
+        document.getElementById('fromDisplay').innerText = 'Earning Wallet';
+        document.getElementById('toDisplay').innerText = 'Fund Wallet';
+    }
+}
+</script>
 @endsection

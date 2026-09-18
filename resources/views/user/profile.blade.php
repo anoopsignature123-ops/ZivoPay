@@ -65,7 +65,7 @@
                                 class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-[10px]">CODE:
                                 {{ $user->referral_code }}</span>
                             <span
-                                class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-400 font-mono font-bold text-[10px]">DEPOSIT:
+                                class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-400 font-mono font-bold text-[10px]">FUND WALLET:
                                 ${{ number_format($user->deposit_wallet, 2) }}</span>
                             <span
                                 class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-[10px]">EARNING:

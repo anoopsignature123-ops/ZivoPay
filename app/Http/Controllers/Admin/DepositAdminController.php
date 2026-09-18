@@ -56,10 +56,10 @@ class DepositAdminController extends Controller
         $success = $depositService->approveDeposit($deposit, $remark);
 
         if ($success) {
-            return redirect()->back()->with('success', "Deposit #{$deposit->deposit_ref} approved! ₹".number_format($deposit->final_amount, 2)." credited to {$deposit->user->name}'s Fund Wallet.");
+            return redirect()->back()->with('success', "Fund Request #{$deposit->deposit_ref} approved! ₹".number_format($deposit->final_amount, 2)." credited to {$deposit->user->name}'s Fund Wallet.");
         }
 
-        return redirect()->back()->with('error', "Deposit #{$deposit->deposit_ref} could not be approved or is already processed.");
+        return redirect()->back()->with('error', "Fund Request #{$deposit->deposit_ref} could not be approved or is already processed.");
     }
 
     /**
@@ -67,13 +67,13 @@ class DepositAdminController extends Controller
      */
     public function reject(Request $request, Deposit $deposit, DepositService $depositService): RedirectResponse
     {
-        $remark = $request->input('admin_remark', 'Deposit request rejected by Admin.');
+        $remark = $request->input('admin_remark', 'Fund Add request rejected by Admin.');
         $success = $depositService->rejectDeposit($deposit, $remark);
 
         if ($success) {
-            return redirect()->back()->with('success', "Deposit #{$deposit->deposit_ref} has been rejected.");
+            return redirect()->back()->with('success', "Fund Request #{$deposit->deposit_ref} has been rejected.");
         }
 
-        return redirect()->back()->with('error', "Deposit #{$deposit->deposit_ref} could not be rejected.");
+        return redirect()->back()->with('error', "Fund Request #{$deposit->deposit_ref} could not be rejected.");
     }
 }
