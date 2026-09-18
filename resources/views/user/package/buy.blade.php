@@ -109,13 +109,13 @@
                 <form action="{{ route('user.wallet.subscription.activate') }}" method="POST">
                     @csrf
                     <button type="submit"
-                        {{ $user->deposit_wallet < 3000 ? 'disabled' : '' }}
-                        class="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-xl {{ $user->deposit_wallet >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.01] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
+                        {{ (float) ($user->deposit_wallet ?? 0) < 3000 ? 'disabled' : '' }}
+                        class="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-xl {{ (float) ($user->deposit_wallet ?? 0) >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.01] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
                         <i data-lucide="zap" class="w-5 h-5"></i>
                         BUY PACKAGE & ACTIVATE NOW (₹3,000)
                     </button>
                 </form>
-                @if($user->deposit_wallet < 3000)
+                @if((float) ($user->deposit_wallet ?? 0) < 3000)
                     <p class="text-xs text-rose-400 text-center font-semibold mt-3">
                         Insufficient Fund Wallet balance (Available: ₹{{ number_format($user->deposit_wallet, 2) }}). Please <a href="{{ route('user.wallet.transfer') }}" class="underline font-bold text-emerald-400">Add Fund</a> first.
                     </p>

@@ -126,13 +126,13 @@
                 <form action="{{ route('user.wallet.subscription.activate') }}" method="POST">
                     @csrf
                     <button type="submit" 
-                        {{ $user->deposit_wallet < 3000 ? 'disabled' : '' }}
-                        class="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg {{ $user->deposit_wallet >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
+                        {{ (float) ($user->deposit_wallet ?? 0) < 3000 ? 'disabled' : '' }}
+                        class="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg {{ (float) ($user->deposit_wallet ?? 0) >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
                         <i data-lucide="zap" class="w-4 h-4"></i>
                         ACTIVATE ACCOUNT NOW (₹3,000)
                     </button>
                 </form>
-                @if($user->deposit_wallet < 3000)
+                @if((float) ($user->deposit_wallet ?? 0) < 3000)
                     <p class="text-[10px] text-rose-400 text-center font-semibold">
                         Insufficient Fund Wallet balance. Please add at least ₹3,000 to your Fund Wallet to activate your account.
                     </p>

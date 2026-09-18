@@ -40,6 +40,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('js/app-validation.js') }}"></script>
     <script src="{{ asset('js/pull-to-refresh.js') }}"></script>
+    @stack('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (window.lucide) {
