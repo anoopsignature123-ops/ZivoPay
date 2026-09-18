@@ -361,9 +361,10 @@ class MLMIncomeService
             ['title' => 'Executive Rank', 'business' => 500000, 'item' => 'Mobile Phone (स्मार्टफोन)'],
             ['title' => 'Senior Executive', 'business' => 1000000, 'item' => 'Laptop (लैपटॉप)'],
             ['title' => 'Manager Rank', 'business' => 2500000, 'item' => 'EV Scooty (इलेक्ट्रिक स्कूटी)'],
-            ['title' => 'Senior Manager', 'business' => 10000000, 'item' => 'Car DP ₹3 Lakh (कार/बाइक)'],
-            ['title' => 'Director Rank', 'business' => 50000000, 'item' => 'Tata Punch (टाटा पंच)'],
-            ['title' => 'Crown Director', 'business' => 100000000, 'item' => 'Tata Sierra (टाटा सेरा SUV)'],
+            ['title' => 'Senior Manager', 'business' => 5000000, 'item' => 'Car DP ₹3 Lakh (कार/बाइक)'],
+            ['title' => 'Director Rank', 'business' => 10000000, 'item' => 'Car DP ₹3 Lakh (कार/बाइक)'],
+            ['title' => 'Crown Director', 'business' => 50000000, 'item' => 'Tata Punch (टाटा पंच)'],
+            ['title' => 'Royal Crown Director', 'business' => 100000000, 'item' => 'Tata Sierra (टाटा सेरा SUV)'],
         ];
     }
 

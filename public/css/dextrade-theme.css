@@ -15,7 +15,7 @@
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* Background - Deep Dark Forest Emerald Fintech Mesh & Ambient Lighting */
+/* Background - Original Card-Free Emerald Fintech Visual */
 body, body#dashboard {
     background-color: #021c10 !important;
     color: #f1f5f9;
@@ -29,33 +29,72 @@ body, body#dashboard {
 
 @keyframes liveBackgroundMotion {
     0% {
-        transform: scale(1) translate(0, 0);
+        transform: scale(1.02) translate(0, 0);
     }
     33% {
-        transform: scale(1.05) translate(-14px, -10px);
+        transform: scale(1.07) translate(-14px, -10px);
     }
     66% {
-        transform: scale(1.08) translate(12px, -18px);
+        transform: scale(1.1) translate(12px, -18px);
     }
     100% {
-        transform: scale(1) translate(0, 0);
+        transform: scale(1.04) translate(0, 0);
     }
+}
+
+@keyframes dashboardLightSweep {
+    0%, 100% { opacity: 0.25; transform: translate3d(-8%, -4%, 0) scale(1); }
+    50% { opacity: 0.7; transform: translate3d(9%, 6%, 0) scale(1.14); }
+}
+
+@keyframes dashboardGridDrift {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 64px 64px, 64px 64px; }
 }
 
 .live-bg-container {
     position: fixed;
     inset: -40px;
     z-index: -2;
-    background-color: #021c10 !important;
-    background-image: 
-        linear-gradient(to bottom, rgba(2, 28, 16, 0.92), rgba(1, 15, 9, 0.96)),
-        url('../images/zivo_dashboard_bg.jpg?v=8') !important;
-    background-size: cover !important;
+    background-color: #010d08 !important;
+    background-image:
+        radial-gradient(ellipse at 12% 8%, rgba(16, 185, 129, 0.22), transparent 32%),
+        radial-gradient(ellipse at 88% 72%, rgba(5, 150, 105, 0.2), transparent 30%),
+        radial-gradient(ellipse at 50% 118%, rgba(20, 83, 45, 0.45), transparent 45%),
+        linear-gradient(125deg, #010d08 0%, #022016 46%, #010b07 100%) !important;
+    background-size: 120% 120%, 130% 130%, 140% 140%, cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     animation: liveBackgroundMotion 28s ease-in-out infinite alternate;
     pointer-events: none;
     will-change: transform;
+}
+
+.live-bg-container::before,
+.live-bg-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.live-bg-container::before {
+    background:
+        repeating-radial-gradient(ellipse at 88% 118%, transparent 0 6%, rgba(52, 211, 153, 0.12) 6.2%, transparent 6.6% 11%),
+        repeating-radial-gradient(ellipse at -8% 10%, transparent 0 9%, rgba(16, 185, 129, 0.07) 9.2%, transparent 9.6% 15%),
+        radial-gradient(circle at 18% 30%, rgba(52, 211, 153, 0.2), transparent 20%);
+    background-size: 100% 100%, 100% 100%, 100% 100%;
+    filter: blur(2px);
+    animation: dashboardLightSweep 12s ease-in-out infinite alternate;
+}
+
+.live-bg-container::after {
+    background-image:
+        linear-gradient(rgba(52, 211, 153, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52, 211, 153, 0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+    animation: dashboardGridDrift 20s linear infinite;
 }
 
 .live-auth-bg-container {
@@ -109,6 +148,26 @@ body, body#dashboard {
     z-index: -1;
     pointer-events: none;
     animation: pulseAuroraGlow 12s ease-in-out infinite reverse;
+}
+
+@media (max-width: 640px) {
+    .live-bg-container {
+        inset: -24px;
+        background-position: 58% center !important;
+    }
+
+    .aurora-glow-orb-1, .aurora-glow-orb-2 {
+        width: 280px;
+        height: 280px;
+        filter: blur(55px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .live-bg-container, .live-bg-container::before, .live-bg-container::after,
+    .aurora-glow-orb-1, .aurora-glow-orb-2 {
+        animation: none !important;
+    }
 }
 
 /* Typography & Headers */
@@ -1161,5 +1220,3 @@ table tbody tr {
         width: 100% !important;
     }
 }
-
-

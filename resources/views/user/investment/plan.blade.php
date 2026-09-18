@@ -234,6 +234,7 @@
                             <div>₹5L Vol: <strong class="text-white font-sans">Mobile Phone</strong></div>
                             <div>₹10L Vol: <strong class="text-white font-sans">Laptop</strong></div>
                             <div>₹25L Vol: <strong class="text-white font-sans">EV Scooty</strong></div>
+                            <div>₹50L Vol: <strong class="text-white font-sans">Car DP ₹3L</strong></div>
                             <div>₹1 Cr Vol: <strong class="text-white font-sans">Car DP ₹3L</strong></div>
                             <div>₹5 Cr Vol: <strong class="text-white font-sans">Tata Punch SUV</strong></div>
                             <div>₹10 Cr Vol: <strong class="text-white font-sans">Tata Sierra SUV</strong></div>

@@ -73,6 +73,73 @@
             flex-shrink: 0;
             box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
         }
+
+        @keyframes growthCardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .growth-hub {
+            position: relative;
+            overflow: hidden;
+            padding: 1.25rem;
+            border: 1px solid rgba(52, 211, 153, 0.24);
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, rgba(1, 30, 18, 0.86), rgba(0, 12, 8, 0.92));
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        .growth-hub::before {
+            content: '';
+            position: absolute;
+            top: -70px;
+            left: 50%;
+            width: 380px;
+            height: 150px;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(52, 211, 153, 0.28), transparent 68%);
+            filter: blur(14px);
+            pointer-events: none;
+        }
+
+        .growth-card {
+            position: relative;
+            min-height: 155px;
+            overflow: hidden;
+            border: 1px solid rgba(110, 231, 183, 0.16);
+            border-radius: 1.1rem;
+            background: linear-gradient(145deg, rgba(8, 42, 27, 0.68), rgba(1, 16, 10, 0.9));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 24px rgba(0, 0, 0, 0.28);
+            transition: transform .35s cubic-bezier(.16, 1, .3, 1), border-color .35s ease, box-shadow .35s ease;
+        }
+
+        .growth-card::after {
+            content: '';
+            position: absolute;
+            right: -22px;
+            bottom: -34px;
+            width: 100px;
+            height: 76px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.8), rgba(16, 185, 129, 0.12) 46%, transparent 70%);
+            filter: blur(8px);
+            transition: transform .35s ease;
+        }
+
+        .growth-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(110, 231, 183, 0.48);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 18px 35px rgba(0, 0, 0, 0.38), 0 0 25px rgba(16, 185, 129, 0.16);
+        }
+
+        .growth-card:hover::after { transform: scale(1.25); }
+        .growth-card:nth-child(2) { animation: growthCardFloat 5s ease-in-out infinite 0.5s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .growth-card:nth-child(2) { animation: none; }
+            .growth-card:hover { transform: none; }
+        }
     </style>
 
     <div class="w-full space-y-5 font-sans relative select-none animate-fade-in-up">
@@ -129,6 +196,37 @@
                 </span>
             </div>
         </div>
+
+        <!-- 2. SMART GROWTH HUB -->
+        <section class="growth-hub relative z-10">
+            <div class="relative mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Your growth space</p>
+                    <h2 class="mt-1 text-lg font-black text-white sm:text-xl">Build. Share. Earn rewards.</h2>
+                </div>
+                <p class="text-xs text-emerald-100/60">Everything you need, in one place.</p>
+            </div>
+            <div class="relative grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <a href="{{ route('user.investment.index') }}" class="growth-card block p-4">
+                    <div class="relative z-10 flex h-full flex-col justify-between">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/25 bg-emerald-400/10 text-emerald-300"><i data-lucide="rocket" class="h-4 w-4"></i></div>
+                        <div><h3 class="text-sm font-black text-white">Activate & Grow</h3><p class="mt-1 max-w-[13rem] text-[11px] leading-4 text-emerald-50/65">Choose your plan and start your growth journey.</p></div>
+                    </div>
+                </a>
+                <a href="{{ route('user.network.direct') }}" class="growth-card block p-4">
+                    <div class="relative z-10 flex h-full flex-col justify-between">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/25 bg-emerald-400/10 text-emerald-300"><i data-lucide="share-2" class="h-4 w-4"></i></div>
+                        <div><h3 class="text-sm font-black text-white">Grow Your Network</h3><p class="mt-1 max-w-[13rem] text-[11px] leading-4 text-emerald-50/65">Share your referral link and build your team.</p></div>
+                    </div>
+                </a>
+                <a href="{{ route('user.rewards.index') }}" class="growth-card block p-4">
+                    <div class="relative z-10 flex h-full flex-col justify-between">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/25 bg-emerald-400/10 text-emerald-300"><i data-lucide="trophy" class="h-4 w-4"></i></div>
+                        <div><h3 class="text-sm font-black text-white">Unlock Rewards</h3><p class="mt-1 max-w-[13rem] text-[11px] leading-4 text-emerald-50/65">Track milestones and unlock your next reward.</p></div>
+                    </div>
+                </a>
+            </div>
+        </section>
 
         <!-- 2. TOP 2 ACTION CARDS (PACKAGE ACTIVATION STATUS + OFFICIAL REFERRAL LINK) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 relative z-10 grid-2-col">

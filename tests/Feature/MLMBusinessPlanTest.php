@@ -164,6 +164,23 @@ class MLMBusinessPlanTest extends TestCase
         $this->assertEquals('achieved', $reward->status);
     }
 
+    public function test_reward_tiers_include_car_downpayment_at_fifty_lakh_and_one_crore(): void
+    {
+        $tiers = MLMIncomeService::getRewardTiers();
+
+        $this->assertSame([
+            500000,
+            1000000,
+            2500000,
+            5000000,
+            10000000,
+            50000000,
+            100000000,
+        ], array_column($tiers, 'business'));
+        $this->assertSame('Car DP ₹3 Lakh (कार/बाइक)', $tiers[3]['item']);
+        $this->assertSame('Car DP ₹3 Lakh (कार/बाइक)', $tiers[4]['item']);
+    }
+
     public function test_dual_wallet_withdrawals(): void
     {
         $user = User::create([
