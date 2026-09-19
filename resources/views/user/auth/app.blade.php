@@ -40,7 +40,7 @@
     <div class="aurora-glow-orb-2"></div>
 
     <!-- Main Auth Content Area (Centered Vertically & Horizontally) -->
-    <div class="w-full max-w-md relative z-20 my-auto py-2">
+    <div class="w-full @yield('card_width', 'max-w-md sm:max-w-lg') relative z-20 my-auto py-2">
         @yield('content')
     </div>
 

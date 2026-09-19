@@ -42,7 +42,8 @@ class MLMBusinessPlanTest extends TestCase
                 'sponsor_code' => $previousCode,
                 'deposit_wallet' => 200000.00,
                 'earning_wallet' => 0.00,
-                'status' => 'inactive',
+                'status' => 'active',
+                'is_subscription_active' => true,
             ]);
 
             $sponsors[$i] = $user;
@@ -71,6 +72,58 @@ class MLMBusinessPlanTest extends TestCase
         // 4. Assert 14 level income transactions created for the sponsor chain
         $sponsorIds = array_map(fn ($u) => $u->id, $sponsors);
         $this->assertEquals(14, Transaction::where('type', 'level_income')->whereIn('user_id', $sponsorIds)->count());
+    }
+
+    public function test_inactive_sponsors_do_not_receive_referral_or_level_incomes(): void
+    {
+        $service = new MLMIncomeService;
+
+        // Create Inactive Top Sponsor (Sponsor 1)
+        $inactiveSponsor = User::create([
+            'role_id' => $this->roleId,
+            'name' => 'Inactive Sponsor',
+            'email' => 'inactive_sponsor@zivopay.com',
+            'referral_code' => 'ZIVO-INACTIVE01',
+            'deposit_wallet' => 0.00,
+            'earning_wallet' => 0.00,
+            'status' => 'inactive',
+            'is_subscription_active' => false,
+        ]);
+
+        // Create Active Direct Sponsor (Sponsor 2) under Inactive Sponsor
+        $activeSponsor = User::create([
+            'role_id' => $this->roleId,
+            'name' => 'Active Sponsor',
+            'email' => 'active_sponsor@zivopay.com',
+            'referral_code' => 'ZIVO-ACTIVE01',
+            'sponsor_code' => 'ZIVO-INACTIVE01',
+            'deposit_wallet' => 10000.00,
+            'earning_wallet' => 0.00,
+            'status' => 'active',
+            'is_subscription_active' => true,
+        ]);
+
+        // Create Investor under Active Sponsor
+        $investor = User::create([
+            'role_id' => $this->roleId,
+            'name' => 'Investor Member',
+            'email' => 'investor_member@zivopay.com',
+            'referral_code' => 'ZIVO-INVESTOR01',
+            'sponsor_code' => 'ZIVO-ACTIVE01',
+            'deposit_wallet' => 100000.00,
+            'earning_wallet' => 0.00,
+            'status' => 'inactive',
+        ]);
+
+        // Investor invests ₹100,000
+        $service->createInvestment($investor, 100000.00, 'deposit_wallet');
+
+        // Active Sponsor (Level 1) receives 5% = ₹5,000
+        $this->assertEquals(5000.00, $activeSponsor->fresh()->earning_wallet);
+
+        // Inactive Sponsor (Level 2) receives NOTHING = ₹0.00
+        $this->assertEquals(0.00, $inactiveSponsor->fresh()->earning_wallet);
+        $this->assertEquals(0, Transaction::where('user_id', $inactiveSponsor->id)->count());
     }
 
     public function test_daily_roi_and_15_level_roi_matching_income(): void

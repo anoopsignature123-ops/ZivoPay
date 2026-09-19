@@ -83,6 +83,14 @@ class InvestmentService
                 break;
             }
 
+            // Only distribute direct business bonus if sponsor account is active
+            if (! $sponsor->isActiveForIncome()) {
+                $currentSponsorCode = $sponsor->sponsor_code;
+                $level++;
+
+                continue;
+            }
+
             // Level 1 gets 5%, Level 2-15 gets 0.50%
             $percentage = ($level === 1) ? 5.00 : 0.50;
             $commission = ($investmentAmount * $percentage) / 100;

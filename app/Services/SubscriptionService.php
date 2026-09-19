@@ -60,6 +60,14 @@ class SubscriptionService
                 break;
             }
 
+            // Only distribute subscription referral income if sponsor account is active
+            if (! $sponsor->isActiveForIncome()) {
+                $currentSponsorCode = $sponsor->sponsor_code;
+                $level++;
+
+                continue;
+            }
+
             // Level 1 gets 5% (₹150), Level 2-15 gets 0.50% (₹15)
             $percentage = ($level === 1) ? 5.00 : 0.50;
             $commission = (self::ACTIVATION_FEE * $percentage) / 100;

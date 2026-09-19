@@ -54,15 +54,20 @@ class NetworkController extends Controller
     public function treeView(Request $request): View
     {
         $currentUser = Auth::user();
-        $code = trim((string) $request->input('code'));
+        $code = trim((string) ($request->input('code') ?? $request->input('search') ?? $request->input('query') ?? ''));
 
         if (! empty($code)) {
-            $targetUser = User::where('referral_code', $code)->first();
+            $targetUser = User::where(function ($q) use ($code) {
+                $q->where('referral_code', $code)
+                    ->orWhere('email', $code)
+                    ->orWhere('mobile', $code)
+                    ->orWhere('name', 'like', "%{$code}%");
+            })->first();
 
-            if ($targetUser && ($targetUser->id === $currentUser->id || in_array($targetUser->id, $currentUser->getBranchUserIds()))) {
+            if ($targetUser && ($targetUser->id === $currentUser->id || in_array($targetUser->id, $currentUser->getBranchUserIds(), true))) {
                 $root = $targetUser;
             } else {
-                return redirect()->route('user.network.tree')->with('error', 'Referral code not found in your downline tree.');
+                return redirect()->route('user.network.tree')->with('error', 'Member not found in your downline tree.');
             }
         } else {
             $root = $currentUser;

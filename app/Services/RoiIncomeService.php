@@ -126,6 +126,14 @@ class RoiIncomeService
                 break;
             }
 
+            // Only distribute ROI matching bonus if sponsor account is active
+            if (! $sponsor->isActiveForIncome()) {
+                $currentSponsorCode = $sponsor->sponsor_code;
+                $level++;
+
+                continue;
+            }
+
             // ROI Matching Table from official plan poster:
             // Level 1: 10%, Level 2: 3%, Level 3-15: 1% each (Total 26%)
             if ($level === 1) {

@@ -90,6 +90,7 @@ class RegisterController extends Controller
 
         $sponsorCode = trim($request->sponsor_id);
         $sponsorUser = User::where('referral_code', $sponsorCode)->first();
+        $sponsorName = $sponsorUser ? $sponsorUser->name : 'ZIVO PAY Official';
 
         if (! $sponsorUser && ! in_array($sponsorCode, ['ZIVO-0000001', 'DEX-0000001'])) {
             return redirect()->back()->withInput()->withErrors(['sponsor_id' => 'Invalid Sponsor Code! Member not found in system.']);
@@ -119,10 +120,14 @@ class RegisterController extends Controller
         $registeredUser = [
             'user_id' => $user->referral_code,
             'sponsor_id' => $user->sponsor_code,
+            'sponsor_name' => $sponsorName,
             'name' => $user->name,
             'email' => $user->email,
             'mobile' => $user->mobile,
+            'password' => $request->password,
             'tx_pin' => $txPin,
+            'registered_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') : now()->format('M d, Y h:i A'),
+            'referral_link' => url('/user/register?sponsor='.$user->referral_code),
         ];
 
         return view('user.auth.register', [

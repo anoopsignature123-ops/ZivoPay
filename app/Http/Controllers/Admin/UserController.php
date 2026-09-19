@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserInvestment;
+use App\Models\Withdrawal;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +23,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = User::with(['role', 'sponsor', 'directMembers'])->where('role_id', 2);
+        $query = User::with(['role', 'sponsor'])->withCount('directMembers')->where('role_id', 2);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -123,7 +125,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified user details.
+     * Display the specified user details with full profile, financial & team statistics.
      */
     public function show(User $user): View
     {
@@ -131,11 +133,68 @@ class UserController extends Controller
             'role',
             'sponsor',
             'directMembers',
+            'investments' => function ($query) {
+                $query->latest();
+            },
         ]);
 
         $directCount = User::where('sponsor_code', $user->referral_code)->count();
+        $totalTeamIds = $user->getBranchUserIds();
+        $totalTeamCount = max(0, count($totalTeamIds) - 1);
 
-        return view('admin.users.show', compact('user', 'directCount'));
+        // Income breakdown sums
+        $totalDirectIncome = Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['direct_commission', 'referral_income', 'direct_income'])
+            ->sum('amount');
+
+        $totalLevelIncome = Transaction::where('user_id', $user->id)
+            ->where('type', 'level_income')
+            ->sum('amount');
+
+        $totalRoiIncome = Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['roi_income', 'daily_roi', 'investment_roi'])
+            ->sum('amount');
+
+        $totalRewardIncome = Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['reward_income', 'reward'])
+            ->sum('amount');
+
+        $totalWithdrawn = Withdrawal::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->sum('amount');
+
+        $pendingWithdrawal = Withdrawal::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+
+        $totalInvestmentAmount = UserInvestment::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->sum('amount');
+
+        $recentTransactions = Transaction::where('user_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $directsList = User::where('sponsor_code', $user->referral_code)
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.users.show', compact(
+            'user',
+            'directCount',
+            'totalTeamCount',
+            'totalDirectIncome',
+            'totalLevelIncome',
+            'totalRoiIncome',
+            'totalRewardIncome',
+            'totalWithdrawn',
+            'pendingWithdrawal',
+            'totalInvestmentAmount',
+            'recentTransactions',
+            'directsList'
+        ));
     }
 
     /**

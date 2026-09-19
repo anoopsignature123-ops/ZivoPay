@@ -46,10 +46,14 @@ class NetworkController extends Controller
      */
     public function treeView(Request $request): View
     {
-        $searchCode = $request->query('code');
+        $searchCode = trim((string) ($request->query('code') ?? $request->query('search') ?? $request->query('query') ?? $request->query('user_id') ?? ''));
 
-        if ($searchCode) {
-            $rootUser = User::where('referral_code', $searchCode)->first();
+        if (! empty($searchCode)) {
+            $rootUser = User::where('referral_code', $searchCode)
+                ->orWhere('email', $searchCode)
+                ->orWhere('mobile', $searchCode)
+                ->orWhere('name', 'like', "%{$searchCode}%")
+                ->first();
         }
 
         if (! isset($rootUser) || ! $rootUser) {

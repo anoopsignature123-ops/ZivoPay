@@ -194,15 +194,15 @@
 
                                     <!-- Direct Members List (Users Icon + Count) -->
                                     <a href="{{ route('admin.users.show', $user) }}" 
-                                        title="Direct Members List ({{ $user->directMembers->count() }})"
+                                        title="Direct Members List ({{ $user->direct_members_count }})"
                                         aria-label="Direct Members List"
                                         class="px-2.5 py-1.5 rounded-2xl bg-[#02180f] border border-amber-500/60 text-amber-300 hover:bg-amber-400 hover:text-black hover:border-amber-400 font-bold font-mono text-xs transition-all duration-200 flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)] hover:scale-105 shrink-0">
                                         <i data-lucide="users" class="w-4 h-4"></i>
-                                        <span>{{ $user->directMembers->count() }}</span>
+                                        <span>{{ $user->direct_members_count }}</span>
                                     </a>
 
                                     <!-- Network Tree View (Tree / Git Fork Icon) -->
-                                    <a href="{{ route('admin.network.tree', ['search' => $user->referral_code]) }}" 
+                                    <a href="{{ route('admin.network.tree', ['code' => $user->referral_code]) }}" 
                                         title="View Network Tree ({{ $user->referral_code }})"
                                         aria-label="View Network Tree"
                                         class="w-9 h-8 rounded-2xl bg-[#02180f] border border-amber-500/60 text-amber-300 hover:bg-amber-400 hover:text-black hover:border-amber-400 font-bold transition-all duration-200 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.15)] hover:scale-105 shrink-0">

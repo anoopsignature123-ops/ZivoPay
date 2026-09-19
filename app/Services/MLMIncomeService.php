@@ -45,6 +45,13 @@ class MLMIncomeService
                 break;
             }
 
+            // Only distribute subscription level income if sponsor account is active
+            if (! $sponsor->isActiveForIncome()) {
+                $currentSponsorCode = $sponsor->sponsor_code;
+
+                continue;
+            }
+
             $percentage = $levelPercentages[$level];
             $incomeAmount = round($amount * ($percentage / 100), 2);
 
@@ -231,6 +238,13 @@ class MLMIncomeService
                 break;
             }
 
+            // Only distribute direct level income if sponsor account is active
+            if (! $sponsor->isActiveForIncome()) {
+                $currentSponsorCode = $sponsor->sponsor_code;
+
+                continue;
+            }
+
             $percentage = $levelPercentages[$level];
             $incomeAmount = round($amount * ($percentage / 100), 2);
 
@@ -322,6 +336,13 @@ class MLMIncomeService
                     break;
                 }
 
+                // Only distribute ROI matching level income if sponsor account is active
+                if (! $sponsor->isActiveForIncome()) {
+                    $currentSponsorCode = $sponsor->sponsor_code;
+
+                    continue;
+                }
+
                 $percentage = $roiLevelPercentages[$level];
                 $roiMatchingIncome = round($dailyRoiAmount * ($percentage / 100), 2);
 
@@ -391,6 +412,11 @@ class MLMIncomeService
      */
     public function checkUserRewardAchievements(User $user): void
     {
+        // Only active users can achieve milestone rewards
+        if (! $user->isActiveForIncome()) {
+            return;
+        }
+
         // Calculate total downline business
         $downlineIds = $user->getBranchUserIds();
         $totalTeamBusiness = UserInvestment::whereIn('user_id', $downlineIds)->sum('amount');

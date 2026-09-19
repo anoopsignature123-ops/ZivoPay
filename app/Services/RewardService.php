@@ -68,6 +68,11 @@ class RewardService
 
     public function evaluateAndAwardRewards(User $user): void
     {
+        // Only active users are eligible to achieve rewards
+        if (! $user->isActiveForIncome()) {
+            return;
+        }
+
         $directBusiness = $this->getUserDirectBusiness($user);
         $teamBusiness = $this->getUserTeamBusiness($user);
 

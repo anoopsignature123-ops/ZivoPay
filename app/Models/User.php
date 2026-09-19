@@ -131,15 +131,24 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all downline user IDs recursively for unilevel tree.
+     * Get all downline user IDs recursively for unilevel tree (Fast BFS).
      */
     public function getBranchUserIds(): array
     {
-        $ids = [$this->id];
-        $directs = User::where('sponsor_code', $this->referral_code)->get();
+        $allUsers = static::select('id', 'referral_code', 'sponsor_code')->get();
 
-        foreach ($directs as $directUser) {
-            $ids = array_merge($ids, $directUser->getBranchUserIds());
+        $ids = [$this->id];
+        $currentCodes = [$this->referral_code];
+
+        while (! empty($currentCodes)) {
+            $nextCodes = [];
+            foreach ($allUsers as $u) {
+                if ($u->sponsor_code && in_array($u->sponsor_code, $currentCodes, true) && ! in_array($u->id, $ids, true)) {
+                    $ids[] = $u->id;
+                    $nextCodes[] = $u->referral_code;
+                }
+            }
+            $currentCodes = $nextCodes;
         }
 
         return array_values(array_unique($ids));
@@ -151,6 +160,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role_id === 1 || ($this->role && $this->role->slug === 'admin');
+    }
+
+    /**
+     * Check if user/sponsor account is active and eligible for commissions & level income.
+     */
+    public function isActiveForIncome(): bool
+    {
+        return (bool) ($this->is_subscription_active || $this->status === 'active');
     }
 
     /**
