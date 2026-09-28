@@ -157,15 +157,15 @@
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                             </span>
-                            ₹3,000 PACKAGE ACTIVE
+                            ₹3,000 PACKAGE ACTIVE (TEAM INCOMES UNLOCKED)
                         </span>
                     @else
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-black border border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.35)]">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.35)]" title="₹3,000 Activation Mandatory to Unlock Team & Level Incomes">
                             <span class="relative flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
                             </span>
-                            NO PACKAGE TAKEN
+                            SELF ROI ACTIVE &bull; TEAM INCOMES LOCKED (₹3,000 ACTIVATION MANDATORY)
                         </span>
                     @endif
                     <span class="text-neutral-400">• ZIVO PAY FINANCIAL PORTAL</span>
@@ -173,16 +173,67 @@
                 <h1 class="text-2xl sm:text-3xl font-black text-white font-heading tracking-tight">
                     Welcome Back, <span class="text-emerald-400">{{ $user->name }}</span>
                 </h1>
-                <p class="text-xs text-neutral-300 mt-1 font-mono">
-                    Referral Code: <span class="text-emerald-300 font-bold">{{ $user->referral_code }}</span> 
-                    &bull; Sponsor: <span class="text-teal-300 font-bold">{{ $user->sponsor_code ?? 'None' }}</span>
-                    &bull; Status: 
-                    @if($user->is_subscription_active)
-                        <span class="text-emerald-400 font-black uppercase">ACTIVE MEMBER</span>
+                <!-- Referral, Sponsor & KYC Status Row -->
+                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs font-mono">
+                    <span class="px-2.5 py-1 rounded-lg bg-[#01140c] border border-emerald-500/30 text-neutral-300 text-[11px]">
+                        Ref Code: <strong class="text-emerald-300">{{ $user->referral_code }}</strong>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-[#01140c] border border-emerald-500/30 text-neutral-300 text-[11px]">
+                        Sponsor: <strong class="text-teal-300">{{ $user->sponsor_code ?? 'System Direct' }}</strong>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-[#01140c] border border-emerald-500/30 text-neutral-300 text-[11px]">
+                        Status: 
+                        @if($user->is_subscription_active)
+                            <strong class="text-emerald-400 font-black uppercase">ACTIVE MEMBER</strong>
+                        @else
+                            <strong class="text-amber-300 font-black uppercase">FREE / SELF ROI MEMBER</strong>
+                        @endif
+                    </span>
+
+                    <!-- KYC Status Badge -->
+                    @if($user->kyc_status === 'approved')
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/60 text-emerald-300 text-[11px] font-bold uppercase inline-flex items-center gap-1 shadow">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> KYC VERIFIED ✓
+                        </span>
+                    @elseif($user->kyc_status === 'pending')
+                        <a href="{{ route('user.kyc.index') }}" class="px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/60 text-amber-300 text-[11px] font-bold uppercase inline-flex items-center gap-1 hover:bg-amber-500/30 transition shadow">
+                            <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-400"></i> KYC UNDER REVIEW ⏳
+                        </a>
+                    @elseif($user->kyc_status === 'rejected')
+                        <a href="{{ route('user.kyc.index') }}" class="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/60 text-rose-300 text-[11px] font-bold uppercase inline-flex items-center gap-1 hover:bg-rose-500/30 transition shadow">
+                            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i> KYC REJECTED (FIX NOW) ✕
+                        </a>
                     @else
-                        <span class="text-rose-400 font-black uppercase">INACTIVE MEMBER</span>
+                        <a href="{{ route('user.kyc.index') }}" class="px-2.5 py-1 rounded-lg bg-neutral-900 border border-amber-500/60 text-amber-300 text-[11px] font-bold uppercase inline-flex items-center gap-1 hover:bg-amber-500/20 transition shadow">
+                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i> KYC UNVERIFIED (VERIFY NOW) ⚠️
+                        </a>
                     @endif
-                </p>
+                </div>
+
+                <!-- Registration & Activation Date & Time Row -->
+                <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-mono">
+                    <!-- Registration Date & Time -->
+                    <span class="px-2.5 py-1 rounded-lg bg-[#01140c]/90 border border-emerald-500/20 inline-flex items-center gap-1.5 text-neutral-300">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span>Reg Date & Time: <strong class="text-white font-bold">{{ $user->created_at ? $user->created_at->format('d M Y, h:i A') : 'N/A' }}</strong></span>
+                    </span>
+
+                    <!-- Activation Date & Time -->
+                    <span class="px-2.5 py-1 rounded-lg bg-[#01140c]/90 border border-emerald-500/20 inline-flex items-center gap-1.5 text-neutral-300">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+                        <span>Activation Date & Time: 
+                            @if($user->subscription_activated_at)
+                                <strong class="text-emerald-400 font-bold">{{ $user->subscription_activated_at->format('d M Y, h:i A') }}</strong>
+                            @elseif($user->activated_at)
+                                <strong class="text-emerald-400 font-bold">{{ $user->activated_at->format('d M Y, h:i A') }}</strong>
+                            @elseif($user->is_subscription_active)
+                                <strong class="text-emerald-400 font-bold">Active (₹3,000 Paid)</strong>
+                            @else
+                                <strong class="text-amber-300 font-bold">Free / Self ROI Member (Activation Pending)</strong>
+                            @endif
+                        </span>
+                    </span>
+                </div>
             </div>
 
             <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
@@ -254,7 +305,7 @@
                                 ⚠️ NO PACKAGE ACTIVATED YET
                             </h4>
                             <p class="text-[11px] text-neutral-300 truncate">
-                                Activate ₹3,000 package to unlock 15-level referral & daily ROI incomes.
+                                Activate ₹3,000 package to unlock 15-Level Referral & Team Incomes.
                             </p>
                         @endif
                     </div>
@@ -450,41 +501,7 @@
                             </thead>
                             <tbody class="divide-y divide-emerald-500/10 font-medium">
                                 
-                                <!-- 1. Total Team Business -->
-                                <tr class="hover:bg-emerald-500/5 transition">
-                                    <td class="py-2.5 px-3">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                                                <i data-lucide="users" class="w-3.5 h-3.5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-white block text-xs">Total Team Business</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">Direct Network: {{ $directMembersCount }} Members ({{ $activeDirectMembersCount }} Active)</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-3 text-center font-mono text-neutral-500">-</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-white text-xs">₹{{ number_format($totalTeamBusiness, 2) }}</td>
-                                </tr>
-
-                                <!-- 2. Referral / Direct Income -->
-                                <tr class="hover:bg-emerald-500/5 transition">
-                                    <td class="py-2.5 px-3">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                                                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-white block text-xs">Referral / Direct Income</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">Flat 5% Instant Commission (₹150 on ₹3,000 activation)</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayDirect, 2) }}</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalDirectIncome, 2) }}</td>
-                                </tr>
-
-                                <!-- 3. Daily ROI Income -->
+                                <!-- 1. Fund Wallet Daily Profit -->
                                 <tr class="hover:bg-emerald-500/5 transition">
                                     <td class="py-2.5 px-3">
                                         <div class="flex items-center gap-2.5">
@@ -492,13 +509,30 @@
                                                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
                                             </div>
                                             <div>
-                                                <span class="font-bold text-white block text-xs">Daily ROI Income</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">0.15%–0.30% Daily Yield (730 Days Return Cap)</span>
+                                                <span class="font-bold text-white block text-xs">Fund Wallet Daily Profit (ROI)</span>
+                                                <span class="text-[9.5px] text-neutral-400 block">Daily 0.15%–0.30% Yield on Fund Deposit Balance</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayRoi, 2) }}</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalRoiIncome, 2) }}</td>
+                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayFundRoi, 2) }}</td>
+                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalFundRoi, 2) }}</td>
+                                </tr>
+
+                                <!-- 2. Capital Investment Daily ROI -->
+                                <tr class="hover:bg-emerald-500/5 transition">
+                                    <td class="py-2.5 px-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
+                                                <i data-lucide="circle-dollar-sign" class="w-3.5 h-3.5"></i>
+                                            </div>
+                                            <div>
+                                                <span class="font-bold text-white block text-xs">Capital Investment Daily ROI</span>
+                                                <span class="text-[9.5px] text-neutral-400 block">0.15%–0.30% Daily Return on Active Capital (730 Days)</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayInvestmentRoi, 2) }}</td>
+                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalInvestmentRoi, 2) }}</td>
                                 </tr>
 
                                 <!-- 4. 15-Level Subscription Income -->
@@ -527,7 +561,7 @@
                                             </div>
                                             <div>
                                                 <span class="font-bold text-white block text-xs">ROI Level Matching Income</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">26% Total ROI Matching (15 Tiers ROI Matching)</span>
+                                                <span class="text-[9.5px] text-neutral-400 block">26% Total ROI Matching (15 Levels ROI Matching)</span>
                                             </div>
                                         </div>
                                     </td>
@@ -567,6 +601,23 @@
                                     </td>
                                     <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayTeamReward, 2) }}</td>
                                     <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalTeamReward, 2) }}</td>
+                                </tr>
+
+                                <!-- 8. Internal Wallet Transfer -->
+                                <tr class="hover:bg-emerald-500/5 transition">
+                                    <td class="py-2.5 px-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
+                                                <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                                            </div>
+                                            <div>
+                                                <span class="font-bold text-white block text-xs">Internal Wallet Transfer</span>
+                                                <span class="text-[9.5px] text-neutral-400 block">Self Fund Wallet to Earning Wallet transfer</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">₹{{ number_format($todayTransfer, 2) }}</td>
+                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">₹{{ number_format($totalTransfer, 2) }}</td>
                                 </tr>
 
                             </tbody>
@@ -648,12 +699,12 @@
                                 </div>
                                 <div class="min-w-0">
                                     <h4 class="text-xs font-bold text-white truncate">Total Team</h4>
-                                    <span class="text-[10px] text-neutral-400 block">Full downline (All Tiers)</span>
+                                    <span class="text-[10px] text-neutral-400 block">Full downline (All Levels)</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <span class="text-base font-black text-white font-mono">{{ $totalTeamCount }}</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">ALL TIERS</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">ALL LEVELS</span>
                             </div>
                         </div>
 

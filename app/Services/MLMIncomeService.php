@@ -118,17 +118,15 @@ class MLMIncomeService
     {
         if ($amount >= 1000000) {
             $percentage = 0.30;
-            $tierName = 'Diamond Tier (0.30% Daily)';
         } elseif ($amount >= 500000) {
             $percentage = 0.25;
-            $tierName = 'Platinum Tier (0.25% Daily)';
         } elseif ($amount >= 100000) {
             $percentage = 0.20;
-            $tierName = 'Gold Tier (0.20% Daily)';
         } else {
             $percentage = 0.15;
-            $tierName = 'Silver Tier (0.15% Daily)';
         }
+
+        $tierName = 'Capital Investment';
 
         $dailyAmount = round($amount * ($percentage / 100), 2);
         $monthlyAmount = round($dailyAmount * 30, 2);

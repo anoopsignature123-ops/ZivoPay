@@ -55,6 +55,15 @@
             </div>
             <span class="nav-text">User Management</span>
         </a>
+
+        <a class='nav-item {{ request()->routeIs("admin.kyc*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.kyc.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">KYC Verification Requests</span>
+        </a>
         <!-- PACKAGE ACTIVATION AUDIT -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             PACKAGE ACTIVATION
@@ -88,7 +97,7 @@
 
         <!-- FUND WALLET 24H ROI INCOME AUDIT -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-            FUND WALLET 24H ROI INCOME
+            FUND WALLET ROI INCOME
         </div>
         
         <a class='nav-item {{ request()->routeIs("admin.reports.roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -111,7 +120,7 @@
 
         <!-- INVESTMENT SECTION (5 REPORTS AUDIT) -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-            INVESTMENT SECTION
+            INVESTMENT INCOME SECTION
         </div>
 
         <a class='nav-item {{ request()->routeIs("admin.packages*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -213,6 +222,15 @@
             <span class="nav-text">Transaction History</span>
         </a>
 
+        <a class='nav-item {{ request()->routeIs("admin.reports.p2p") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.reports.p2p") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">P2P Member Transfers</span>
+        </a>
+
         <!-- ACCOUNT SETTINGS -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             ACCOUNT SETTINGS
@@ -224,7 +242,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="user-cog" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Admin Profile</span>
+            <span class="nav-text">My Profile</span>
         </a>
     </nav>
 

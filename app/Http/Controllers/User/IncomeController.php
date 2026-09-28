@@ -202,6 +202,74 @@ class IncomeController extends Controller
         return view('user.income.roi', compact('user', 'transactions', 'totalAmount'));
     }
 
+    public function fundWalletRoiIncome(Request $request)
+    {
+        $user = Auth::user();
+        $query = Transaction::where('user_id', $user->id)
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'FWPROFIT%')
+                    ->orWhere('description', 'like', '%Fund Wallet%');
+            });
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
+        $totalAmount = (clone $query)->sum('amount');
+        $reportTitle = 'Fund Wallet Daily Profit (ROI Income)';
+
+        return view('user.income.roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
+    }
+
+    public function capitalInvestmentRoiIncome(Request $request)
+    {
+        $user = Auth::user();
+        $query = Transaction::where('user_id', $user->id)
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'DROI%')
+                    ->orWhere('trx_id', 'like', 'ROI%')
+                    ->orWhere('description', 'like', '%Daily ROI Income%')
+                    ->orWhere('description', 'like', '%Capital%');
+            });
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
+        $totalAmount = (clone $query)->sum('amount');
+        $reportTitle = 'Capital Investment Daily ROI Income';
+
+        return view('user.income.roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
+    }
+
     public function levelDirectIncome(Request $request)
     {
         $user = Auth::user();
@@ -234,6 +302,13 @@ class IncomeController extends Controller
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
 
+        $reportTitle = 'ROI ON LEVEL INCOME (26% MATCHING)';
+        if ($request->query('type') === 'fund') {
+            $reportTitle = 'ROI ON LEVEL INCOME (SECONDARY)';
+        } elseif ($request->query('type') === 'investment') {
+            $reportTitle = 'ROI ON ROI LEVEL INCOME';
+        }
+
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
             $query->where(function ($q) use ($search) {
@@ -253,7 +328,7 @@ class IncomeController extends Controller
         $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
 
-        return view('user.income.level_roi', compact('user', 'transactions', 'totalAmount'));
+        return view('user.income.level_roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
     }
 
     public function subscriptionDirectIncome(Request $request)

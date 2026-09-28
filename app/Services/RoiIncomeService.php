@@ -29,7 +29,7 @@ class RoiIncomeService
 
         // 1. Process Daily ROI for Active Capital Investments
         $activeInvestments = UserInvestment::where('status', 'active')
-            ->where('days_received', '<', 730)
+            ->where('days_completed', '<', 730)
             ->get();
 
         foreach ($activeInvestments as $investment) {
@@ -39,17 +39,17 @@ class RoiIncomeService
                     return;
                 }
 
-                $dailyAmount = $investment->daily_profit;
+                $dailyAmount = $investment->daily_amount;
 
                 // Credit Daily ROI to User's Earning Wallet
                 $user->earning_wallet += $dailyAmount;
                 $user->save();
 
-                $investment->days_received += 1;
-                $investment->total_earned += $dailyAmount;
-                if ($investment->days_received >= 730) {
+                $investment->days_completed += 1;
+                $investment->total_returned += $dailyAmount;
+                $investment->last_payout_at = now();
+                if ($investment->days_completed >= 730) {
                     $investment->status = 'completed';
-                    $investment->completed_at = now();
                 }
                 $investment->save();
 
@@ -63,7 +63,7 @@ class RoiIncomeService
                     'amount' => $dailyAmount,
                     'charge' => 0.00,
                     'post_balance' => $user->earning_wallet,
-                    'description' => "Daily ROI Income (Day {$investment->days_received}/730) on Capital ₹".number_format($investment->amount, 2),
+                    'description' => "Daily ROI Income (Day {$investment->days_completed}/730) on Capital ₹".number_format($investment->amount, 2),
                 ]);
 
                 // Distribute 26% 15-Level Secondary ROI Matching Bonus (L1: 10%, L2: 3%, L3-L15: 1%)
@@ -73,43 +73,38 @@ class RoiIncomeService
             });
         }
 
-        // 2. Process 24-Hour Compound Daily Profit on Idle Fund Wallet Balance
-        // Requirement: Activation ke 24 hours ke baad Fund Wallet balance pe Daily Profit Start hoga!
-        $activeUsersWithFundBalance = User::where('is_subscription_active', true)
-            ->where('deposit_wallet', '>=', 1000)
-            ->get();
+        // 2. Process Daily Profit on Fund Wallet Balance (Deposit Wallet)
+        // Requirement: Fund Deposit Wallet me paise aate hi User ko Daily ROI milna start hoga.
+        $usersWithFundBalance = User::where('deposit_wallet', '>=', 1000)->get();
 
-        foreach ($activeUsersWithFundBalance as $user) {
-            // Check if activated at least 24 hours ago
-            if ($user->activated_at && $user->activated_at->diffInHours(now()) >= 24) {
-                DB::transaction(function () use ($user, &$processedCount) {
-                    $fundBalance = $user->deposit_wallet;
-                    $rate = $this->calculateDailyRoiPercentage($fundBalance);
-                    $dailyProfit = ($fundBalance * $rate) / 100;
+        foreach ($usersWithFundBalance as $user) {
+            DB::transaction(function () use ($user, &$processedCount) {
+                $fundBalance = $user->deposit_wallet;
+                $rate = $this->calculateDailyRoiPercentage($fundBalance);
+                $dailyProfit = ($fundBalance * $rate) / 100;
 
-                    if ($dailyProfit > 0) {
-                        $user->earning_wallet += $dailyProfit;
-                        $user->save();
+                if ($dailyProfit > 0) {
+                    $user->earning_wallet += $dailyProfit;
+                    $user->save();
 
-                        Transaction::create([
-                            'user_id' => $user->id,
-                            'trx_id' => 'FWPROFIT-'.strtoupper(Str::random(10)),
-                            'type' => 'daily_roi',
-                            'wallet_type' => 'earning',
-                            'trx_type' => '+',
-                            'amount' => $dailyProfit,
-                            'charge' => 0.00,
-                            'post_balance' => $user->earning_wallet,
-                            'description' => "24-Hour Fund Wallet Daily Profit ({$rate}%) on Balance ₹".number_format($fundBalance, 2),
-                        ]);
+                    Transaction::create([
+                        'user_id' => $user->id,
+                        'trx_id' => 'FWPROFIT-'.strtoupper(Str::random(10)),
+                        'type' => 'daily_roi',
+                        'wallet_type' => 'earning',
+                        'trx_type' => '+',
+                        'amount' => $dailyProfit,
+                        'charge' => 0.00,
+                        'post_balance' => $user->earning_wallet,
+                        'description' => "Fund Wallet Daily Profit ({$rate}%) on Balance ₹".number_format($fundBalance, 2),
+                    ]);
 
-                        // Distribute 26% 15-Level Secondary ROI Matching Bonus
-                        $this->distributeRoiOnRoiMatchingBonus($user, $dailyProfit);
+                    // Distribute 26% 15-Level Secondary ROI Matching Bonus (Only to active ₹3,000 subscribed sponsors)
+                    $this->distributeRoiOnRoiMatchingBonus($user, $dailyProfit);
 
-                        $processedCount++;
-                    }
-                });
-            }
+                    $processedCount++;
+                }
+            });
         }
 
         return $processedCount;

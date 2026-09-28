@@ -10,8 +10,8 @@
             <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
                 DAILY CAPITAL RETURN (730 DAYS RETURN CAP)
             </span>
-            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">DAILY ROI INCOME LOG</h1>
-            <p class="text-xs text-neutral-300 mt-1">Daily 0.15% to 0.30% ROI profits generated every 24 hours on your active capital package investments.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">{{ $reportTitle ?? 'DAILY ROI INCOME LOG' }}</h1>
+            <p class="text-xs text-neutral-300 mt-1">Daily 0.15% to 0.30% ROI profits generated every 24 hours on your active capital deposits and investments.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">
@@ -22,7 +22,7 @@
 
     <!-- Official Filter Bar Component -->
     <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl">
-        <form action="{{ route('user.income.roi') }}" method="GET" class="zivo-filter-bar">
+        <form action="{{ url()->current() }}" method="GET" class="zivo-filter-bar">
             <!-- FROM DATE -->
             <div class="zivo-filter-field-date">
                 <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
@@ -52,7 +52,7 @@
                 <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
                     <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
                 </button>
-                <a href="{{ route('user.income.roi') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
+                <a href="{{ url()->current() }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
                     Reset
                 </a>
             </div>

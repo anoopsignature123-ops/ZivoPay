@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\UserInvestment;
-use App\Services\MLMIncomeService;
+use App\Services\RoiIncomeService;
 use Illuminate\Console\Command;
 
 class ProcessDailyROI extends Command
@@ -20,30 +19,18 @@ class ProcessDailyROI extends Command
      *
      * @var string
      */
-    protected $description = 'Process daily ROI distributions and 15-level ROI matching income for active investments';
+    protected $description = 'Process daily ROI distributions and 15-level ROI matching income for active investments & deposit balances';
 
     /**
      * Execute the console command.
      */
-    public function handle(MLMIncomeService $incomeService): int
+    public function handle(RoiIncomeService $roiService): int
     {
-        $this->info('Starting ZIVO PAY Daily ROI processing...');
+        $this->info('Starting ZIVO PAY Daily ROI & Fund Deposit Yield processing...');
 
-        $activeInvestments = UserInvestment::where('status', 'active')
-            ->where('days_completed', '<', 730)
-            ->where(function ($q) {
-                $q->whereNull('last_payout_at')
-                    ->orWhere('last_payout_at', '<=', now()->subHours(20));
-            })
-            ->get();
+        $count = $roiService->processDailyRoiPayouts();
 
-        $count = 0;
-        foreach ($activeInvestments as $investment) {
-            $incomeService->distributeDailyROI($investment);
-            $count++;
-        }
-
-        $this->info("Successfully processed Daily ROI & 15-Level ROI Income for {$count} active investments.");
+        $this->info("Successfully processed Daily ROI & 15-Level ROI Level Income for {$count} active contracts / deposit accounts.");
 
         return Command::SUCCESS;
     }

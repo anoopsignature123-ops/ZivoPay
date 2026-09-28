@@ -49,8 +49,44 @@ class DashboardController extends Controller
         $recentTransactions = $user->transactions()->latest()->take(5)->get();
 
         // Comprehensive Income Breakdown (Today & Total)
-        $todayRoi = $user->transactions()->where('type', 'daily_roi')->whereDate('created_at', now())->sum('amount');
-        $totalRoiIncome = $user->transactions()->where('type', 'daily_roi')->sum('amount');
+        $todayFundRoi = $user->transactions()
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'FWPROFIT%')
+                    ->orWhere('description', 'like', '%Fund Wallet%');
+            })
+            ->whereDate('created_at', now())
+            ->sum('amount');
+
+        $totalFundRoi = $user->transactions()
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'FWPROFIT%')
+                    ->orWhere('description', 'like', '%Fund Wallet%');
+            })
+            ->sum('amount');
+
+        $todayInvestmentRoi = $user->transactions()
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'DROI%')
+                    ->orWhere('trx_id', 'like', 'ROI%')
+                    ->orWhere('description', 'like', '%Capital%');
+            })
+            ->whereDate('created_at', now())
+            ->sum('amount');
+
+        $totalInvestmentRoi = $user->transactions()
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'DROI%')
+                    ->orWhere('trx_id', 'like', 'ROI%')
+                    ->orWhere('description', 'like', '%Capital%');
+            })
+            ->sum('amount');
+
+        $todayRoi = $todayFundRoi + $todayInvestmentRoi;
+        $totalRoiIncome = $totalFundRoi + $totalInvestmentRoi;
 
         $todayDirect = $user->transactions()->where('type', 'direct_bonus')->whereDate('created_at', now())->sum('amount');
         $totalDirectIncome = $user->transactions()->where('type', 'direct_bonus')->sum('amount');
@@ -66,6 +102,9 @@ class DashboardController extends Controller
 
         $todayTeamReward = $user->transactions()->where('type', 'team_reward')->whereDate('created_at', now())->sum('amount');
         $totalTeamReward = $user->transactions()->where('type', 'team_reward')->sum('amount');
+
+        $todayTransfer = $user->transactions()->where('type', 'wallet_transfer')->whereDate('created_at', now())->sum('amount');
+        $totalTransfer = $user->transactions()->where('type', 'wallet_transfer')->sum('amount');
 
         $totalIncomeEarned = $totalRoiIncome + $totalDirectIncome + $totalSubLevelIncome + $totalLevelRoiIncome + $totalDirectReward + $totalTeamReward;
 
@@ -96,6 +135,10 @@ class DashboardController extends Controller
             'recentTransactions',
             'todayRoi',
             'totalRoiIncome',
+            'todayFundRoi',
+            'totalFundRoi',
+            'todayInvestmentRoi',
+            'totalInvestmentRoi',
             'todayDirect',
             'totalDirectIncome',
             'todaySubLevel',
@@ -106,6 +149,8 @@ class DashboardController extends Controller
             'totalDirectReward',
             'todayTeamReward',
             'totalTeamReward',
+            'todayTransfer',
+            'totalTransfer',
             'totalIncomeEarned'
         ));
     }

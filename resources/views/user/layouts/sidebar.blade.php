@@ -4,7 +4,7 @@
 <div id="sidebarOverlay"
     class="fixed inset-0 bg-black/70 z-40 hidden lg:hidden transition-opacity duration-300 opacity-0"
     aria-hidden="true"></div>
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar flex flex-col h-full bg-[#01140c] border-r border-emerald-500/30" id="sidebar">
     <!-- Logo Section -->
     <div
         class="logo-section flex items-center justify-between gap-2 px-4 py-4 border-b border-emerald-500/30 shrink-0 bg-gradient-to-b from-emerald-500/20 via-emerald-500/5 to-transparent">
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="py-4 flex-1 overflow-y-auto space-y-1">
+    <nav class="py-4 flex-1 overflow-y-auto space-y-1 custom-scrollbar">
 
         <!-- DASHBOARD -->
         <div class="nav-section-title px-5 pt-2 pb-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
@@ -65,6 +65,15 @@
             <span class="nav-text">Internal Wallet Transfer</span>
         </a>
 
+        <a class='nav-item {{ request()->routeIs("user.p2p*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.p2p.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">P2P Member Transfer</span>
+        </a>
+
         <a class='nav-item {{ request()->routeIs("user.reports.deposits") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.reports.deposits") }}'>
             <div
@@ -74,7 +83,7 @@
             <span class="nav-text">Fund Wallet History</span>
         </a>
 
-        <!-- BUY PACKAGE ₹3,000 -->
+        <!-- BUY PACKAGE -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             BUY PACKAGE
         </div>
@@ -115,13 +124,13 @@
             <span class="nav-text">Team Bonus Referral Income</span>
         </a>
 
-        <!-- FUND ACTIVATION (24H PROFIT) -->
+        <!-- FUND INCOME SECTION -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-            FUND ACTIVATION
+            FUND INCOME SECTION
         </div>
 
-        <a class='nav-item {{ request()->routeIs("user.income.roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("user.income.roi") }}'>
+        <a class='nav-item {{ request()->routeIs("user.income.fund-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.income.fund-roi") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="trending-up" class="w-4 h-4"></i>
@@ -129,21 +138,21 @@
             <span class="nav-text">ROI Income (Fund Wallet Profit)</span>
         </a>
 
-        <a class='nav-item {{ request()->routeIs("user.income.level-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("user.income.level-roi") }}'>
+        <a class='nav-item {{ request()->routeIs("user.income.level-roi") && request()->query("type") === "fund" ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.income.level-roi", ["type" => "fund"]) }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="badge-percent" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">ROI on Level Income (Secondary)</span>
-            </a>
-            
-            <!-- INVESTMENT SECTION (5 REPORTS) -->
-            <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-                INVESTMENT SECTION
+        </a>
+
+        <!-- INVESTMENT SECTION -->
+        <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
+            INVESTMENT INCOME SECTION
             </div>
 
-        <a class='nav-item {{ request()->routeIs("user.investment*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+        <a class='nav-item {{ request()->routeIs("user.investment.index") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.investment.index") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
@@ -156,18 +165,18 @@
             href='{{ route("user.reports.investments") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                <i data-lucide="history" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">My Investment History</span>
         </a>
 
-        <a class='nav-item {{ request()->routeIs("user.income.roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("user.income.roi") }}'>
+        <a class='nav-item {{ request()->routeIs("user.income.investment-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.income.investment-roi") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">ROI Income </span>
+            <span class="nav-text">ROI Income</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs("user.income.level-direct") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -179,11 +188,11 @@
             <span class="nav-text">Business Level Income</span>
         </a>
 
-        <a class='nav-item {{ request()->routeIs("user.income.level-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("user.income.level-roi") }}'>
+        <a class='nav-item {{ request()->routeIs("user.income.level-roi") && request()->query("type") === "investment" ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.income.level-roi", ["type" => "investment"]) }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">ROI on ROI Level Income</span>
         </a>
@@ -210,6 +219,7 @@
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             REPORTS & PAYOUTS
         </div>
+
         <a class='nav-item {{ request()->routeIs("user.income.index") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.income.index") }}'>
             <div
@@ -269,11 +279,28 @@
             </div>
         </div>
 
-
         <!-- MY ACCOUNT -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             MY ACCOUNT
         </div>
+
+        <a class='nav-item {{ request()->routeIs("user.kyc*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center justify-between mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("user.kyc.index") }}'>
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <span class="nav-text">KYC Verification</span>
+            </div>
+            @if(Auth::user() && Auth::user()->kyc_status === 'approved')
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase border border-emerald-500/40">Verified</span>
+            @elseif(Auth::user() && Auth::user()->kyc_status === 'pending')
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-black uppercase border border-amber-500/40">Pending</span>
+            @else
+                <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[9px] font-black uppercase border border-rose-500/40">Unverified</span>
+            @endif
+        </a>
 
         <a class='nav-item {{ request()->routeIs("user.profile*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("user.profile") }}'>
@@ -290,13 +317,13 @@
         <div class="flex items-center gap-3">
             <div
                 class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-sm shadow-md">
-                US
+                {{ strtoupper(substr(Auth::user() ? Auth::user()->name : 'U', 0, 2)) }}
             </div>
             <div class="user-info flex-1 min-w-0">
                 <p class="font-bold text-sm text-white truncate">{{ Auth::user() ? Auth::user()->name : 'Member' }}</p>
                 <p
-                    class="text-[11px] font-semibold truncate {{ Auth::user() && Auth::user()->is_subscription_active ? 'text-emerald-400' : 'text-rose-400' }}">
-                    {{ Auth::user() && Auth::user()->is_subscription_active ? 'Active (₹3,000 Paid)' : 'Inactive Account' }}
+                    class="text-[11px] font-semibold truncate {{ Auth::user() && Auth::user()->is_subscription_active ? 'text-emerald-400' : 'text-amber-400' }}">
+                    {{ Auth::user() && Auth::user()->is_subscription_active ? 'Active (₹3,000 Paid)' : 'Self ROI / Free Member' }}
                 </p>
             </div>
         </div>

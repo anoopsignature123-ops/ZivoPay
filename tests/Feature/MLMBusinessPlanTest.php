@@ -55,7 +55,7 @@ class MLMBusinessPlanTest extends TestCase
         $investment = $service->createInvestment($investor, 100000.00, 'deposit_wallet');
 
         // 1. Assert investor's investment tier & state
-        $this->assertEquals('Gold Tier (0.20% Daily)', $investment->plan_name);
+        $this->assertEquals('Capital Investment', $investment->plan_name);
         $this->assertEquals(0.20, $investment->daily_percentage);
         $this->assertEquals(200.00, $investment->daily_amount);
         $this->assertEquals('active', $investor->fresh()->status);
@@ -141,9 +141,10 @@ class MLMBusinessPlanTest extends TestCase
                 'email' => "user{$i}@zivopay.com",
                 'referral_code' => "ZIVO-00000{$i}",
                 'sponsor_code' => $previousCode,
-                'deposit_wallet' => 200000.00,
+                'deposit_wallet' => 0.00,
                 'earning_wallet' => 0.00,
                 'status' => 'active',
+                'is_subscription_active' => true,
             ]);
 
             $sponsors[$i] = $user;
@@ -178,7 +179,7 @@ class MLMBusinessPlanTest extends TestCase
         // 5. Assert ROI transaction logs created
         $sponsorIds = array_map(fn ($u) => $u->id, $sponsors);
         $this->assertEquals(1, Transaction::where('type', 'daily_roi')->where('user_id', $investor->id)->count());
-        $this->assertEquals(14, Transaction::where('type', 'roi_level_income')->whereIn('user_id', $sponsorIds)->count());
+        $this->assertEquals(14, Transaction::whereIn('type', ['level_roi', 'roi_level_income'])->whereIn('user_id', $sponsorIds)->count());
     }
 
     public function test_reward_offer_achievements(): void
@@ -193,6 +194,7 @@ class MLMBusinessPlanTest extends TestCase
             'deposit_wallet' => 0.00,
             'earning_wallet' => 0.00,
             'status' => 'active',
+            'is_subscription_active' => true,
         ]);
 
         $downline = User::create([
@@ -243,6 +245,7 @@ class MLMBusinessPlanTest extends TestCase
             'referral_code' => 'ZIVO-WTH01',
             'deposit_wallet' => 2000.00,
             'earning_wallet' => 5000.00,
+            'kyc_status' => 'approved',
             'status' => 'active',
         ]);
 

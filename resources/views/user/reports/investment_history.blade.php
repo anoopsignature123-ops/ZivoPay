@@ -89,7 +89,7 @@
                         <tr class="hover:bg-emerald-500/5 transition">
                             <td class="px-5 py-4 font-mono font-bold text-emerald-300">#INV-{{ $inv->id }}</td>
                             <td class="px-5 py-4">
-                                <span class="font-extrabold text-white uppercase">{{ $inv->plan_name ?? $inv->package_name ?? 'Capital Package' }}</span>
+                                <span class="font-extrabold text-white uppercase">{{ ($inv->plan_name && !str_contains($inv->plan_name, 'Tier')) ? $inv->plan_name : 'Capital Investment' }}</span>
                             </td>
                             <td class="px-5 py-4 font-bold text-emerald-400 text-sm">₹{{ number_format($inv->amount, 2) }}</td>
                             <td class="px-5 py-4 text-emerald-300 font-bold">

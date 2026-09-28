@@ -51,88 +51,7 @@
         </div>
     @endif
 
-    <!-- Investment Tiers Grid (Compact Clean Cards) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Tier 1: Silver -->
-        <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg relative overflow-hidden group hover:border-emerald-400 transition space-y-3">
-            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                <span class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">SILVER TIER</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] font-black text-emerald-300">0.15% DAILY</span>
-            </div>
-            <div>
-                <span class="text-[10px] text-neutral-400 block font-bold">Capital Range</span>
-                <h3 class="text-base font-black text-white font-mono mt-0.5">₹1,000 - ₹99,999</h3>
-            </div>
-            <div class="space-y-1 text-[11px] text-neutral-300 pt-1">
-                <div class="flex justify-between"><span>Daily Profit:</span> <strong class="text-emerald-400">0.15% / day</strong></div>
-                <div class="flex justify-between"><span>Duration:</span> <strong class="text-white">730 Days (24 Mo)</strong></div>
-                <div class="flex justify-between"><span>Direct Bonus:</span> <strong class="text-emerald-300">5% Level 1</strong></div>
-            </div>
-            <button type="button" onclick="selectAmount(5000)" class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-black transition cursor-pointer">
-                Select ₹5,000
-            </button>
-        </div>
 
-        <!-- Tier 2: Gold -->
-        <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg relative overflow-hidden group hover:border-emerald-400 transition space-y-3">
-            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                <span class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">GOLD TIER</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] font-black text-emerald-300">0.20% DAILY</span>
-            </div>
-            <div>
-                <span class="text-[10px] text-neutral-400 block font-bold">Capital Range</span>
-                <h3 class="text-base font-black text-white font-mono mt-0.5">₹1,00,000 - ₹4,99,999</h3>
-            </div>
-            <div class="space-y-1 text-[11px] text-neutral-300 pt-1">
-                <div class="flex justify-between"><span>Daily Profit:</span> <strong class="text-emerald-400">0.20% / day</strong></div>
-                <div class="flex justify-between"><span>Duration:</span> <strong class="text-white">730 Days (24 Mo)</strong></div>
-                <div class="flex justify-between"><span>Direct Bonus:</span> <strong class="text-emerald-300">5% Level 1</strong></div>
-            </div>
-            <button type="button" onclick="selectAmount(100000)" class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-black transition cursor-pointer">
-                Select ₹1,00,000
-            </button>
-        </div>
-
-        <!-- Tier 3: Platinum -->
-        <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg relative overflow-hidden group hover:border-emerald-400 transition space-y-3">
-            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                <span class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">PLATINUM TIER</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] font-black text-emerald-300">0.25% DAILY</span>
-            </div>
-            <div>
-                <span class="text-[10px] text-neutral-400 block font-bold">Capital Range</span>
-                <h3 class="text-base font-black text-white font-mono mt-0.5">₹5,00,000 - ₹9,99,999</h3>
-            </div>
-            <div class="space-y-1 text-[11px] text-neutral-300 pt-1">
-                <div class="flex justify-between"><span>Daily Profit:</span> <strong class="text-emerald-400">0.25% / day</strong></div>
-                <div class="flex justify-between"><span>Duration:</span> <strong class="text-white">730 Days (24 Mo)</strong></div>
-                <div class="flex justify-between"><span>Direct Bonus:</span> <strong class="text-emerald-300">5% Level 1</strong></div>
-            </div>
-            <button type="button" onclick="selectAmount(500000)" class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-black transition cursor-pointer">
-                Select ₹5,00,000
-            </button>
-        </div>
-
-        <!-- Tier 4: Diamond -->
-        <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg relative overflow-hidden group hover:border-emerald-400 transition space-y-3">
-            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                <span class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">DIAMOND TIER</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] font-black text-emerald-300">0.30% DAILY</span>
-            </div>
-            <div>
-                <span class="text-[10px] text-neutral-400 block font-bold">Capital Range</span>
-                <h3 class="text-base font-black text-white font-mono mt-0.5">₹10,00,000+</h3>
-            </div>
-            <div class="space-y-1 text-[11px] text-neutral-300 pt-1">
-                <div class="flex justify-between"><span>Daily Profit:</span> <strong class="text-emerald-400">0.30% / day</strong></div>
-                <div class="flex justify-between"><span>Duration:</span> <strong class="text-white">730 Days (24 Mo)</strong></div>
-                <div class="flex justify-between"><span>Direct Bonus:</span> <strong class="text-emerald-300">5% Level 1</strong></div>
-            </div>
-            <button type="button" onclick="selectAmount(1000000)" class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-black transition cursor-pointer">
-                Select ₹10,00,000
-            </button>
-        </div>
-    </div>
 
     <!-- Interactive Returns Calculator & Plan Activation Form -->
     <div id="investFormSection" class="p-5 sm:p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-2xl relative">
@@ -143,11 +62,11 @@
             <span class="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Instant Processing</span>
         </div>
 
-        <form action="{{ route('user.investment.store') }}" method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <form action="{{ route('user.investment.store') }}" method="POST" class="space-y-6">
             @csrf
 
-            <!-- Left 50% (lg:col-span-6): Calculator Inputs & Form -->
-            <div class="lg:col-span-6 space-y-4">
+            <!-- Calculator Inputs & Form -->
+            <div class="w-full space-y-4">
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="block text-xs font-bold text-emerald-400 uppercase">Enter Investment Amount (₹) *</label>
@@ -204,49 +123,7 @@
                 </button>
             </div>
 
-            <!-- Right 50% (lg:col-span-6): 15-Level Income & Rewards Summary -->
-            <div class="lg:col-span-6 p-4 sm:p-5 rounded-2xl bg-[#02180f] border border-emerald-500/30 space-y-4 flex flex-col justify-between">
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
-                        <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">
-                            15-LEVEL DOWNLINE & MATCHING INCOME RULES
-                        </h3>
-                        <span class="text-[10px] text-neutral-400 font-mono">24 MONTHS DURATION</span>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 text-xs">
-                        <div class="p-3 rounded-xl bg-[#01140c] border border-emerald-500/20 space-y-1">
-                            <span class="block text-emerald-400 font-bold uppercase text-[10px]">Direct Level Income (12%)</span>
-                            <span class="block text-white font-black text-sm">Level 1: 5.0%</span>
-                            <span class="block text-neutral-400 text-[10px]">Levels 2 to 15: 0.5% per level</span>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-[#01140c] border border-emerald-500/20 space-y-1">
-                            <span class="block text-emerald-400 font-bold uppercase text-[10px]">ROI Level Matching (26%)</span>
-                            <span class="block text-white font-black text-sm">L1: 10% | L2: 3%</span>
-                            <span class="block text-neutral-400 text-[10px]">L3 to L15: 1.0% per level</span>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-[#01140c] border border-emerald-500/20 space-y-1 text-xs">
-                        <span class="text-emerald-400 font-bold uppercase text-[10px] block">🏆 Milestone Rewards Targets</span>
-                        <div class="grid grid-cols-2 gap-1 text-[11px] text-neutral-300 pt-0.5 font-mono">
-                            <div>₹5L Vol: <strong class="text-white font-sans">Mobile Phone</strong></div>
-                            <div>₹10L Vol: <strong class="text-white font-sans">Laptop</strong></div>
-                            <div>₹25L Vol: <strong class="text-white font-sans">EV Scooty</strong></div>
-                            <div>₹50L Vol: <strong class="text-white font-sans">Car DP ₹3L</strong></div>
-                            <div>₹1 Cr Vol: <strong class="text-white font-sans">Car DP ₹3L</strong></div>
-                            <div>₹5 Cr Vol: <strong class="text-white font-sans">Tata Punch SUV</strong></div>
-                            <div>₹10 Cr Vol: <strong class="text-white font-sans">Tata Sierra SUV</strong></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 font-semibold flex items-center gap-2">
-                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-                    <span>Your capital is backed by 24 months automated daily payouts directly into your Earning Wallet.</span>
-                </div>
-            </div>
         </form>
     </div>
 

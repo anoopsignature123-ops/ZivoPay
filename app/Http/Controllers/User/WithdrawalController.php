@@ -64,6 +64,12 @@ class WithdrawalController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if (! $user->isKycApproved()) {
+            return back()->withErrors([
+                'kyc' => 'KYC verification is required before requesting a withdrawal. Please complete and submit your KYC documents first.',
+            ])->withInput();
+        }
         $amount = (float) $request->amount;
         $fromWallet = $request->input('from_wallet', 'earning_wallet');
         if (! in_array($fromWallet, ['earning_wallet', 'deposit_wallet'])) {

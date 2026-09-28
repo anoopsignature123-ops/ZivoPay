@@ -3,8 +3,10 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositAdminController;
 use App\Http\Controllers\Admin\InvestmentAdminController;
+use App\Http\Controllers\Admin\KycAdminController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
+use App\Http\Controllers\Admin\P2pAdminController;
 use App\Http\Controllers\Admin\PackageAdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReportController;
@@ -74,9 +76,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('withdrawals', [InvestmentAdminController::class, 'withdrawals'])->name('withdrawals');
         Route::post('withdrawals/{withdrawal}/status', [InvestmentAdminController::class, 'updateWithdrawalStatus'])->name('withdrawals.update');
 
+        // Admin KYC Management Routes
+        Route::get('kyc', [KycAdminController::class, 'index'])->name('kyc.index');
+        Route::get('kyc/{kyc}', [KycAdminController::class, 'show'])->name('kyc.show');
+        Route::post('kyc/{kyc}/approve', [KycAdminController::class, 'approve'])->name('kyc.approve');
+        Route::post('kyc/{kyc}/reject', [KycAdminController::class, 'reject'])->name('kyc.reject');
+
         // Reports & Financial History Routes
         Route::get('reports/deposits', [ReportController::class, 'depositHistory'])->name('reports.deposits');
         Route::get('reports/transactions', [ReportController::class, 'transactionHistory'])->name('reports.transactions');
+        Route::get('reports/p2p', [P2pAdminController::class, 'index'])->name('reports.p2p');
         Route::get('reports/subscriptions', [ReportController::class, 'subscriptionHistory'])->name('reports.subscriptions');
         Route::get('reports/subscription-direct', [ReportController::class, 'directSubscriptionHistory'])->name('reports.subscription-direct');
         Route::get('reports/subscription-team', [ReportController::class, 'teamSubscriptionHistory'])->name('reports.subscription-team');

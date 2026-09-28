@@ -41,13 +41,13 @@
         </div>
     @endif
 
-    <!-- Main Add Fund Layout (Sleek Compact Proportions) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <!-- Main Add Fund 50%-50% Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
         
-        <!-- Left Column: Add Fund Form (7 cols) -->
-        <div class="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
+        <!-- Left Column (50%): Add Fund Form -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
             <div class="flex items-center gap-2.5 border-b border-emerald-500/20 pb-3">
-                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
                 </div>
                 <div>
@@ -181,84 +181,224 @@
             </form>
         </div>
 
-        <!-- Right Column: Recent Deposit Requests (5 cols) -->
-        <div class="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-3.5">
+        <!-- Right Column (50%): Fund Wallet Daily Profit Slabs & Features Card -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
+            <!-- Header -->
             <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="history" class="w-4 h-4 text-emerald-400"></i>
-                    <h3 class="text-sm font-black text-white uppercase tracking-tight font-heading">MY ADD FUND REQUESTS</h3>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-black text-white uppercase tracking-tight font-heading">DAILY PROFIT SLABS</h2>
+                        <p class="text-[11px] text-neutral-400">Wallet deposit balance auto-yields daily ROI profit.</p>
+                    </div>
                 </div>
-                <span class="text-[11px] text-neutral-400 font-mono font-bold">{{ $deposits->total() }} Total</span>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase">
+                    AUTO PROFIT ⚡
+                </span>
             </div>
 
-            <!-- Compact Search & Filter Bar -->
-            <form action="{{ route('user.deposit.index') }}" method="GET" class="space-y-2 pb-2 border-b border-emerald-500/20">
-                <div class="relative">
-                    <i data-lucide="search" class="w-3.5 h-3.5 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Ref, UTR, Method..."
-                        class="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[#01140c] border border-emerald-500/30 text-white text-[11px] font-mono focus:outline-none focus:border-emerald-400">
+            <!-- 4 Small Slabs Grid (2x2) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                
+                <!-- Slab 1 -->
+                <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 1</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30">
+                            0.15% DAILY
+                        </span>
+                    </div>
+                    <div class="text-xs font-black text-white font-mono">₹1,000 – ₹99,999</div>
+                    <p class="text-[10px] text-neutral-400 font-sans">Daily 0.15% profit credited automatically.</p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <div class="flex-1">
-                        <select name="status" class="w-full px-2 py-1 rounded-lg bg-[#01140c] border border-emerald-500/30 text-white text-[10px] font-semibold focus:outline-none focus:border-emerald-400">
-                            <option value="">All Statuses</option>
-                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                        </select>
+                <!-- Slab 2 -->
+                <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 2</span>
+                        <span class="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[10px] font-black border border-teal-500/30">
+                            0.20% DAILY
+                        </span>
                     </div>
-                    <button type="submit" class="px-3 py-1 rounded-lg bg-emerald-500 text-black font-black text-[10px] uppercase tracking-wider hover:bg-emerald-400 transition cursor-pointer flex items-center gap-1">
-                        <i data-lucide="filter" class="w-3 h-3"></i> Filter
+                    <div class="text-xs font-black text-white font-mono">₹1,00,000 – ₹4,99,999</div>
+                    <p class="text-[10px] text-neutral-400 font-sans">Daily 0.20% profit credited automatically.</p>
+                </div>
+
+                <!-- Slab 3 -->
+                <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 3</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
+                            0.25% DAILY
+                        </span>
+                    </div>
+                    <div class="text-xs font-black text-white font-mono">₹5,00,000 – ₹9,99,999</div>
+                    <p class="text-[10px] text-neutral-400 font-sans">Daily 0.25% profit credited automatically.</p>
+                </div>
+
+                <!-- Slab 4 -->
+                <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 4 (MAX)</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-black border border-emerald-400/40">
+                            0.30% DAILY
+                        </span>
+                    </div>
+                    <div class="text-xs font-black text-white font-mono">₹10,00,000 & Above</div>
+                    <p class="text-[10px] text-neutral-400 font-sans">Maximum 0.30% daily yield credited.</p>
+                </div>
+
+            </div>
+
+            <!-- Features & Flexibility Cards -->
+            <div class="p-4 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2.5">
+                <div class="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Wallet Flexibility & Benefits</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
+                    <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400 mb-1"></i>
+                        <h4 class="text-[11px] font-bold text-white">24x7 Withdrawal</h4>
+                        <p class="text-[9.5px] text-neutral-400">Profit withdraw facility anytime.</p>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
+                        <i data-lucide="coins" class="w-3.5 h-3.5 text-teal-400 mb-1"></i>
+                        <h4 class="text-[11px] font-bold text-white">Auto Compound</h4>
+                        <p class="text-[9.5px] text-neutral-400">Daily yield on balance.</p>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
+                        <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-amber-400 mb-1"></i>
+                        <h4 class="text-[11px] font-bold text-white">Multi-Utility</h4>
+                        <p class="text-[9.5px] text-neutral-400">Bank, Recharge, Mart.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bottom Section: MY ADD FUND REQUESTS HISTORY (Full Width Table) -->
+    <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-emerald-500/20 pb-3 gap-2">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-white uppercase tracking-tight font-heading">MY ADD FUND REQUESTS HISTORY</h3>
+                    <p class="text-[11px] text-neutral-400">Track status of all your deposit wallet recharge requests.</p>
+                </div>
+            </div>
+            <span class="text-xs text-emerald-400 font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                Total Requests: {{ $deposits->total() }}
+            </span>
+        </div>
+
+        <!-- Official Filter Bar Component -->
+        <div class="p-4 rounded-2xl bg-[#01140c] border border-emerald-500/30 shadow-xl">
+            <form action="{{ route('user.deposit.index') }}" method="GET" class="zivo-filter-bar">
+                <!-- FROM DATE -->
+                <div class="zivo-filter-field-date">
+                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
+                    <input type="date" name="from_date" value="{{ request('from_date') }}"
+                        class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                </div>
+
+                <!-- TO DATE -->
+                <div class="zivo-filter-field-date">
+                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">TO DATE</label>
+                    <input type="date" name="to_date" value="{{ request('to_date') }}"
+                        class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                </div>
+
+                <!-- STATUS -->
+                <div class="zivo-filter-field-select">
+                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">STATUS</label>
+                    <select name="status" class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                        <option value="">All Statuses</option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+
+                <!-- SEARCH REF / UTR / METHOD -->
+                <div class="zivo-filter-field-search">
+                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">SEARCH REF / UTR / METHOD</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Ref ID, UTR Number, UPI..."
+                            class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="zivo-filter-actions">
+                    <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                        <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
                     </button>
-                    <a href="{{ route('user.deposit.index') }}" class="px-2 py-1 rounded-lg bg-black/60 border border-emerald-500/30 text-neutral-300 text-[10px] font-bold hover:text-white transition">
+                    <a href="{{ route('user.deposit.index') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
                         Reset
                     </a>
                 </div>
             </form>
-
-            <!-- Deposit History Cards List -->
-            <div class="space-y-2.5 overflow-y-auto max-h-[500px] pr-1">
-                @forelse($deposits as $deposit)
-                    <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/20 space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-mono font-bold text-emerald-300">{{ $deposit->deposit_ref }}</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase 
-                                {{ $deposit->status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : ($deposit->status === 'pending' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40') }}">
-                                {{ $deposit->status }}
-                            </span>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-0.5">
-                            <div>
-                                <span class="text-base font-black text-white font-mono">₹{{ number_format($deposit->amount, 2) }}</span>
-                                <span class="text-[10px] text-neutral-400 block font-sans">{{ $deposit->payment_method }}</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[10px] text-neutral-400 font-mono block">{{ $deposit->created_at->format('d M, h:i A') }}</span>
-                                @if($deposit->trx_hash)
-                                    <span class="text-[10px] text-emerald-400 font-mono truncate max-w-[110px] block" title="{{ $deposit->trx_hash }}">UTR: {{ $deposit->trx_hash }}</span>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if($deposit->admin_remark)
-                            <div class="pt-1 border-t border-emerald-500/10 text-[10px] text-neutral-300">
-                                <strong class="text-emerald-400">Note:</strong> {{ $deposit->admin_remark }}
-                            </div>
-                        @endif
-                    </div>
-                @empty
-                    <div class="p-6 text-center text-neutral-400 font-bold text-xs bg-[#01140c] rounded-xl border border-emerald-500/20">
-                        No Add Fund requests found.
-                    </div>
-                @endforelse
-            </div>
-
-            <div class="pt-1">
-                {{ $deposits->links() }}
-            </div>
         </div>
+
+        <!-- Requests Table -->
+        <div class="overflow-x-auto rounded-xl border border-emerald-500/20">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-[#02180f] text-emerald-400 font-extrabold uppercase tracking-wider border-b border-emerald-500/30">
+                    <tr>
+                        <th class="px-4 py-3">REF CODE</th>
+                        <th class="px-4 py-3">AMOUNT</th>
+                        <th class="px-4 py-3">METHOD</th>
+                        <th class="px-4 py-3">UTR / HASH</th>
+                        <th class="px-4 py-3">STATUS</th>
+                        <th class="px-4 py-3 text-right">DATE & TIME</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-emerald-500/10 text-neutral-200 font-medium bg-[#01140c]">
+                    @forelse($deposits as $deposit)
+                        <tr class="hover:bg-emerald-500/5 transition">
+                            <td class="px-4 py-3 font-mono font-bold text-emerald-300">{{ $deposit->deposit_ref }}</td>
+                            <td class="px-4 py-3 font-mono font-black text-white text-sm">₹{{ number_format($deposit->amount, 2) }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                    {{ $deposit->payment_method }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 font-mono text-neutral-300 text-xs">{{ $deposit->trx_hash ?? 'N/A' }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase 
+                                    {{ $deposit->status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : ($deposit->status === 'pending' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40') }}">
+                                    {{ $deposit->status }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <p class="text-white font-bold">{{ $deposit->created_at->format('d M Y') }}</p>
+                                <p class="text-[10px] text-neutral-400 font-mono">{{ $deposit->created_at->format('h:i:s A') }}</p>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-neutral-400 font-bold">
+                                No Add Fund requests found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($deposits->hasPages())
+            <div class="pt-2">
+                {{ $deposits->withQueryString()->links() }}
+            </div>
+        @endif
     </div>
 </div>
 

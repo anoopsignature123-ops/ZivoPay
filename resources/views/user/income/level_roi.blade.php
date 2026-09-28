@@ -10,7 +10,7 @@
             <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
                 SECONDARY ROI MATCHING INCOME (26% TOTAL)
             </span>
-            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">ROI ON LEVEL INCOME</h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">{{ $reportTitle ?? 'ROI ON LEVEL INCOME' }}</h1>
             <p class="text-xs text-neutral-300 mt-1">Earn daily matching returns on your downline team's daily ROI yields (Level 1: 10%, Level 2: 3%, Levels 3-15: 1%).</p>
         </div>
 
@@ -22,7 +22,10 @@
 
     <!-- Official Filter Bar Component -->
     <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl">
-        <form action="{{ route('user.income.level-roi') }}" method="GET" class="zivo-filter-bar">
+        <form action="{{ url()->current() }}" method="GET" class="zivo-filter-bar">
+            @if(request('type'))
+                <input type="hidden" name="type" value="{{ request('type') }}">
+            @endif
             <!-- FROM DATE -->
             <div class="zivo-filter-field-date">
                 <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM DATE</label>
@@ -52,7 +55,7 @@
                 <button type="submit" class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
                     <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
                 </button>
-                <a href="{{ route('user.income.level-roi') }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
+                <a href="{{ request()->fullUrlWithQuery(['from_date' => null, 'to_date' => null, 'search' => null]) }}" class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
                     Reset
                 </a>
             </div>

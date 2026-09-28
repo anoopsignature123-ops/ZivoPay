@@ -101,14 +101,26 @@ class WalletController extends Controller
             'trx_id' => $trxId,
         ]);
 
+        // 1. Debit from source wallet
         Transaction::create([
             'user_id' => $user->id,
             'amount' => $amount,
             'wallet_type' => $fromWalletKey === 'deposit_wallet' ? 'fund' : 'earning',
             'type' => 'wallet_transfer',
             'trx_type' => '-',
-            'description' => $desc,
+            'description' => $desc.' (Debited)',
             'trx_id' => $trxId,
+        ]);
+
+        // 2. Credit into destination wallet
+        Transaction::create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'wallet_type' => $toWalletKey === 'deposit_wallet' ? 'fund' : 'earning',
+            'type' => 'wallet_transfer',
+            'trx_type' => '+',
+            'description' => $desc.' (Credited)',
+            'trx_id' => $trxId.'-IN',
         ]);
 
         return back()->with('success', $msg);

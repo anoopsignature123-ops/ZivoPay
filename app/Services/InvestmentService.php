@@ -33,23 +33,26 @@ class InvestmentService
         $dailyProfit = ($amount * $roiRate) / 100;
         $totalReturn = $amount + ($dailyProfit * 730); // Principal Return + 730 Days ROI Profit
 
-        return DB::transaction(function () use ($user, $amount, $roiRate, $dailyProfit, $totalReturn) {
+        return DB::transaction(function () use ($user, $amount, $roiRate) {
             // Deduct investment capital from user Fund Wallet
             $user->deposit_wallet -= $amount;
             $user->save();
 
+            $tierInfo = MLMIncomeService::getTierInfo($amount);
+
             // Create Investment record
             $investment = UserInvestment::create([
                 'user_id' => $user->id,
+                'plan_name' => $tierInfo['tier_name'],
                 'amount' => $amount,
-                'daily_roi_rate' => $roiRate,
-                'daily_profit' => $dailyProfit,
-                'duration_days' => 730,
-                'days_received' => 0,
-                'total_earned' => 0.00,
-                'total_expected' => $totalReturn,
+                'daily_percentage' => $tierInfo['daily_percentage'],
+                'daily_amount' => $tierInfo['daily_amount'],
+                'monthly_amount' => $tierInfo['monthly_amount'],
+                'total_returned' => 0.00,
+                'days_completed' => 0,
+                'total_days' => 730,
                 'status' => 'active',
-                'invested_at' => now(),
+                'activated_at' => now(),
             ]);
 
             // Log Fund Wallet debit transaction

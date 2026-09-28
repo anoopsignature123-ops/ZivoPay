@@ -43,6 +43,34 @@
         </div>
     @endif
 
+    <!-- KYC Enforcement Alert Banner -->
+    @if(!$user->isKycApproved())
+        <div class="p-6 rounded-3xl bg-amber-950/40 border-2 border-amber-500/60 text-amber-200 text-xs space-y-3 shadow-xl">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/50">
+                        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-wider font-heading">⚠️ KYC Verification Required for Payouts</h3>
+                        <p class="text-xs text-amber-200/90 mt-0.5">
+                            @if($user->kyc_status === 'pending')
+                                Your KYC submission is currently <strong>Under Admin Review</strong>. Withdrawals will unlock automatically once approved.
+                            @elseif($user->kyc_status === 'rejected')
+                                Your KYC submission was <strong>Rejected</strong>. Please review the reason, update your details, and resubmit.
+                            @else
+                                You have not completed your KYC document & banking verification yet. Please submit your documents to unlock 24x7 withdrawals.
+                            @endif
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('user.kyc.index') }}" class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition shrink-0 shadow-lg flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Complete KYC Now
+                </a>
+            </div>
+        </div>
+    @endif
+
     <!-- Withdrawal Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- 1. Total Approved Withdrawn -->
@@ -168,9 +196,15 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i> Submit 24x7 Payout Request
-                    </button>
+                    @if(!$user->isKycApproved())
+                        <a href="{{ route('user.kyc.index') }}" class="w-full py-3.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-bold uppercase tracking-wider text-xs transition flex items-center justify-center gap-2 shadow-lg">
+                            <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i> KYC Verification Required - Click to Verify
+                        </a>
+                    @else
+                        <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i> Submit 24x7 Payout Request
+                        </button>
+                    @endif
                 </form>
             </div>
         </div>

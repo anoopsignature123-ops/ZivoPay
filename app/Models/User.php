@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'sponsor_code',
         'position',
         'status',
+        'kyc_status',
         'is_subscription_active',
         'subscription_activated_at',
         'is_bot_active',
@@ -123,6 +125,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Relationship for user KYC document record.
+     */
+    public function kyc(): HasOne
+    {
+        return $this->hasOne(Kyc::class);
+    }
+
+    /**
+     * Check if user KYC is verified and approved.
+     */
+    public function isKycApproved(): bool
+    {
+        return $this->kyc_status === 'approved';
+    }
+
+    /**
      * Direct Sponsored Team Members.
      */
     public function directs(): HasMany
@@ -163,11 +181,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user/sponsor account is active and eligible for commissions & level income.
+     * Check if user/sponsor account is active and eligible for team commissions & level income.
+     * Requires mandatory ₹3,000 package subscription activation.
      */
     public function isActiveForIncome(): bool
     {
-        return (bool) ($this->is_subscription_active || $this->status === 'active');
+        return (bool) $this->is_subscription_active;
     }
 
     /**

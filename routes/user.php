@@ -5,8 +5,10 @@ use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\IncomeController;
 use App\Http\Controllers\User\InvestmentController;
+use App\Http\Controllers\User\KycController;
 use App\Http\Controllers\User\LoginController;
 use App\Http\Controllers\User\NetworkController as UserNetworkController;
+use App\Http\Controllers\User\P2pController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\RegisterController;
 use App\Http\Controllers\User\RewardController;
@@ -53,6 +55,11 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('wallet/transfer', [WalletController::class, 'showTransferForm'])->name('wallet.transfer');
         Route::post('wallet/transfer', [WalletController::class, 'transfer'])->name('wallet.transfer.store');
 
+        // P2P Member Transfer Routes
+        Route::get('p2p', [P2pController::class, 'index'])->name('p2p.index');
+        Route::get('p2p/check-member', [P2pController::class, 'checkMember'])->name('p2p.check-member');
+        Route::post('p2p', [P2pController::class, 'store'])->name('p2p.store');
+
         // Buy Package ₹3,000 Activation Routes
         Route::get('package/buy', [WalletController::class, 'showBuyPackageForm'])->name('package.buy');
         Route::post('package/buy', [WalletController::class, 'activateSubscription'])->name('wallet.subscription.activate');
@@ -66,6 +73,10 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::put('profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
         Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
 
+        // KYC Verification Routes
+        Route::get('kyc', [KycController::class, 'index'])->name('kyc.index');
+        Route::post('kyc', [KycController::class, 'store'])->name('kyc.store');
+
         // Investment Packages Plan Routes
         Route::get('investment/plan', [InvestmentController::class, 'index'])->name('investment.index');
         Route::post('investment/plan', [InvestmentController::class, 'store'])->name('investment.store');
@@ -78,6 +89,8 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('income/subscription-direct', [IncomeController::class, 'subscriptionDirectIncome'])->name('income.subscription-direct');
         Route::get('income/subscription-team', [IncomeController::class, 'subscriptionTeamIncome'])->name('income.subscription-team');
         Route::get('income/roi', [IncomeController::class, 'roiIncome'])->name('income.roi');
+        Route::get('income/fund-wallet-roi', [IncomeController::class, 'fundWalletRoiIncome'])->name('income.fund-roi');
+        Route::get('income/capital-investment-roi', [IncomeController::class, 'capitalInvestmentRoiIncome'])->name('income.investment-roi');
         Route::get('income/level-direct', [IncomeController::class, 'levelDirectIncome'])->name('income.level-direct');
         Route::get('income/direct-business', [IncomeController::class, 'directBusinessIncome'])->name('income.direct-business');
         Route::get('income/level-roi', [IncomeController::class, 'levelRoiIncome'])->name('income.level-roi');
