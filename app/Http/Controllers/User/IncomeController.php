@@ -4,10 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deposit;
+use App\Models\P2pTransfer;
 use App\Models\Transaction;
 use App\Models\UserInvestment;
 use App\Models\UserReward;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
@@ -92,6 +94,164 @@ class IncomeController extends Controller
         $totalCount = Deposit::where('user_id', $user->id)->count();
 
         return view('user.reports.deposits', compact('user', 'deposits', 'totalApproved', 'totalPending', 'totalCount'));
+    }
+
+    /**
+     * Combined Deposit and P2P Transaction Audit Report for User.
+     */
+    public function depositP2pHistory(Request $request)
+    {
+        $user = Auth::user();
+
+        // 1. Fetch Deposits
+        $depositQuery = Deposit::where('user_id', $user->id);
+
+        if ($request->filled('from_date')) {
+            $depositQuery->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $depositQuery->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('status')) {
+            $depositQuery->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $depositQuery->where(function ($q) use ($search) {
+                $q->where('deposit_ref', 'like', "%{$search}%")
+                    ->orWhere('trx_hash', 'like', "%{$search}%")
+                    ->orWhere('payment_method', 'like', "%{$search}%");
+            });
+        }
+
+        $deposits = $depositQuery->get()->map(function ($dep) {
+            $isAdmin = $dep->payment_method === 'ADMIN';
+
+            return [
+                'id' => 'DEP-'.$dep->id,
+                'created_at' => $dep->created_at,
+                'record_type' => 'deposit',
+                'category' => $isAdmin ? 'admin_credit' : 'deposit',
+                'category_label' => $isAdmin ? 'Admin Add Fund' : 'Add Fund ('.$dep->payment_method.')',
+                'badge_class' => $isAdmin ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+                'ref_code' => $dep->deposit_ref,
+                'amount' => (float) $dep->final_amount,
+                'party_detail' => $isAdmin ? 'Processed by System Admin' : 'Payment Gateway: '.$dep->payment_method,
+                'trx_hash' => $dep->trx_hash ?? 'N/A',
+                'status' => $dep->status,
+                'status_badge' => $dep->status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : ($dep->status === 'pending' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'),
+                'remark' => $dep->admin_remark ?? 'Direct Wallet Recharge',
+                'proof_file' => $dep->proof_file,
+            ];
+        });
+
+        // 2. Fetch P2P Transfers
+        $p2pQuery = P2pTransfer::with(['sender', 'receiver'])
+            ->where(function ($q) use ($user) {
+                $q->where('sender_id', $user->id)
+                    ->orWhere('receiver_id', $user->id);
+            });
+
+        if ($request->filled('from_date')) {
+            $p2pQuery->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $p2pQuery->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $p2pQuery->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('remarks', 'like', "%{$search}%")
+                    ->orWhereHas('sender', function ($sq) use ($search) {
+                        $sq->where('name', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('receiver', function ($rq) use ($search) {
+                        $rq->where('name', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $p2pTransfers = $p2pQuery->get()->map(function ($p2p) use ($user) {
+            $isSender = ($p2p->sender_id === $user->id);
+
+            return [
+                'id' => 'P2P-'.$p2p->id,
+                'created_at' => $p2p->created_at,
+                'record_type' => 'p2p',
+                'category' => $isSender ? 'p2p_sent' : 'p2p_received',
+                'category_label' => $isSender ? 'P2P Transfer Sent' : 'P2P Transfer Received',
+                'badge_class' => $isSender ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-teal-500/20 text-teal-300 border border-teal-500/40',
+                'ref_code' => $p2p->trx_id,
+                'amount' => (float) $p2p->amount,
+                'party_detail' => $isSender
+                    ? 'To: '.($p2p->receiver?->name ?? 'Member').' ('.($p2p->receiver?->referral_code ?? 'N/A').')'
+                    : 'From: '.($p2p->sender?->name ?? 'Member').' ('.($p2p->sender?->referral_code ?? 'N/A').')',
+                'trx_hash' => $p2p->trx_id,
+                'status' => 'completed',
+                'status_badge' => 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+                'remark' => $p2p->remarks ?? 'P2P Member Transfer',
+                'proof_file' => null,
+            ];
+        });
+
+        // 3. Combine & Filter by Category Type if requested
+        $allRecords = $deposits->concat($p2pTransfers);
+
+        if ($request->filled('type')) {
+            $type = $request->type;
+            if ($type === 'p2p') {
+                $allRecords = $allRecords->whereIn('category', ['p2p_sent', 'p2p_received']);
+            } else {
+                $allRecords = $allRecords->where('category', $type);
+            }
+        }
+
+        // Filter status if requested
+        if ($request->filled('status')) {
+            $reqStatus = strtolower($request->status);
+            $allRecords = $allRecords->filter(function ($item) use ($reqStatus) {
+                return strtolower($item['status']) === $reqStatus;
+            });
+        }
+
+        // Sort BY created_at DESC
+        $sortedRecords = $allRecords->sortByDesc('created_at')->values();
+
+        // Calculate Summary Totals
+        $totalDepositAmount = $sortedRecords->whereIn('category', ['deposit', 'admin_credit'])->where('status', 'approved')->sum('amount');
+        $totalP2pSentAmount = $sortedRecords->where('category', 'p2p_sent')->sum('amount');
+        $totalP2pReceivedAmount = $sortedRecords->where('category', 'p2p_received')->sum('amount');
+        $totalCount = $sortedRecords->count();
+
+        // Manual Pagination
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 20;
+        $currentPageItems = $sortedRecords->slice(($page - 1) * $perPage, $perPage)->values();
+
+        $paginatedRecords = new LengthAwarePaginator(
+            $currentPageItems,
+            $sortedRecords->count(),
+            $perPage,
+            $page,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
+        );
+
+        return view('user.reports.deposit_p2p', compact(
+            'user',
+            'paginatedRecords',
+            'totalDepositAmount',
+            'totalP2pSentAmount',
+            'totalP2pReceivedAmount',
+            'totalCount'
+        ));
     }
 
     public function packageHistory(Request $request)

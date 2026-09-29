@@ -84,6 +84,7 @@ Route::prefix('user')->name('user.')->group(function () {
         // Income & Transaction Ledger Routes
         Route::get('income', [IncomeController::class, 'index'])->name('income.index');
         Route::get('reports/deposits', [IncomeController::class, 'depositHistory'])->name('reports.deposits');
+        Route::get('reports/deposit-p2p', [IncomeController::class, 'depositP2pHistory'])->name('reports.deposit-p2p');
         Route::get('reports/package-history', [IncomeController::class, 'packageHistory'])->name('reports.package-history');
         Route::get('reports/investments', [IncomeController::class, 'investmentHistory'])->name('reports.investments');
         Route::get('income/subscription-direct', [IncomeController::class, 'subscriptionDirectIncome'])->name('income.subscription-direct');

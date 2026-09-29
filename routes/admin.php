@@ -84,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Reports & Financial History Routes
         Route::get('reports/deposits', [ReportController::class, 'depositHistory'])->name('reports.deposits');
+        Route::get('reports/deposit-p2p', [ReportController::class, 'depositP2pHistory'])->name('reports.deposit-p2p');
         Route::get('reports/transactions', [ReportController::class, 'transactionHistory'])->name('reports.transactions');
         Route::get('reports/p2p', [P2pAdminController::class, 'index'])->name('reports.p2p');
         Route::get('reports/subscriptions', [ReportController::class, 'subscriptionHistory'])->name('reports.subscriptions');

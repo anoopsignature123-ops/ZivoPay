@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Deposit;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserInvestment;
@@ -215,7 +216,7 @@ class UserController extends Controller
         $userRemark = $request->input('remark');
         $remark = $userRemark ? "{$userRemark} (Processed by Admin)" : 'Processed by Admin';
 
-        DB::transaction(function () use ($user, $walletType, $action, $amount, $remark) {
+        DB::transaction(function () use ($user, $walletType, $action, $amount, $remark, $userRemark) {
             if ($action === 'deduct') {
                 $user->decrement($walletType, $amount);
                 $trxType = 'admin_debit';
@@ -224,14 +225,34 @@ class UserController extends Controller
                 $trxType = 'admin_credit';
             }
 
+            $trxId = 'ADM-'.strtoupper(Str::random(10));
+
             Transaction::create([
                 'user_id' => $user->id,
                 'amount' => $amount,
                 'wallet_type' => $walletType,
                 'type' => $trxType,
                 'description' => "Admin {$action}: {$remark}",
-                'trx_id' => 'ADM-'.strtoupper(Str::random(10)),
+                'trx_id' => $trxId,
             ]);
+
+            // When funds are added directly to deposit_wallet by Admin, create an approved Deposit record
+            // so it appears seamlessly in the User Panel Add Fund History & Fund Wallet History.
+            if ($walletType === 'deposit_wallet' && $action === 'add') {
+                Deposit::create([
+                    'user_id' => $user->id,
+                    'deposit_ref' => 'DEP-'.strtoupper(Str::random(10)),
+                    'amount' => $amount,
+                    'charge' => 0.00,
+                    'final_amount' => $amount,
+                    'payment_method' => 'ADMIN',
+                    'trx_hash' => $trxId,
+                    'proof_file' => null,
+                    'gateway_reference' => 'ADMIN-DIRECT-CREDIT',
+                    'status' => 'approved',
+                    'admin_remark' => $userRemark ? "Admin Add: {$userRemark}" : 'Fund added directly by Admin',
+                ]);
+            }
         });
 
         $walletLabel = $walletType === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet';
