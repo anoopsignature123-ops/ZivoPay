@@ -112,11 +112,6 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // If guest (not logged in), automatically log in as the newly registered user
-        if (! Auth::check()) {
-            Auth::login($user);
-        }
-
         $registeredUser = [
             'user_id' => $user->referral_code,
             'sponsor_id' => $user->sponsor_code,

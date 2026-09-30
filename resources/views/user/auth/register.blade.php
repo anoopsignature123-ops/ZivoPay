@@ -330,9 +330,14 @@
                             Copy Member Details
                         </button>
 
-                        <a href="{{ route('user.dashboard') }}"
+                        <a href="{{ route('user.login') }}"
                             class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm uppercase tracking-wider shadow-lg hover:from-emerald-400 hover:to-teal-500 transition flex items-center justify-center gap-2">
-                            PROCEED TO DASHBOARD
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10 17 15 12 10 7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            PROCEED TO LOGIN
                         </a>
                     </div>
 
