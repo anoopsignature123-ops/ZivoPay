@@ -139,4 +139,49 @@ class AuthApiTest extends TestCase
         $responseInvalid->assertStatus(404)
             ->assertJsonPath('success', false);
     }
+
+    /**
+     * Test mobile OTP login flow (Send OTP, Verify OTP, Resend OTP, and Unified Login).
+     */
+    public function test_user_can_login_via_mobile_and_otp(): void
+    {
+        $user = User::factory()->create([
+            'mobile' => '8888899999',
+        ]);
+
+        // 1. Send OTP
+        $responseSend = $this->postJson('/api/send-otp', [
+            'mobile' => '8888899999',
+        ]);
+        $responseSend->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.otp', '1111');
+
+        // 2. Verify OTP
+        $responseVerify = $this->postJson('/api/verify-otp', [
+            'mobile' => '8888899999',
+            'otp' => '1111',
+        ]);
+        $responseVerify->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.mobile', '8888899999')
+            ->assertJsonStructure(['data' => ['token', 'token_type']]);
+
+        // 3. Resend OTP
+        $responseResend = $this->postJson('/api/resend-otp', [
+            'mobile' => '8888899999',
+        ]);
+        $responseResend->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.otp', '1111');
+
+        // 4. Unified /api/login endpoint with OTP
+        $responseUnified = $this->postJson('/api/login', [
+            'mobile' => '8888899999',
+            'otp' => '1111',
+        ]);
+        $responseUnified->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.id', $user->id);
+    }
 }

@@ -18,7 +18,8 @@ class LoginRequest extends BaseApiRequest
             'login_id' => 'nullable|string',
             'email' => 'nullable|string',
             'mobile' => 'nullable|string',
-            'password' => 'required|string',
+            'password' => 'required_without:otp|nullable|string',
+            'otp' => 'required_without:password|nullable|string',
         ];
     }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
+use App\Http\Controllers\Api\SupportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,20 +17,34 @@ use Illuminate\Support\Facades\Route;
 // Public Authentication & Verification Endpoints
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('send-otp', [AuthController::class, 'sendOtp']);
+Route::post('login/send-otp', [AuthController::class, 'sendOtp']);
+Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('login/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('login-otp', [AuthController::class, 'verifyOtp']);
+Route::post('resend-otp', [AuthController::class, 'resendOtp']);
+Route::post('login/resend-otp', [AuthController::class, 'resendOtp']);
 Route::get('check-sponsor', [AuthController::class, 'checkSponsor']);
 Route::get('sponsor/{code?}', [AuthController::class, 'checkSponsor']);
+Route::get('support/contact', [SupportController::class, 'contact']);
+Route::get('support', [SupportController::class, 'contact']);
 
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
 
 // Authenticated Sanctum Protected Endpoints
 Route::middleware('auth:sanctum')->group(function () {
+    // Help & Support Endpoints
+    Route::get('support/tickets', [SupportController::class, 'tickets']);
+    Route::post('support/tickets', [SupportController::class, 'createTicket']);
+    Route::get('support/tickets-detail', [SupportController::class, 'showTicket']);
+
     // Dashboard, Home & Transaction Details API
     Route::get('dashboard', [DashboardController::class, 'index']);
     Route::get('home', [DashboardController::class, 'index']);
 
-
-    Route::get('transaction-details', [DashboardController::class, 'transactionDetails']);
+    Route::get('transaction/{id}', [DashboardController::class, 'transactionDetails']);
+    Route::get('transaction-details/{id?}', [DashboardController::class, 'transactionDetails']);
 
     // User & Profile Endpoints
     Route::get('profile', [ProfileController::class, 'show']);

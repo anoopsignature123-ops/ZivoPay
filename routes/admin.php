@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RechargeAdminController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceAdminController;
+use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\AdminAuth;
 use App\Http\Middleware\AdminGuest;
@@ -106,6 +107,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('recharges', [RechargeAdminController::class, 'index'])->name('recharges.index');
         Route::post('recharges/{recharge}/sync', [RechargeAdminController::class, 'sync'])->name('recharges.sync');
         Route::post('recharges/{recharge}/refund', [RechargeAdminController::class, 'refund'])->name('recharges.refund');
+
+        // Help & Support Admin Control Routes
+        Route::get('support', [SupportAdminController::class, 'index'])->name('support.index');
+        Route::get('support/{ticket}', [SupportAdminController::class, 'show'])->name('support.show');
+        Route::post('support/{ticket}/reply', [SupportAdminController::class, 'reply'])->name('support.reply');
 
         // Profile & Password Management
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
