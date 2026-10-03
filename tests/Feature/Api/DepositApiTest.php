@@ -29,7 +29,7 @@ class DepositApiTest extends TestCase
             'remark' => 'Test Add Fund',
         ];
 
-        $response = $this->postJson(route('api.add_fund.store'), $payload);
+        $response = $this->postJson('/api/add-fund', $payload);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -67,7 +67,7 @@ class DepositApiTest extends TestCase
             'proof_file' => $file,
         ];
 
-        $response = $this->postJson(route('api.add_fund.store'), $payload);
+        $response = $this->postJson('/api/add-fund', $payload);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -87,7 +87,7 @@ class DepositApiTest extends TestCase
         Sanctum::actingAs($user);
 
         // Min deposit validation test
-        $response = $this->postJson(route('api.add_fund.store'), [
+        $response = $this->postJson('/api/add-fund', [
             'amount' => 10.00, // Below min 100
             'payment_method' => 'UPI',
             'trx_hash' => 'UTR1122334455',
@@ -108,7 +108,7 @@ class DepositApiTest extends TestCase
             'status' => 'approved',
         ]);
 
-        $dupResponse = $this->postJson(route('api.add_fund.store'), [
+        $dupResponse = $this->postJson('/api/add-fund', [
             'amount' => 200.00,
             'payment_method' => 'UPI',
             'trx_hash' => 'EXISTING_UTR_123',
@@ -148,7 +148,7 @@ class DepositApiTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->getJson(route('api.add_fund.history'));
+        $response = $this->getJson('/api/fund-history');
 
         $response->assertStatus(200)
             ->assertJson([

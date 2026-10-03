@@ -28,8 +28,8 @@ class AdminManagementTest extends TestCase
         $admin = User::create([
             'role_id' => 1,
             'name' => 'Super Admin',
-            'email' => 'admin@zivopay.com',
-            'referral_code' => 'ZIVO-ADMIN01',
+            'email' => 'admin_ctrl_'.uniqid().'@zivopay.com',
+            'referral_code' => 'ZIVO-ADM'.rand(100000, 999999),
             'password' => bcrypt('admin123'),
         ]);
 
@@ -53,17 +53,17 @@ class AdminManagementTest extends TestCase
         $admin = User::create([
             'role_id' => 1,
             'name' => 'Super Admin',
-            'email' => 'admin@zivopay.com',
-            'referral_code' => 'ZIVO-ADMIN01',
+            'email' => 'admin_tgl_'.uniqid().'@zivopay.com',
+            'referral_code' => 'ZIVO-ADM'.rand(100000, 999999),
             'password' => bcrypt('admin123'),
         ]);
 
         $member = User::create([
             'role_id' => 2,
             'name' => 'Member Test',
-            'email' => 'member@example.com',
+            'email' => 'member_'.uniqid().'@example.com',
             'status' => 'inactive',
-            'referral_code' => 'ZIVO-4000001',
+            'referral_code' => 'ZIVO-MBR'.rand(100000, 999999),
             'password' => bcrypt('password123'),
         ]);
 

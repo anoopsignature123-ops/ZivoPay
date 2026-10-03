@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Recharge;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserInvestment;
@@ -33,10 +34,12 @@ class DashboardController extends Controller
         $totalRoiDistributed = Transaction::where('type', 'daily_roi')->sum('amount');
         $totalCommissionsPaid = Transaction::whereIn('type', ['direct_bonus', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income'])->sum('amount');
 
-        // Withdrawals Summary
+        // Withdrawals & Recharges Summary
         $pendingWithdrawalsSum = Withdrawal::where('status', 'pending')->sum('amount');
         $pendingWithdrawalsCount = Withdrawal::where('status', 'pending')->count();
         $approvedWithdrawalsSum = Withdrawal::where('status', 'approved')->sum('amount');
+        $totalRechargesVolume = Recharge::where('status', 'success')->sum('amount');
+        $totalRechargesCount = Recharge::where('status', 'success')->count();
 
         // Recent Collections for Live Dashboard Feed (No withdrawal cards on dashboard)
         $recentUsers = User::where('role_id', '!=', 1)->latest()->take(6)->get();
@@ -63,6 +66,8 @@ class DashboardController extends Controller
             'pendingWithdrawalsSum',
             'pendingWithdrawalsCount',
             'approvedWithdrawalsSum',
+            'totalRechargesVolume',
+            'totalRechargesCount',
             'recentUsers',
             'recentTransactions',
             'recentSubscriptions'

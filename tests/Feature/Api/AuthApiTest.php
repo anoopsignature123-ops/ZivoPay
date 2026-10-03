@@ -106,4 +106,37 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.user.id', $user->id);
     }
+
+    /**
+     * Test verifying sponsor name and details via public API.
+     */
+    public function test_can_check_and_verify_sponsor_details(): void
+    {
+        $sponsor = User::factory()->create([
+            'name' => 'Rajesh Kumar Sponsor',
+            'referral_code' => 'ZIVO-9998887',
+            'mobile' => '9888877777',
+        ]);
+
+        // Path parameter test
+        $responsePath = $this->getJson('/api/sponsor/ZIVO-9998887');
+
+        $responsePath->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.sponsor.name', 'Rajesh Kumar Sponsor')
+            ->assertJsonPath('data.sponsor.referral_code', 'ZIVO-9998887');
+
+        // Query parameter test with mobile
+        $responseQuery = $this->getJson('/api/check-sponsor?sponsor_code=9888877777');
+
+        $responseQuery->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.sponsor.name', 'Rajesh Kumar Sponsor');
+
+        // Invalid sponsor code test
+        $responseInvalid = $this->getJson('/api/sponsor/INVALID-999');
+
+        $responseInvalid->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
 }

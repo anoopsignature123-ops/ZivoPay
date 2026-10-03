@@ -23,8 +23,8 @@ class UserAllRoutesTest extends TestCase
         $user = User::create([
             'role_id' => 2,
             'name' => 'Route Tester',
-            'email' => 'routetester@example.com',
-            'referral_code' => 'ZIVO-9990001',
+            'email' => 'routetester_'.uniqid().'@example.com',
+            'referral_code' => 'ZIVO-RTE'.rand(100000, 999999),
             'password' => bcrypt('password123'),
             'deposit_wallet' => 5000.00,
             'earning_wallet' => 2000.00,
@@ -69,8 +69,8 @@ class UserAllRoutesTest extends TestCase
         $user = User::create([
             'role_id' => 2,
             'name' => 'Fund User',
-            'email' => 'funduser@example.com',
-            'referral_code' => 'ZIVO-8880001',
+            'email' => 'funduser_'.uniqid().'@example.com',
+            'referral_code' => 'ZIVO-FND'.rand(100000, 999999),
             'password' => bcrypt('password123'),
             'deposit_wallet' => 0.00,
         ]);
@@ -102,23 +102,23 @@ class UserAllRoutesTest extends TestCase
         $admin = User::create([
             'role_id' => 1,
             'name' => 'Admin Approver',
-            'email' => 'adminapprover@example.com',
-            'referral_code' => 'ZIVO-ADMIN02',
+            'email' => 'adminapprover_'.uniqid().'@example.com',
+            'referral_code' => 'ZIVO-ADM'.rand(100000, 999999),
             'password' => bcrypt('password123'),
         ]);
 
         $user = User::create([
             'role_id' => 2,
             'name' => 'Deposit User',
-            'email' => 'depuser@example.com',
-            'referral_code' => 'ZIVO-7770001',
+            'email' => 'depuser_'.uniqid().'@example.com',
+            'referral_code' => 'ZIVO-DEP'.rand(100000, 999999),
             'password' => bcrypt('password123'),
             'deposit_wallet' => 500.00,
         ]);
 
         $deposit = Deposit::create([
             'user_id' => $user->id,
-            'deposit_ref' => 'DEP-TEST12345',
+            'deposit_ref' => 'DEP-'.uniqid(),
             'amount' => 2500.00,
             'charge' => 0.00,
             'final_amount' => 2500.00,

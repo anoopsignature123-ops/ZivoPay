@@ -32,13 +32,14 @@ class MLMBusinessPlanTest extends TestCase
         // Build 15-Level Sponsor Chain
         $sponsors = [];
         $previousCode = null;
+        $uid = uniqid();
 
         for ($i = 1; $i <= 15; $i++) {
             $user = User::create([
                 'role_id' => $this->roleId,
                 'name' => "User Level {$i}",
-                'email' => "user{$i}@zivopay.com",
-                'referral_code' => "ZIVO-00000{$i}",
+                'email' => "user_t1_{$i}_{$uid}@zivopay.com",
+                'referral_code' => "ZIVO-T1-{$i}-{$uid}",
                 'sponsor_code' => $previousCode,
                 'deposit_wallet' => 200000.00,
                 'earning_wallet' => 0.00,
@@ -77,13 +78,14 @@ class MLMBusinessPlanTest extends TestCase
     public function test_inactive_sponsors_do_not_receive_referral_or_level_incomes(): void
     {
         $service = new MLMIncomeService;
+        $uid = uniqid();
 
         // Create Inactive Top Sponsor (Sponsor 1)
         $inactiveSponsor = User::create([
             'role_id' => $this->roleId,
             'name' => 'Inactive Sponsor',
-            'email' => 'inactive_sponsor@zivopay.com',
-            'referral_code' => 'ZIVO-INACTIVE01',
+            'email' => "inactive_sponsor_{$uid}@zivopay.com",
+            'referral_code' => "ZIVO-INACT-{$uid}",
             'deposit_wallet' => 0.00,
             'earning_wallet' => 0.00,
             'status' => 'inactive',
@@ -94,9 +96,9 @@ class MLMBusinessPlanTest extends TestCase
         $activeSponsor = User::create([
             'role_id' => $this->roleId,
             'name' => 'Active Sponsor',
-            'email' => 'active_sponsor@zivopay.com',
-            'referral_code' => 'ZIVO-ACTIVE01',
-            'sponsor_code' => 'ZIVO-INACTIVE01',
+            'email' => "active_sponsor_{$uid}@zivopay.com",
+            'referral_code' => "ZIVO-ACT-{$uid}",
+            'sponsor_code' => "ZIVO-INACT-{$uid}",
             'deposit_wallet' => 10000.00,
             'earning_wallet' => 0.00,
             'status' => 'active',
@@ -107,9 +109,9 @@ class MLMBusinessPlanTest extends TestCase
         $investor = User::create([
             'role_id' => $this->roleId,
             'name' => 'Investor Member',
-            'email' => 'investor_member@zivopay.com',
-            'referral_code' => 'ZIVO-INVESTOR01',
-            'sponsor_code' => 'ZIVO-ACTIVE01',
+            'email' => "investor_member_{$uid}@zivopay.com",
+            'referral_code' => "ZIVO-INV-{$uid}",
+            'sponsor_code' => "ZIVO-ACT-{$uid}",
             'deposit_wallet' => 100000.00,
             'earning_wallet' => 0.00,
             'status' => 'inactive',
@@ -133,13 +135,14 @@ class MLMBusinessPlanTest extends TestCase
         // Build 15-Level Chain
         $sponsors = [];
         $previousCode = null;
+        $uid = uniqid();
 
         for ($i = 1; $i <= 15; $i++) {
             $user = User::create([
                 'role_id' => $this->roleId,
                 'name' => "User Level {$i}",
-                'email' => "user{$i}@zivopay.com",
-                'referral_code' => "ZIVO-00000{$i}",
+                'email' => "user_t3_{$i}_{$uid}@zivopay.com",
+                'referral_code' => "ZIVO-T3-{$i}-{$uid}",
                 'sponsor_code' => $previousCode,
                 'deposit_wallet' => 0.00,
                 'earning_wallet' => 0.00,

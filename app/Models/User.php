@@ -127,6 +127,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relationship for user recharges.
+     */
+    public function recharges(): HasMany
+    {
+        return $this->hasMany(Recharge::class);
+    }
+
+    /**
      * Relationship for user KYC document record.
      */
     public function kyc(): HasOne

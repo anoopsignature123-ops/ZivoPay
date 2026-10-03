@@ -66,9 +66,9 @@ class DepositApiService
         $deposits = $query->orderBy('id', 'desc')->paginate($perPage);
 
         $stats = [
-            // 'total_approved' => (float) Deposit::where('user_id', $user->id)->where('status', 'approved')->sum('final_amount'),
-            // 'total_pending' => (float) Deposit::where('user_id', $user->id)->where('status', 'pending')->sum('amount'),
-            // 'total_rejected' => (float) Deposit::where('user_id', $user->id)->where('status', 'rejected')->sum('amount'),
+            'total_approved' => (float) Deposit::where('user_id', $user->id)->where('status', 'approved')->sum('final_amount'),
+            'total_pending' => (float) Deposit::where('user_id', $user->id)->where('status', 'pending')->sum('amount'),
+            'total_rejected' => (float) Deposit::where('user_id', $user->id)->where('status', 'rejected')->sum('amount'),
             'total_count' => Deposit::where('user_id', $user->id)->count(),
             'current_deposit_wallet_balance' => (float) $user->deposit_wallet,
         ];

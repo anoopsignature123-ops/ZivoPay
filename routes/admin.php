@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\P2pAdminController;
 use App\Http\Controllers\Admin\PackageAdminController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RechargeAdminController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\AdminAuth;
 use App\Http\Middleware\AdminGuest;
@@ -56,6 +58,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Impersonate / Login as User Route
         Route::get('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
 
+        // App Services Management Routes
+        Route::get('services', [ServiceAdminController::class, 'index'])->name('services.index');
+        Route::post('services/{service}/toggle-status', [ServiceAdminController::class, 'toggleStatus'])->name('services.toggle-status');
+
         // Network & Binary Team Tree Routes
         Route::get('network/tree', [NetworkController::class, 'treeView'])->name('network.tree');
 
@@ -95,6 +101,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reports/direct-business', [ReportController::class, 'directBusinessHistory'])->name('reports.direct-business');
         Route::get('reports/level-roi', [ReportController::class, 'levelRoiHistory'])->name('reports.level-roi');
         Route::get('reports/rewards', [ReportController::class, 'rewardHistory'])->name('reports.rewards');
+
+        // Recharge Admin Control & Report Routes
+        Route::get('recharges', [RechargeAdminController::class, 'index'])->name('recharges.index');
+        Route::post('recharges/{recharge}/sync', [RechargeAdminController::class, 'sync'])->name('recharges.sync');
+        Route::post('recharges/{recharge}/refund', [RechargeAdminController::class, 'refund'])->name('recharges.refund');
 
         // Profile & Password Management
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
