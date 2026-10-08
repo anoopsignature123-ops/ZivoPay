@@ -13,19 +13,11 @@ class PageAdminController extends Controller
     /**
      * Display list of static content pages in Admin Panel.
      */
-    public function index()
+    public function index(Request $request): View
     {
         $pages = StaticContent::orderBy('id', 'asc')->get();
 
         return view('admin.pages.index', compact('pages'));
-    }
-
-    /**
-     * Invoke fallback method for single action or index calls.
-     */
-    public function __invoke(Request $request): View
-    {
-        return $this->index($request);
     }
 
     /**
