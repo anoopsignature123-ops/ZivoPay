@@ -13,7 +13,7 @@ class PageAdminController extends Controller
     /**
      * Display list of static content pages in Admin Panel.
      */
-    public function index(Request $request): View
+    public function index()
     {
         $pages = StaticContent::orderBy('id', 'asc')->get();
 
