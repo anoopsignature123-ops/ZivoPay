@@ -182,6 +182,96 @@ return [
     |--------------------------------------------------------------------------
     */
     'plans' => [
+        'FASTAG_DEFAULT' => [
+            [
+                'amount' => 100,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹100 · Instant Toll Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+            [
+                'amount' => 200,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹200 · Highway Toll Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+            [
+                'amount' => 500,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹500 · Recommended Toll Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+            [
+                'amount' => 1000,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹1000 · High Value Toll Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+            [
+                'amount' => 2000,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹2000 · Express Highway Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+            [
+                'amount' => 5000,
+                'validity' => 'Instant Top-Up',
+                'description' => 'FASTag Top-Up ₹5000 · Commercial Vehicle Pass',
+                'category' => 'FASTag Quick Top-Up',
+            ],
+        ],
+        'DTH_DEFAULT' => [
+            [
+                'amount' => 150,
+                'validity' => '1 Month',
+                'description' => 'DTH Monthly Base Pack Top-Up',
+                'category' => 'DTH Quick Packs',
+            ],
+            [
+                'amount' => 250,
+                'validity' => '1 Month',
+                'description' => 'DTH Monthly Standard HD Pack',
+                'category' => 'DTH Quick Packs',
+            ],
+            [
+                'amount' => 500,
+                'validity' => '2 Months',
+                'description' => 'DTH Super Saver Pack',
+                'category' => 'DTH Quick Packs',
+            ],
+            [
+                'amount' => 1000,
+                'validity' => '4 Months',
+                'description' => 'DTH Long Term Value Pack',
+                'category' => 'DTH Quick Packs',
+            ],
+        ],
+        'BILL_DEFAULT' => [
+            [
+                'amount' => 500,
+                'validity' => 'Bill Payment',
+                'description' => 'Utility Bill Payment ₹500',
+                'category' => 'Quick Amounts',
+            ],
+            [
+                'amount' => 1000,
+                'validity' => 'Bill Payment',
+                'description' => 'Utility Bill Payment ₹1000',
+                'category' => 'Quick Amounts',
+            ],
+            [
+                'amount' => 2000,
+                'validity' => 'Bill Payment',
+                'description' => 'Utility Bill Payment ₹2000',
+                'category' => 'Quick Amounts',
+            ],
+            [
+                'amount' => 5000,
+                'validity' => 'Bill Payment',
+                'description' => 'Utility Bill Payment ₹5000',
+                'category' => 'Quick Amounts',
+            ],
+        ],
         'RC' => [ // Jio
             [
                 'amount' => 239,

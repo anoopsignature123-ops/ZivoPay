@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\P2pAdminController;
 use App\Http\Controllers\Admin\PackageAdminController;
+use App\Http\Controllers\Admin\PageAdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RechargeAdminController;
 use App\Http\Controllers\Admin\ReportController;
@@ -112,6 +113,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('support', [SupportAdminController::class, 'index'])->name('support.index');
         Route::get('support/{ticket}', [SupportAdminController::class, 'show'])->name('support.show');
         Route::post('support/{ticket}/reply', [SupportAdminController::class, 'reply'])->name('support.reply');
+
+        // Static Content Pages Admin Management
+        Route::get('pages', [PageAdminController::class, 'index'])->name('pages.index');
+        Route::get('pages/{page}/edit', [PageAdminController::class, 'edit'])->name('pages.edit');
+        Route::match(['put', 'post'], 'pages/{page}', [PageAdminController::class, 'update'])->name('pages.update');
 
         // Profile & Password Management
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');

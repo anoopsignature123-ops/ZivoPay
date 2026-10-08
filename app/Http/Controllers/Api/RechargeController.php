@@ -131,7 +131,32 @@ class RechargeController extends Controller
             $plans = $dbPlans->toArray();
         } else {
             $allPlans = config('a1topup.plans', []);
-            $plans = $allPlans[$operatorCode] ?? $allPlans['RC'] ?? [];
+
+            if (isset($allPlans[$operatorCode])) {
+                $plans = $allPlans[$operatorCode];
+            } else {
+                $operator = Operator::where('code', $operatorCode)->first();
+                $category = $operator ? strtolower((string) $operator->category) : null;
+
+                if (! $category) {
+                    $configOperators = config('a1topup.operators', []);
+                    foreach ($configOperators as $cat => $opList) {
+                        foreach ($opList as $op) {
+                            if (strtoupper((string) ($op['code'] ?? '')) === strtoupper($operatorCode)) {
+                                $category = strtolower((string) $cat);
+                                break 2;
+                            }
+                        }
+                    }
+                }
+
+                $plans = match ($category) {
+                    'fastag' => $allPlans['FASTAG_DEFAULT'] ?? [],
+                    'dth' => $allPlans['DTH_DEFAULT'] ?? [],
+                    'electricity', 'gas', 'postpaid', 'insurance' => $allPlans['BILL_DEFAULT'] ?? [],
+                    default => $allPlans['RC'] ?? [],
+                };
+            }
         }
 
         // Group plans by category for Google Pay / PhonePe style category tabs

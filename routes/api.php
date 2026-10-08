@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
+use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\SupportController;
@@ -28,6 +29,8 @@ Route::get('check-sponsor', [AuthController::class, 'checkSponsor']);
 Route::get('sponsor/{code?}', [AuthController::class, 'checkSponsor']);
 Route::get('support/contact', [SupportController::class, 'contact']);
 Route::get('support', [SupportController::class, 'contact']);
+Route::get('pages', [PageApiController::class, 'index']);
+Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
@@ -37,7 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Help & Support Endpoints
     Route::get('support/tickets', [SupportController::class, 'tickets']);
     Route::post('support/tickets', [SupportController::class, 'createTicket']);
-    Route::get('support/tickets-detail', [SupportController::class, 'showTicket']);
+    Route::get('support/tickets/{id}', [SupportController::class, 'showTicket']);
+    Route::get('support/tickets-detail/{id?}', [SupportController::class, 'showTicket']);
 
     // Dashboard, Home & Transaction Details API
     Route::get('dashboard', [DashboardController::class, 'index']);
@@ -67,14 +71,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('recharge/status/{orderId?}', [RechargeController::class, 'status']);
 
     // Dedicated Category Operator Listing GET Endpoints
-    Route::get('recharge/operators/mobile', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'mobile');
-    Route::get('recharge/operators/dth', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'dth');
-    Route::get('recharge/operators/postpaid', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'postpaid');
-    Route::get('recharge/operators/electricity', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'electricity');
-    Route::get('recharge/operators/gas', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'gas');
-    Route::get('recharge/operators/fastag', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'fastag');
-    Route::get('recharge/operators/insurance', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'insurance');
-    Route::get('recharge/operators/voucher', [RechargeController::class, 'operatorsByCategory'])->defaults('category', 'voucher');
+    Route::get('recharge/operators/mobile', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'mobile');
+    Route::get('recharge/operators/dth', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'dth');
+    Route::get('recharge/operators/postpaid', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'postpaid');
+    Route::get('recharge/operators/electricity', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'electricity');
+    Route::get('recharge/operators/gas', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'gas');
+    Route::get('recharge/operators/fastag', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'fastag');
+    Route::get('recharge/operators/insurance', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'insurance');
+    Route::get('recharge/operators/voucher', [RechargeController::class, 'operatorsByCategory'])
+        ->defaults('category', 'voucher');
     Route::get('recharge/operators/{category}', [RechargeController::class, 'operatorsByCategory']);
 
     // Dedicated Recharge POST Action Endpoints

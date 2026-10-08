@@ -199,13 +199,23 @@ class RechargeApiTest extends TestCase
         ]);
         Sanctum::actingAs($user);
 
-        // Test Recharge Plans API
+        // Test Recharge Plans API for Mobile
         $plansResponse = $this->getJson('/api/recharge/plans?operator_code=RC');
 
         $plansResponse->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.operator_code', 'RC')
             ->assertJsonStructure(['data' => ['recommended_plans', 'dth_quick_amounts']]);
+
+        // Test FASTag Plans API returns FASTag top-up amounts and NOT mobile plans
+        $fastagResponse = $this->getJson('/api/recharge/plans?operator_code=ICF');
+        $fastagResponse->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.operator_code', 'ICF');
+
+        $fastagPlans = $fastagResponse->json('data.all_plans');
+        $this->assertStringContainsString('FASTag Top-Up', $fastagPlans[0]['description']);
+        $this->assertStringNotContainsString('Unlimited Calls', $fastagPlans[0]['description']);
 
         // Test Home Dashboard API matching UI
         $dashResponse = $this->getJson('/api/dashboard');

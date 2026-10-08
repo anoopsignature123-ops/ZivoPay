@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('app_services', function (Blueprint $table) {
-            $table->id();
-            $table->string('category');
-            $table->string('title');
-            $table->string('key')->unique();
-            $table->string('icon')->nullable();
-            $table->string('status')->default('active');
-            $table->boolean('is_active')->default(true);
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('app_services')) {
+            Schema::create('app_services', function (Blueprint $table) {
+                $table->id();
+                $table->string('category');
+                $table->string('title');
+                $table->string('key')->unique();
+                $table->string('icon')->nullable();
+                $table->string('status')->default('active');
+                $table->boolean('is_active')->default(true);
+                $table->integer('sort_order')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

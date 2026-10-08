@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('support_tickets', function (Blueprint $table) {
-            $table->id();
-            $table->string('ticket_number')->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('category')->default('general'); // recharge, deposit, withdrawal, account, general
-            $table->string('subject');
-            $table->text('message');
-            $table->string('priority')->default('medium'); // low, medium, high
-            $table->string('status')->default('pending'); // pending, open, in_progress, resolved, closed
-            $table->text('admin_reply')->nullable();
-            $table->timestamp('replied_at')->nullable();
-            $table->string('attachment')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('support_tickets')) {
+            Schema::create('support_tickets', function (Blueprint $table) {
+                $table->id();
+                $table->string('ticket_number')->unique();
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->string('category')->nullable()->default('general');
+                $table->string('subject')->nullable();
+                $table->text('message')->nullable();
+                $table->string('priority')->nullable()->default('medium');
+                $table->string('status')->nullable()->default('pending');
+                $table->text('admin_reply')->nullable();
+                $table->timestamp('replied_at')->nullable();
+                $table->string('attachment')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -272,6 +272,15 @@
             <span class="nav-text">Support Tickets Desk</span>
         </a>
 
+        <a class='nav-item {{ request()->routeIs("admin.pages*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.pages.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Static Pages & WebViews</span>
+        </a>
+
         <!-- ACCOUNT SETTINGS -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             ACCOUNT SETTINGS
