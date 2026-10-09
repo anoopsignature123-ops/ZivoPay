@@ -10,6 +10,7 @@ return [
     'username' => env('A1TOPUP_USERNAME', '500011'),
     'password' => env('A1TOPUP_PASSWORD', '123'),
     'base_url' => env('A1TOPUP_BASE_URL', 'https://business.a1topup.com'),
+    'verify_ssl' => env('A1TOPUP_VERIFY_SSL', false),
 
     /*
     |--------------------------------------------------------------------------

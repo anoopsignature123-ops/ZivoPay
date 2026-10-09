@@ -42,7 +42,11 @@ class A1TopupService
         ], fn ($val) => $val !== null && $val !== '');
 
         try {
-            $response = Http::timeout(30)->get($url, $queryParams);
+            $client = Http::timeout(30);
+            if (! config('a1topup.verify_ssl', false)) {
+                $client->withoutVerifying();
+            }
+            $response = $client->get($url, $queryParams);
 
             if (! $response->successful()) {
                 Log::error('A1Topup Recharge API HTTP Error', [
@@ -100,7 +104,11 @@ class A1TopupService
         ];
 
         try {
-            $response = Http::timeout(15)->get($url, $queryParams);
+            $client = Http::timeout(15);
+            if (! config('a1topup.verify_ssl', false)) {
+                $client->withoutVerifying();
+            }
+            $response = $client->get($url, $queryParams);
 
             if ($response->successful() && is_array($response->json())) {
                 return $response->json();
@@ -136,7 +144,11 @@ class A1TopupService
         ];
 
         try {
-            $response = Http::timeout(20)->get($url, $queryParams);
+            $client = Http::timeout(20);
+            if (! config('a1topup.verify_ssl', false)) {
+                $client->withoutVerifying();
+            }
+            $response = $client->get($url, $queryParams);
 
             if ($response->successful() && is_array($response->json())) {
                 return $response->json();
