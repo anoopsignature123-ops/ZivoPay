@@ -36,53 +36,78 @@
 
     <!-- Services Table -->
     <div class="bg-[#042718] border border-emerald-500/40 rounded-3xl overflow-hidden shadow-2xl p-6">
-        <h2 class="text-lg font-black text-white uppercase tracking-wider mb-4">All Mobile App Services</h2>
+        <div class="flex items-center justify-between mb-5 border-b border-emerald-500/20 pb-4">
+            <div>
+                <h2 class="text-lg font-black text-white uppercase tracking-wider">ALL MOBILE APP SERVICES</h2>
+                <p class="text-xs text-neutral-400 mt-0.5">Toggle services to dynamically reflect on Mobile App Dashboard & REST API feed.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs border border-emerald-500/40">
+                Total Services: {{ $services->count() }}
+            </span>
+        </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-neutral-200">
-                <thead class="bg-[#02180f] text-xs uppercase font-extrabold text-emerald-400 border-b border-emerald-500/40">
+                <thead class="bg-[#02180f] text-xs uppercase font-black tracking-wider text-emerald-400 border-b border-emerald-500/40">
                     <tr>
                         <th class="py-4 px-4">#</th>
                         <th class="py-4 px-4">Service Title</th>
                         <th class="py-4 px-4">Category</th>
-                        <th class="py-4 px-4">Key</th>
-                        <th class="py-4 px-4">Current Status</th>
+                        <th class="py-4 px-4">System Key</th>
+                        <th class="py-4 px-4 text-center">Current Status</th>
                         <th class="py-4 px-4 text-right">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-emerald-500/20">
+                <tbody class="divide-y divide-emerald-500/15 font-semibold">
                     @foreach($services as $index => $service)
-                        <tr class="hover:bg-emerald-500/5 transition">
-                            <td class="py-4 px-4 font-mono font-bold text-neutral-400">{{ $index + 1 }}</td>
-                            <td class="py-4 px-4 font-bold text-white flex items-center gap-3">
-                                <span class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-mono text-xs">
-                                    {{ strtoupper(substr($service->key, 0, 2)) }}
-                                </span>
-                                {{ $service->title }}
+                        <tr class="hover:bg-emerald-500/10 transition border-b border-emerald-500/15">
+                            <td class="py-4 px-4 font-mono font-black text-neutral-400 text-xs">{{ $index + 1 }}</td>
+                            <td class="py-4 px-4 font-black text-white">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 shrink-0 shadow-inner">
+                                        <i data-lucide="{{ $service->icon ?? 'app-window' }}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm font-black text-white block tracking-tight">{{ $service->title }}</span>
+                                        <span class="text-[11px] text-neutral-400 font-mono font-normal">ID: #{{ $service->id }}</span>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="py-4 px-4 font-mono text-xs text-neutral-300">
-                                <span class="px-2.5 py-1 rounded-lg bg-neutral-800 border border-neutral-700 font-bold text-neutral-300">
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 font-bold text-xs text-emerald-300 inline-block uppercase tracking-wider shadow-sm">
                                     {{ ucfirst(str_replace('_', ' ', $service->category)) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-4 font-mono text-xs text-emerald-400 font-bold">{{ $service->key }}</td>
                             <td class="py-4 px-4">
+                                <span class="px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/40 font-mono text-xs text-cyan-300 font-black inline-block">
+                                    {{ $service->key }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
                                 @if($service->status === 'active' && $service->is_active)
-                                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                                        ● ACTIVE
+                                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm shadow-emerald-500/20">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        ACTIVE
                                     </span>
                                 @else
-                                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase bg-amber-500/20 text-amber-400 border border-amber-500/40">
-                                        ⏱ COMING SOON
+                                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-500/20">
+                                        <i data-lucide="hourglass" class="w-3.5 h-3.5 text-amber-300"></i>
+                                        COMING SOON
                                     </span>
                                 @endif
                             </td>
                             <td class="py-4 px-4 text-right">
                                 <form action="{{ route('admin.services.toggle-status', $service) }}" method="POST" class="inline-block">
                                     @csrf
-                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase transition border shadow-md {{ $service->status === 'active' ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/40' : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border-emerald-500/40' }}">
-                                        {{ $service->status === 'active' ? 'Set Coming Soon' : 'Set Active' }}
-                                    </button>
+                                    @if($service->status === 'active')
+                                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-black uppercase transition border shadow-md bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border-amber-500/50 flex items-center gap-1.5 ml-auto">
+                                            <i data-lucide="pause-circle" class="w-4 h-4"></i> Set Coming Soon
+                                        </button>
+                                    @else
+                                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-black uppercase transition border shadow-md bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border-emerald-500/50 flex items-center gap-1.5 ml-auto">
+                                            <i data-lucide="play-circle" class="w-4 h-4"></i> Set Active
+                                        </button>
+                                    @endif
                                 </form>
                             </td>
                         </tr>

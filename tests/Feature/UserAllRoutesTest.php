@@ -66,6 +66,8 @@ class UserAllRoutesTest extends TestCase
 
     public function test_user_can_submit_add_fund_request_with_validation(): void
     {
+        config(['app.add_fund_enabled' => true]);
+
         $user = User::create([
             'role_id' => 2,
             'name' => 'Fund User',

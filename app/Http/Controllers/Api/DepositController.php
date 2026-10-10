@@ -52,6 +52,13 @@ class DepositController extends Controller
     public function store(DepositRequest $request, DepositApiService $depositApiService): JsonResponse
     {
         try {
+            if (! config('app.add_fund_enabled', false)) {
+                return $this->errorResponse(
+                    'Online Add Fund Payment Gateway is currently under maintenance / coming soon. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.',
+                    400
+                );
+            }
+
             $user = $request->user();
             $proofFile = $request->file('proof_file');
 

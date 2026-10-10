@@ -59,6 +59,13 @@ class DepositController extends Controller
      */
     public function store(Request $request, DepositService $depositService): RedirectResponse
     {
+        if (! config('app.add_fund_enabled', false)) {
+            return redirect()->route('user.deposit.index')->with(
+                'error',
+                'Online Add Fund Payment Gateway is currently under maintenance / coming soon. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.'
+            );
+        }
+
         $minDeposit = config('gateway.min_deposit', 100.00);
         $maxDeposit = config('gateway.max_deposit', 500000.00);
 

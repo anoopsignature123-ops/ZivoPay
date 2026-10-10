@@ -251,7 +251,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="sliders" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Services Status Control</span>
+            <span class="nav-text">Service Management</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs("admin.recharges*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -260,7 +260,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Recharge & Utility Ledger</span>
+            <span class="nav-text">Recharge History</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs("admin.support*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'

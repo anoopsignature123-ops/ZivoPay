@@ -22,6 +22,16 @@
         </div>
     </div>
 
+    @if(!config('app.add_fund_enabled', false))
+        <div class="p-4 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-bold flex items-center gap-2.5 shadow-lg shadow-amber-500/10">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 shrink-0"></i>
+            <div>
+                <span class="block font-black uppercase text-amber-400 tracking-wider">NOTICE: ONLINE PAYMENT GATEWAY DISABLED</span>
+                <span class="text-neutral-200 font-medium leading-relaxed">Online Add Fund Payment Gateway is currently under maintenance / coming soon. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.</span>
+            </div>
+        </div>
+    @endif
+
     <!-- Alert Messages -->
     @if(session('success'))
         <div class="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold flex items-center gap-2">

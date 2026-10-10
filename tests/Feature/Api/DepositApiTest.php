@@ -4,7 +4,6 @@ namespace Tests\Feature\Api;
 
 use App\Models\Deposit;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -12,7 +11,32 @@ use Tests\TestCase;
 
 class DepositApiTest extends TestCase
 {
-    use RefreshDatabase;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['app.add_fund_enabled' => true]);
+    }
+
+    public function test_add_fund_returns_maintenance_message_when_disabled(): void
+    {
+        config(['app.add_fund_enabled' => false]);
+
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/add-fund', [
+            'amount' => 500.00,
+            'payment_method' => 'UPI',
+            'trx_hash' => 'UTR123456789',
+        ]);
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Online Add Fund Payment Gateway is currently under maintenance / coming soon. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.',
+            ]);
+    }
 
     public function test_user_can_submit_add_fund_request_successfully(): void
     {
