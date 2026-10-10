@@ -45,10 +45,7 @@ class DashboardController extends Controller
         $recentUsers = User::where('role_id', '!=', 1)->latest()->take(6)->get();
         $recentTransactions = Transaction::with('user')->latest()->take(6)->get();
         $recentSubscriptions = User::where('role_id', '!=', 1)
-            ->where('is_subscription_active', 1)
-            ->latest('activated_at')
-            ->take(5)
-            ->get();
+            ->where('is_subscription_active', 1)->latest('activated_at')->take(5)->get();
 
         return view('admin.dashboard', compact(
             'totalMembers',

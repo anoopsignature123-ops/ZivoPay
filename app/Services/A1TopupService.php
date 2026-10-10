@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -16,8 +17,8 @@ class A1TopupService
     public function __construct()
     {
         $this->baseUrl = rtrim((string) config('a1topup.base_url', 'https://business.a1topup.com'), '/');
-        $this->username = (string) config('a1topup.username', '500011');
-        $this->password = (string) config('a1topup.password', '123');
+        $this->username = (string) config('a1topup.username', '');
+        $this->password = (string) config('a1topup.password', '');
     }
 
     /**
@@ -26,6 +27,13 @@ class A1TopupService
      */
     public function doRecharge(string $orderId, string $operatorCode, string $number, float $amount, ?string $circleCode = null, ?string $value1 = null, ?string $value2 = null): array
     {
+        if (! $this->hasCredentials()) {
+            return [
+                'status' => 'Unknown',
+                'message' => 'A1Topup API credentials are not configured on this server.',
+            ];
+        }
+
         $url = "{$this->baseUrl}/recharge/api";
 
         $queryParams = array_filter([
@@ -42,10 +50,7 @@ class A1TopupService
         ], fn ($val) => $val !== null && $val !== '');
 
         try {
-            $client = Http::timeout(30);
-            if (! config('a1topup.verify_ssl', false)) {
-                $client->withoutVerifying();
-            }
+            $client = $this->httpClient(30);
             $response = $client->get($url, $queryParams);
 
             if (! $response->successful()) {
@@ -56,35 +61,23 @@ class A1TopupService
                 ]);
 
                 return [
-                    'status' => 'Failure',
-                    'message' => 'Gateway HTTP connection error.',
+                    'status' => 'Unknown',
+                    'message' => $this->safeResponseMessage($response->body(), $response->header('Content-Type')),
+                    'http_status' => $response->status(),
                     'raw' => $response->body(),
                 ];
             }
 
-            $data = $response->json();
-
-            if (! is_array($data)) {
-                // If CSV or fallback returned
-                $body = trim($response->body());
-                Log::warning('A1Topup non-JSON response', ['body' => $body]);
-
-                return [
-                    'status' => str_contains($body, 'Success') ? 'Success' : 'Failure',
-                    'raw' => $body,
-                ];
-            }
-
-            return $data;
-        } catch (\Exception $e) {
+            return $this->parseResponse($response->body(), $response->header('Content-Type'));
+        } catch (\Throwable $e) {
             Log::error('A1Topup Recharge API Exception', [
                 'orderid' => $orderId,
-                'error' => $e->getMessage(),
+                'error' => $this->sanitizeDiagnostic($e->getMessage()),
             ]);
 
             return [
-                'status' => 'Failure',
-                'message' => $e->getMessage(),
+                'status' => 'Unknown',
+                'message' => $this->sanitizeDiagnostic($e->getMessage()),
             ];
         }
     }
@@ -95,6 +88,14 @@ class A1TopupService
      */
     public function checkBalance(): array
     {
+        if (! $this->hasCredentials()) {
+            return [
+                'status' => 'error',
+                'balance' => '0.00',
+                'message' => 'A1Topup API credentials are not configured on this server.',
+            ];
+        }
+
         $url = "{$this->baseUrl}/recharge/balance";
 
         $queryParams = [
@@ -104,14 +105,17 @@ class A1TopupService
         ];
 
         try {
-            $client = Http::timeout(15);
-            if (! config('a1topup.verify_ssl', false)) {
-                $client->withoutVerifying();
-            }
+            $client = $this->httpClient(15);
             $response = $client->get($url, $queryParams);
 
-            if ($response->successful() && is_array($response->json())) {
-                return $response->json();
+            if ($response->successful()) {
+                return array_merge(
+                    $this->parseResponse($response->body(), $response->header('Content-Type')),
+                    [
+                        'http_status' => $response->status(),
+                        'content_type' => $response->header('Content-Type'),
+                    ]
+                );
             }
 
             return [
@@ -119,7 +123,7 @@ class A1TopupService
                 'balance' => '0.00',
                 'message' => 'Failed to fetch provider balance.',
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return [
                 'status' => 'error',
                 'balance' => '0.00',
@@ -134,6 +138,13 @@ class A1TopupService
      */
     public function checkStatus(string $orderId): array
     {
+        if (! $this->hasCredentials()) {
+            return [
+                'status' => 'Unknown',
+                'message' => 'A1Topup API credentials are not configured on this server.',
+            ];
+        }
+
         $url = "{$this->baseUrl}/recharge/status";
 
         $queryParams = [
@@ -144,25 +155,165 @@ class A1TopupService
         ];
 
         try {
-            $client = Http::timeout(20);
-            if (! config('a1topup.verify_ssl', false)) {
-                $client->withoutVerifying();
-            }
+            $client = $this->httpClient(20);
             $response = $client->get($url, $queryParams);
 
-            if ($response->successful() && is_array($response->json())) {
-                return $response->json();
+            if ($response->successful()) {
+                return array_merge(
+                    $this->parseResponse($response->body(), $response->header('Content-Type')),
+                    [
+                        'http_status' => $response->status(),
+                        'content_type' => $response->header('Content-Type'),
+                    ]
+                );
             }
 
             return [
                 'status' => 'Unknown',
-                'message' => 'Failed to retrieve transaction status from gateway.',
+                'message' => $this->safeResponseMessage($response->body(), $response->header('Content-Type')),
+                'http_status' => $response->status(),
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return [
                 'status' => 'Error',
-                'message' => $e->getMessage(),
+                'message' => $this->sanitizeDiagnostic($e->getMessage()),
             ];
         }
+    }
+
+    /**
+     * Parse A1Topup's documented JSON, CSV, and XML response formats.
+     *
+     * @return array<string, mixed>
+     */
+    protected function parseResponse(string $body, ?string $contentType = null): array
+    {
+        $trimmedBody = trim($body);
+        $json = json_decode($trimmedBody, true);
+
+        if (is_array($json)) {
+            if (! isset($json['status']) && isset($json['Status'])) {
+                $json['status'] = $json['Status'];
+            }
+
+            if (! isset($json['message'])) {
+                foreach (['msg', 'error', 'remarks', 'description'] as $messageKey) {
+                    if (isset($json[$messageKey]) && is_scalar($json[$messageKey])) {
+                        $json['message'] = $this->safeResponseMessage((string) $json[$messageKey]);
+                        break;
+                    }
+                }
+            } elseif (is_scalar($json['message'])) {
+                $json['message'] = $this->safeResponseMessage((string) $json['message']);
+            }
+
+            return $json;
+        }
+
+        if (preg_match('/^(success|approved|failure|failed|pending|processing|unknown|error)$/i', $trimmedBody)) {
+            return [
+                'status' => ucfirst(strtolower($trimmedBody)),
+                'raw' => $trimmedBody,
+            ];
+        }
+
+        if (preg_match('/authentication\s+fail(?:ed)?/i', $trimmedBody)) {
+            return [
+                'status' => 'Authentication Failed',
+                'message' => 'A1Topup rejected the API credentials or API access for this account. Confirm the issued API username/password with A1Topup.',
+                'raw' => $trimmedBody,
+            ];
+        }
+
+        if (str_contains(strtolower((string) $contentType), 'xml') || str_starts_with($trimmedBody, '<')) {
+            if (preg_match_all('/<([a-zA-Z0-9_]+)>(.*?)<\/\\1>/s', $trimmedBody, $xmlFields, PREG_SET_ORDER)) {
+                $parsedXml = [];
+                foreach ($xmlFields as $field) {
+                    $parsedXml[$field[1]] = html_entity_decode(strip_tags($field[2]), ENT_QUOTES | ENT_XML1, 'UTF-8');
+                }
+
+                if ($parsedXml !== []) {
+                    return $parsedXml;
+                }
+            }
+        }
+
+        $fields = str_getcsv($trimmedBody);
+
+        if (count($fields) >= 6) {
+            return [
+                'txid' => trim((string) $fields[0]),
+                'status' => trim((string) $fields[1]),
+                'opid' => trim((string) $fields[2]),
+                'number' => trim((string) $fields[3]),
+                'amount' => trim((string) $fields[4]),
+                'orderid' => trim((string) $fields[5]),
+                'raw' => $trimmedBody,
+            ];
+        }
+
+        Log::warning('A1Topup response could not be parsed', [
+            'content_type' => $contentType,
+            'body' => $trimmedBody,
+        ]);
+
+        return [
+            'status' => 'Unknown',
+            'message' => $this->safeResponseMessage($trimmedBody, $contentType),
+            'raw' => $trimmedBody,
+        ];
+    }
+
+    protected function httpClient(int $timeout): PendingRequest
+    {
+        $caBundle = config('a1topup.ca_bundle');
+        $verify = $caBundle ?: (bool) config('a1topup.verify_ssl', true);
+
+        return Http::connectTimeout(5)
+            ->timeout($timeout)
+            ->withOptions(['verify' => $verify]);
+    }
+
+    protected function sanitizeDiagnostic(string $message): string
+    {
+        return preg_replace('/(username|pwd|password)=([^&\s]+)/i', '$1=[redacted]', $message) ?? $message;
+    }
+
+    protected function hasCredentials(): bool
+    {
+        return $this->username !== '' && $this->password !== '';
+    }
+
+    protected function safeResponseMessage(string $body, ?string $contentType = null): string
+    {
+        $trimmedBody = trim($body);
+
+        if ($trimmedBody === '') {
+            return 'A1Topup returned an empty response.';
+        }
+
+        if (str_contains(strtolower((string) $contentType), 'html') || preg_match('/^<!doctype html|^<html\b/i', $trimmedBody)) {
+            $pageText = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', ' ', $trimmedBody) ?? $trimmedBody;
+            $pageText = html_entity_decode(strip_tags($pageText), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $pageText = preg_replace('/\s+/', ' ', $pageText) ?? $pageText;
+            $pageText = $this->sanitizeDiagnostic($pageText);
+            $pageText = preg_replace('/\b\d{10,}\b/', '[redacted number]', $pageText) ?? $pageText;
+
+            if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $trimmedBody, $titleMatch)) {
+                $title = $this->sanitizeDiagnostic(strip_tags($titleMatch[1]));
+                $title = mb_substr(trim($title), 0, 100);
+
+                return 'A1Topup returned an HTML page instead of an API response. Page title: '.$title.'. Page text: '.mb_substr($pageText, 0, 180);
+            }
+
+            return 'A1Topup returned an HTML page instead of an API response. Page text: '.mb_substr($pageText, 0, 180);
+        }
+
+        $message = html_entity_decode(strip_tags($trimmedBody), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $message = preg_replace('/\s+/', ' ', $message) ?? $message;
+        $message = $this->sanitizeDiagnostic($message);
+        $message = preg_replace('/\b\d{10,}\b/', '[redacted number]', $message) ?? $message;
+
+        return mb_substr($message, 0, 300);
     }
 }

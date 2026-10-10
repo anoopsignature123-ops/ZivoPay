@@ -6,6 +6,7 @@ use App\Models\AppService;
 use App\Models\Operator;
 use App\Models\RechargePlan;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RechargeMasterSeeder extends Seeder
 {
@@ -31,22 +32,29 @@ class RechargeMasterSeeder extends Seeder
             }
         }
 
-        foreach ($plans as $opCode => $planList) {
-            foreach ($planList as $plan) {
-                RechargePlan::updateOrCreate(
-                    [
-                        'operator_code' => $opCode,
-                        'amount' => $plan['amount'],
-                    ],
-                    [
-                        'validity' => $plan['validity'] ?? '28 Days',
-                        'description' => $plan['description'] ?? '',
-                        'category' => $plan['category'] ?? 'Recommended Plans',
-                        'is_active' => true,
-                    ]
-                );
+        DB::transaction(function () use ($plans): void {
+            $mobileOperatorCodes = ['RC', 'A', 'V', 'BT', 'BR'];
+
+            RechargePlan::whereIn('operator_code', $mobileOperatorCodes)
+                ->update(['is_active' => false]);
+
+            foreach ($plans as $opCode => $planList) {
+                foreach ($planList as $plan) {
+                    RechargePlan::updateOrCreate(
+                        [
+                            'operator_code' => $opCode,
+                            'amount' => $plan['amount'],
+                        ],
+                        [
+                            'validity' => $plan['validity'] ?? '28 Days',
+                            'description' => $plan['description'] ?? '',
+                            'category' => $plan['category'] ?? 'Recommended Plans',
+                            'is_active' => true,
+                        ]
+                    );
+                }
             }
-        }
+        });
 
         $defaultServices = [
             'recharge_and_topup' => [

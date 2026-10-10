@@ -40,8 +40,8 @@ class DashboardController extends Controller
                         'subtitle' => $t->description ?? ($t->created_at->format('d M Y, h:i A')),
                         'amount' => $amountPrefix.number_format((float) $t->amount, 2),
                         'is_credit' => $isCredit,
-                        'status' => 'Success',
-                        'status_color' => $isCredit ? 'green' : 'black',
+                        'status' => ($transactionStatus = $this->transactionStatus($t)),
+                        'status_color' => $this->transactionStatusColor($transactionStatus, $isCredit),
                         'created_at' => $t->created_at->toIso8601String(),
                         'date_formatted' => $t->created_at->format('d M Y, h:i A'),
                     ];
@@ -175,6 +175,27 @@ class DashboardController extends Controller
         };
     }
 
+    protected function transactionStatus(Transaction $transaction): string
+    {
+        if (strtolower($transaction->type) === 'recharge') {
+            return ucfirst((string) Recharge::where('user_id', $transaction->user_id)
+                ->where('order_id', $transaction->trx_id)
+                ->value('status')) ?: 'Pending';
+        }
+
+        return 'Success';
+    }
+
+    protected function transactionStatusColor(string $status, bool $isCredit): string
+    {
+        return match (strtolower($status)) {
+            'success' => 'green',
+            'pending' => 'orange',
+            'failed', 'failure', 'refunded' => 'red',
+            default => $isCredit ? 'green' : 'black',
+        };
+    }
+
     /**
      * Get Transaction Details API for Recent Transactions Click View.
      */
@@ -193,7 +214,7 @@ class DashboardController extends Controller
                 })
                 ->first();
 
-            if (!$t) {
+            if (! $t) {
                 return $this->errorResponse('Transaction record not found.', 404);
             }
 
@@ -226,22 +247,29 @@ class DashboardController extends Controller
                 }
             }
 
+            $transactionStatus = $rechargeDetails['status'] ?? 'Success';
+
             $formattedData = [
                 'id' => $t->id,
-                'trx_id' => $t->trx_id ?? 'TXN' . $t->id,
+                'trx_id' => $t->trx_id ?? 'TXN'.$t->id,
                 'type' => $t->type,
                 'type_formatted' => ucfirst(str_replace('_', ' ', $t->type)),
                 'title' => $rechargeDetails['operator_name'] ?? $this->formatTransactionTitle($t),
                 'subtitle' => $t->description ?? $t->created_at->format('d M Y, h:i A'),
                 'amount' => (float) $t->amount,
-                'amount_formatted' => $amountPrefix . number_format((float) $t->amount, 2),
+                'amount_formatted' => $amountPrefix.number_format((float) $t->amount, 2),
                 'is_credit' => $isCredit,
                 'wallet_type' => $t->wallet_type ?? 'deposit_wallet',
                 'wallet_type_formatted' => ($t->wallet_type === 'earning_wallet') ? 'Earning Wallet' : 'Fund Wallet',
                 'post_balance' => (float) $t->post_balance,
-                'post_balance_formatted' => '₹' . number_format((float) $t->post_balance, 2),
-                'status' => 'Success',
-                'status_color' => $isCredit ? 'green' : 'black',
+                'post_balance_formatted' => '₹'.number_format((float) $t->post_balance, 2),
+                'status' => $transactionStatus,
+                'status_color' => match (strtolower($transactionStatus)) {
+                    'success' => 'green',
+                    'pending' => 'orange',
+                    'failed', 'failure', 'refunded' => 'red',
+                    default => $isCredit ? 'green' : 'black',
+                },
                 'created_at' => $t->created_at->toIso8601String(),
                 'date_formatted' => $t->created_at->format('d M Y, h:i A'),
                 'description' => $t->description,
@@ -250,7 +278,7 @@ class DashboardController extends Controller
 
             return $this->successResponse($formattedData, 'Transaction details retrieved successfully.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch transaction details: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Failed to fetch transaction details: '.$e->getMessage(), 500);
         }
     }
 }

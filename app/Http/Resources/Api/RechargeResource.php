@@ -29,6 +29,10 @@ class RechargeResource extends JsonResource
             'txid' => $this->txid,
             'opid' => $this->opid,
             'admin_remark' => $this->admin_remark,
+            'provider_status' => data_get($this->api_response, 'status'),
+            'provider_message' => data_get($this->api_response, 'message'),
+            'provider_http_status' => data_get($this->api_response, 'http_status'),
+            'provider_content_type' => data_get($this->api_response, 'content_type'),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toIso8601String() : null,
         ];

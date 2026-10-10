@@ -84,7 +84,7 @@ class RechargeService
             value2: $value2
         );
 
-        $gatewayStatus = strtolower((string) ($response['status'] ?? 'failure'));
+        $gatewayStatus = strtolower(trim((string) ($response['status'] ?? 'unknown')));
 
         // 4. Handle Gateway Response & Auto-Refund if Failed
         if (in_array($gatewayStatus, ['success', 'approved'], true)) {
@@ -94,7 +94,7 @@ class RechargeService
                 'opid' => $response['opid'] ?? null,
                 'api_response' => $response,
             ]);
-        } elseif (in_array($gatewayStatus, ['failure', 'failed', 'error'], true)) {
+        } elseif (in_array($gatewayStatus, ['failure', 'failed'], true)) {
             // Perform Instant Auto-Refund
             $this->refundRecharge($recharge, 'Gateway execution failed: '.($response['message'] ?? 'Rejected by operator'), $response);
         } else {
@@ -114,11 +114,17 @@ class RechargeService
      */
     public function refundRecharge(Recharge $recharge, string $reason = 'Recharge failed - Fund refunded', ?array $apiResponse = null): bool
     {
-        if (in_array($recharge->status, ['refunded'], true)) {
+        if (in_array($recharge->status, ['refunded', 'success'], true)) {
             return false;
         }
 
         return DB::transaction(function () use ($recharge, $reason, $apiResponse) {
+            $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
+
+            if (in_array($lockedRecharge->status, ['refunded', 'success'], true)) {
+                return false;
+            }
+
             $user = $recharge->user;
             $amount = (float) $recharge->amount;
 
@@ -136,7 +142,7 @@ class RechargeService
             ]);
 
             // Update Recharge status
-            $recharge->update([
+            $lockedRecharge->update([
                 'status' => 'refunded',
                 'admin_remark' => $reason,
                 'api_response' => $apiResponse ?? $recharge->api_response,
@@ -151,7 +157,7 @@ class RechargeService
      */
     public function handleCallback(array $params): bool
     {
-        $orderId = trim((string) ($params['orderid'] ?? $params['txid'] ?? $params['order_id'] ?? ''));
+        $orderId = trim((string) ($params['txid'] ?? $params['orderid'] ?? $params['order_id'] ?? ''));
 
         if (empty($orderId)) {
             return false;
@@ -166,6 +172,10 @@ class RechargeService
         $status = strtolower(trim((string) ($params['status'] ?? '')));
 
         if (in_array($status, ['success', 'approved'], true)) {
+            if ($recharge->status === 'refunded') {
+                return false;
+            }
+
             $recharge->update([
                 'status' => 'success',
                 'opid' => $params['opid'] ?? $recharge->opid,
@@ -175,8 +185,8 @@ class RechargeService
             return true;
         }
 
-        if (in_array($status, ['failure', 'failed', 'error'], true)) {
-            return $this->refundRecharge($recharge, 'Callback received: Failure from operator', $params);
+        if (in_array($status, ['failure', 'failed', 'reversed'], true)) {
+            return $this->refundRecharge($recharge, 'Callback received: '.ucfirst($status).' from operator', $params);
         }
 
         // If status parameter is missing or unknown, sync live status from gateway
@@ -194,6 +204,10 @@ class RechargeService
         $status = strtolower((string) ($response['status'] ?? ''));
 
         if (in_array($status, ['success'], true)) {
+            if ($recharge->status === 'refunded') {
+                return $recharge->fresh();
+            }
+
             $recharge->update([
                 'status' => 'success',
                 'txid' => $response['txid'] ?? $recharge->txid,
@@ -202,6 +216,12 @@ class RechargeService
             ]);
         } elseif (in_array($status, ['failure', 'failed'], true)) {
             $this->refundRecharge($recharge, 'Live status check: Failed', $response);
+        } else {
+            $recharge->update([
+                'txid' => $response['txid'] ?? $recharge->txid,
+                'opid' => $response['opid'] ?? $recharge->opid,
+                'api_response' => $response,
+            ]);
         }
 
         return $recharge->fresh();
@@ -276,6 +296,17 @@ class RechargeService
 
         if (in_array($operatorCode, $electricityCodes, true)) {
             return 'electricity';
+        }
+
+        foreach (config('a1topup.operators', []) as $category => $operators) {
+            foreach ($operators as $operator) {
+                if (strtoupper((string) ($operator['code'] ?? '')) === strtoupper($operatorCode)) {
+                    return match ($category) {
+                        'mobile', 'dth', 'postpaid', 'electricity', 'gas', 'fastag', 'insurance' => $category,
+                        default => 'mobile',
+                    };
+                }
+            }
         }
 
         return 'mobile';
