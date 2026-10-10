@@ -217,45 +217,47 @@
                 </thead>
                 <tbody class="divide-y divide-emerald-500/10 font-semibold">
                     @forelse($recharges as $recharge)
-                        <tr class="hover:bg-emerald-500/5 transition">
-                            <td class="py-3.5 px-4">
-                                <span class="font-mono font-bold text-white block">{{ $recharge->order_id }}</span>
-                                <span class="text-[10px] text-neutral-400 block mt-0.5">{{ $recharge->created_at->format('M d, Y H:i A') }}</span>
+                        <tr class="hover:bg-emerald-500/10 transition border-b border-emerald-500/20">
+                            <td class="py-4 px-4">
+                                <span class="font-mono font-black text-white text-xs block tracking-wide">{{ $recharge->order_id }}</span>
+                                <span class="text-xs text-neutral-300 font-medium block mt-1"><i data-lucide="clock" class="w-3 h-3 inline text-emerald-400 mr-0.5"></i>{{ $recharge->created_at->format('M d, Y • h:i A') }}</span>
                             </td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-bold text-white">{{ $recharge->user->name ?? 'N/A' }}</div>
-                                <span class="text-[10px] font-mono text-emerald-400">{{ $recharge->user->referral_code ?? '' }}</span>
+                            <td class="py-4 px-4">
+                                <div class="font-black text-white text-sm tracking-tight">{{ $recharge->user->name ?? 'N/A' }}</div>
+                                <div class="mt-0.5">
+                                    <span class="px-2 py-0.5 rounded-md bg-emerald-950 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold inline-block">{{ $recharge->user->referral_code ?? '' }}</span>
+                                </div>
                             </td>
-                            <td class="py-3.5 px-4">
-                                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-black inline-block mb-1 border border-emerald-500/20">{{ strtoupper($recharge->service_type) }}</span>
-                                <div class="text-white text-xs font-bold">{{ $recharge->operator_name ?? $recharge->operator_code }}</div>
+                            <td class="py-4 px-4">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] uppercase font-black inline-block mb-1 border border-emerald-500/40 tracking-wider">{{ strtoupper($recharge->service_type) }}</span>
+                                <div class="text-white text-xs font-black uppercase">{{ $recharge->operator_name ?? $recharge->operator_code }}</div>
                             </td>
-                            <td class="py-3.5 px-4 font-mono font-bold text-emerald-300">
-                                {{ $recharge->number }}
+                            <td class="py-4 px-4 font-mono">
+                                <span class="text-white text-sm font-black block tracking-wide">{{ $recharge->number }}</span>
                                 @if($recharge->circle_code)
-                                    <span class="text-[10px] text-neutral-400 block font-sans">Circle: {{ $recharge->circle_code }}</span>
+                                    <span class="text-xs font-bold text-emerald-400 block font-sans mt-0.5">Circle: {{ $recharge->circle_code }}</span>
                                 @endif
                             </td>
-                            <td class="py-3.5 px-4 text-right font-mono font-black text-white text-sm">
+                            <td class="py-4 px-4 text-right font-mono font-black text-emerald-300 text-base">
                                 ₹{{ number_format((float)$recharge->amount, 2) }}
                             </td>
-                            <td class="py-3.5 px-4 text-center">
+                            <td class="py-4 px-4 text-center">
                                 @if(strtolower($recharge->status) === 'success')
-                                    <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase">Success</span>
+                                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 text-xs font-black uppercase tracking-wider shadow-sm shadow-emerald-500/20">Success</span>
                                 @elseif(strtolower($recharge->status) === 'pending')
-                                    <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-black uppercase">Pending</span>
+                                    <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-black uppercase tracking-wider shadow-sm shadow-amber-500/20">Pending</span>
                                 @elseif(strtolower($recharge->status) === 'refunded')
-                                    <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 text-[10px] font-black uppercase">Refunded</span>
+                                    <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 text-xs font-black uppercase tracking-wider shadow-sm shadow-cyan-500/20">Refunded</span>
                                 @else
-                                    <span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] font-black uppercase">Failed</span>
+                                    <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/50 text-xs font-black uppercase tracking-wider shadow-sm shadow-rose-500/20">Failed</span>
                                 @endif
                             </td>
-                            <td class="py-3.5 px-4 text-center font-mono text-[11px]">
+                            <td class="py-4 px-4 text-center font-mono text-xs">
                                 @if($recharge->txid || $recharge->opid)
-                                    <span class="text-emerald-300 block">TxID: {{ $recharge->txid ?? '-' }}</span>
-                                    <span class="text-neutral-400 block text-[10px]">OpID: {{ $recharge->opid ?? '-' }}</span>
+                                    <span class="text-emerald-300 font-bold block">TxID: {{ $recharge->txid ?? '-' }}</span>
+                                    <span class="text-neutral-300 font-semibold block text-xs mt-0.5">OpID: {{ $recharge->opid ?? '-' }}</span>
                                 @else
-                                    <span class="text-neutral-500">-</span>
+                                    <span class="text-neutral-400 font-bold">-</span>
                                 @endif
                             </td>
                             <td class="py-3.5 px-4 text-right">
