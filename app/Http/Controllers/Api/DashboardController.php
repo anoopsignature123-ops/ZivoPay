@@ -23,8 +23,23 @@ class DashboardController extends Controller
         try {
             $user = $request->user();
 
-            // Fetch Recent Transactions & Recharges merged and sorted by date
+            // Fetch Recent Transactions (only Recharge and Deposit types)
+            $allowedTypes = [
+                'deposit',
+                'recharge',
+                'recharge_refund',
+                'mobile',
+                'dth',
+                'fastag',
+                'postpaid',
+                'electricity',
+                'gas',
+                'insurance',
+                'voucher',
+            ];
+
             $transactions = Transaction::where('user_id', $user->id)
+                ->whereIn('type', $allowedTypes)
                 ->orderBy('id', 'desc')
                 ->take(8)
                 ->get()
