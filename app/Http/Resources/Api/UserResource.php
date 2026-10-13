@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'mobile' => $this->mobile,
             'referral_code' => $this->referral_code,
             'sponsor_code' => $this->sponsor_code,
+            'sponsor_id' => $this->sponsor_code,
             'wallet_address' => $this->wallet_address,
             'image' => $this->image,
             'image_url' => $this->image ? asset('storage/'.$this->image) : null,

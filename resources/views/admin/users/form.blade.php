@@ -32,9 +32,6 @@
             <div id="adminSponsorInfoBox" class="mt-2 hidden p-3 rounded-xl border text-xs font-medium transition-all"></div>
         </div>
     </div>
-
-
-
     <!-- Password & Password Confirmation -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div>

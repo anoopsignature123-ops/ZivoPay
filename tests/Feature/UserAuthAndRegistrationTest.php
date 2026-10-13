@@ -72,6 +72,33 @@ class UserAuthAndRegistrationTest extends TestCase
         ]);
     }
 
+    public function test_user_can_register_new_account_without_sponsor_id_defaults_to_root(): void
+    {
+        $rootUser = User::firstOrCreate(
+            ['referral_code' => 'ZIVO-0000001'],
+            [
+                'role_id' => 2,
+                'name' => 'Root System User',
+                'email' => 'root@zivopay.net',
+                'password' => bcrypt('password123'),
+            ]
+        );
+
+        $response = $this->post(route('user.register'), [
+            'name' => 'Web Member No Sponsor',
+            'email' => 'webnosponsor@example.com',
+            'mobile' => '+9876543210',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'email' => 'webnosponsor@example.com',
+            'sponsor_code' => 'ZIVO-0000001',
+        ]);
+    }
+
     public function test_authenticated_user_can_access_dashboard_network_and_profile(): void
     {
         $user = User::create([

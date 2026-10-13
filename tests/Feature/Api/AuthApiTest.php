@@ -55,6 +55,82 @@ class AuthApiTest extends TestCase
     }
 
     /**
+     * Test user can register via API without sponsor code and defaults to root sponsor.
+     */
+    public function test_user_can_register_via_api_without_sponsor_code_defaults_to_root(): void
+    {
+        $rootUser = User::factory()->create([
+            'email' => 'root@zivopay.net',
+            'referral_code' => 'ZIVO-0000001',
+            'sponsor_code' => null,
+            'role_id' => 2,
+        ]);
+
+        $response = $this->postJson('/api/register', [
+            'name' => 'No Sponsor User',
+            'email' => 'nosponsor@example.com',
+            'mobile' => '9111222333',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.sponsor_code', 'ZIVO-0000001');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'nosponsor@example.com',
+            'sponsor_code' => 'ZIVO-0000001',
+        ]);
+    }
+
+    /**
+     * Test user can register via API using sponsor_id parameter.
+     */
+    public function test_user_can_register_via_api_using_sponsor_id_param(): void
+    {
+        $sponsor = User::factory()->create([
+            'referral_code' => 'ZIVO-8888999',
+        ]);
+
+        $response = $this->postJson('/api/register', [
+            'name' => 'Sponsor Id User',
+            'email' => 'sponsorid@example.com',
+            'mobile' => '9222333444',
+            'sponsor_id' => $sponsor->referral_code,
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.sponsor_code', 'ZIVO-8888999');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'sponsorid@example.com',
+            'sponsor_code' => 'ZIVO-8888999',
+        ]);
+    }
+
+    /**
+     * Test user registration fails when an invalid sponsor code is provided.
+     */
+    public function test_user_registration_fails_with_invalid_sponsor_code(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Invalid Sponsor User',
+            'email' => 'invalid@example.com',
+            'mobile' => '9333444555',
+            'sponsor_code' => 'INVALID-CODE-999',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['sponsor_code']);
+    }
+
+    /**
      * Test user registration followed by explicit login using User ID / Email / Mobile + Password.
      */
     public function test_user_can_login_via_id_email_or_mobile(): void

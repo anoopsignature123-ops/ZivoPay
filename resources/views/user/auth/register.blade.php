@@ -131,7 +131,7 @@
 
                             <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeOpen', 'regEyeClosed')"
                                 class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
-                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 50% !important; transform: translateY(-50%) !important;"
+                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
                                 aria-label="Toggle Password Visibility">
                                 <svg id="regEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -163,7 +163,7 @@
                             <button type="button"
                                 onclick="togglePassVisibility('regPasswordConfirm', 'regConfirmEyeOpen', 'regConfirmEyeClosed')"
                                 class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
-                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 50% !important; transform: translateY(-50%) !important;"
+                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
                                 aria-label="Toggle Password Visibility">
                                 <svg id="regConfirmEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

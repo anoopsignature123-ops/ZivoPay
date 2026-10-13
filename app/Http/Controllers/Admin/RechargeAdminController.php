@@ -79,7 +79,7 @@ class RechargeAdminController extends Controller
     {
         $updatedRecharge = $rechargeService->syncOrderStatus($recharge);
 
-        return redirect()->back()->with('success', "Order #{$updatedRecharge->order_id} status synced: ".ucfirst($updatedRecharge->status));
+        return redirect()->back()->with('success', "Order #{$updatedRecharge->order_id} status synced: " . ucfirst($updatedRecharge->status));
     }
 
     /**

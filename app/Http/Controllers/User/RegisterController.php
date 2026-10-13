@@ -70,13 +70,12 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'sponsor_id' => 'required|string',
+            'sponsor_id' => 'nullable|string',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'mobile' => 'required|string|max:20|unique:users,mobile',
             'password' => 'required|string|min:6|confirmed',
         ], [
-            'sponsor_id.required' => 'Please enter a valid Sponsor Code.',
             'name.required' => 'Please enter member full name.',
             'email.required' => 'Please enter email address.',
             'email.email' => 'Please enter a valid email address.',
@@ -88,7 +87,8 @@ class RegisterController extends Controller
             'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
-        $sponsorCode = trim($request->sponsor_id);
+        $sponsorInput = trim((string) ($request->input('sponsor_id') ?? $request->input('sponsor_code') ?? $request->input('sponsor')));
+        $sponsorCode = ! empty($sponsorInput) ? $sponsorInput : User::getRootSponsorCode();
         $sponsorUser = User::where('referral_code', $sponsorCode)->first();
         $sponsorName = $sponsorUser ? $sponsorUser->name : 'ZIVO PAY Official';
 

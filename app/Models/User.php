@@ -210,4 +210,24 @@ class User extends Authenticatable
 
         return $code;
     }
+
+    /**
+     * Get root user referral code or system fallback.
+     */
+    public static function getRootSponsorCode(): string
+    {
+        $rootUser = static::where('referral_code', 'ZIVO-0000001')
+            ->orWhere('email', 'root@zivopay.net')
+            ->first();
+
+        if ($rootUser) {
+            return $rootUser->referral_code;
+        }
+
+        $fallbackUser = static::where('role_id', 2)->whereNull('sponsor_code')->orderBy('id', 'asc')->first()
+            ?? static::where('role_id', 2)->orderBy('id', 'asc')->first()
+            ?? static::orderBy('id', 'asc')->first();
+
+        return $fallbackUser?->referral_code ?? 'ZIVO-0000001';
+    }
 }

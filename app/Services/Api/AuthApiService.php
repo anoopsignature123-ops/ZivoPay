@@ -18,6 +18,9 @@ class AuthApiService
     public function register(array $data): array
     {
         $referralCode = User::generateReferralCode();
+        $sponsorCode = ! empty($data['sponsor_code'])
+            ? (string) $data['sponsor_code']
+            : User::getRootSponsorCode();
 
         $user = User::create([
             'role_id' => 2,
@@ -25,7 +28,7 @@ class AuthApiService
             'email' => $data['email'],
             'mobile' => $data['mobile'],
             'referral_code' => $referralCode,
-            'sponsor_code' => $data['sponsor_code'],
+            'sponsor_code' => $sponsorCode,
             'position' => $data['position'] ?? 'direct',
             'status' => 'inactive',
             'password' => Hash::make($data['password']),

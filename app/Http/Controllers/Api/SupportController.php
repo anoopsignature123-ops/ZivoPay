@@ -150,7 +150,7 @@ class SupportController extends Controller
         try {
             $user = $request->user();
             $ticketId = $request->id;
-             
+
             $ticket = SupportTicket::where('user_id', $user->id)
                 ->where(function ($q) use ($ticketId) {
                     if (is_numeric($ticketId)) {
