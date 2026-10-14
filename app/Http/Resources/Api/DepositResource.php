@@ -21,6 +21,7 @@ class DepositResource extends JsonResource
             'charge' => (float) $this->charge,
             'final_amount' => (float) $this->final_amount,
             'payment_method' => $this->payment_method,
+            'status' => $this->status,
             'trx_hash' => $this->trx_hash,
             'proof_file' => $this->proof_file,
             'proof_file_url' => $this->proof_file ? asset('storage/'.$this->proof_file) : null,

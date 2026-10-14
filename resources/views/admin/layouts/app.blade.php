@@ -40,6 +40,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('js/app-validation.js') }}"></script>
     <script src="{{ asset('js/pull-to-refresh.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" defer></script>
+
     @stack('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function() {

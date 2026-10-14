@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\P2pAdminController;
 use App\Http\Controllers\Admin\PackageAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
+use App\Http\Controllers\Admin\PaymentGatewayController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RechargeAdminController;
 use App\Http\Controllers\Admin\ReportController;
@@ -61,6 +62,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
 
         // App Services Management Routes
+        Route::get('payment-gateway', [PaymentGatewayController::class, 'index'])->name('payment-gateway.index');
+        Route::put('payment-gateway', [PaymentGatewayController::class, 'update'])->name('payment-gateway.update');
         Route::get('services', [ServiceAdminController::class, 'index'])->name('services.index');
         Route::post('services/{service}/toggle-status', [ServiceAdminController::class, 'toggleStatus'])->name('services.toggle-status');
 

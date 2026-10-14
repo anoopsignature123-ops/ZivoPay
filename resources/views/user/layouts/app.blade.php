@@ -11,6 +11,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=10" />
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
+    @if(request()->routeIs('user.deposit.index'))
+        @vite(['resources/css/app.css'])
+    @endif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 </head>

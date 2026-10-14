@@ -68,12 +68,10 @@ class DepositController extends Controller
                 $proofFile
             );
 
-            $freshUser = $user->fresh();
-
             return $this->successResponse([
                 'deposit' => new DepositResource($deposit),
-                'deposit_wallet_balance' => (float) $freshUser->deposit_wallet,
-            ], 'Success! ₹'.number_format((float) $deposit->final_amount, 2).' has been credited to your Fund Wallet.', 201);
+                'deposit_wallet_balance' => (float) $user->fresh()->deposit_wallet,
+            ], 'Add Fund request submitted. Your wallet will be credited after admin verifies the payment.', 201);
         } catch (ValidationException $e) {
             return $this->validationErrorResponse($e->errors(), 'Add fund request failed validation.');
         } catch (\Exception $e) {

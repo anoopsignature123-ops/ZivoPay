@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class DepositService
 {
     /**
-     * Create a new deposit request with instant direct credit to user's Fund Wallet.
+     * Create a deposit request for admin review. Only verified gateway payments are credited automatically.
      */
     public function createDeposit(User $user, float $amount, string $paymentMethod, ?string $trxHash = null, ?string $proofPath = null): Deposit
     {
@@ -19,37 +19,19 @@ class DepositService
         $charge = 0.00;
         $finalAmount = $amount - $charge;
 
-        return DB::transaction(function () use ($user, $depositRef, $amount, $charge, $finalAmount, $paymentMethod, $trxHash, $proofPath) {
-            // 1. Create Deposit Record with Approved status
-            $deposit = Deposit::create([
-                'user_id' => $user->id,
-                'deposit_ref' => $depositRef,
-                'amount' => $amount,
-                'charge' => $charge,
-                'final_amount' => $finalAmount,
-                'payment_method' => $paymentMethod,
-                'trx_hash' => $trxHash,
-                'proof_file' => $proofPath,
-                'gateway_reference' => 'GATEWAY-'.strtoupper(Str::random(12)),
-                'status' => 'approved',
-                'admin_remark' => 'Instant Automated Credit to Fund Wallet.',
-            ]);
-
-            // 2. Instantly Credit User's Fund Wallet
-            $user->increment('deposit_wallet', $finalAmount);
-
-            // 3. Log Transaction Record
-            Transaction::create([
-                'user_id' => $user->id,
-                'amount' => $finalAmount,
-                'wallet_type' => 'deposit_wallet',
-                'type' => 'deposit',
-                'description' => "Instant Direct Fund Deposit via {$paymentMethod} (Ref: {$depositRef}, UTR/Hash: {$trxHash})",
-                'trx_id' => $depositRef,
-            ]);
-
-            return $deposit;
-        });
+        return Deposit::create([
+            'user_id' => $user->id,
+            'deposit_ref' => $depositRef,
+            'amount' => $amount,
+            'charge' => $charge,
+            'final_amount' => $finalAmount,
+            'payment_method' => $paymentMethod,
+            'trx_hash' => $trxHash,
+            'proof_file' => $proofPath,
+            'gateway_reference' => 'GATEWAY-'.strtoupper(Str::random(12)),
+            'status' => 'pending',
+            'admin_remark' => 'Payment submitted; awaiting admin verification.',
+        ]);
     }
 
     /**
@@ -57,28 +39,30 @@ class DepositService
      */
     public function approveDeposit(Deposit $deposit, ?string $adminRemark = null): bool
     {
-        if ($deposit->status !== 'pending') {
+        if ($deposit->status !== 'pending' || $deposit->payment_provider === 'razorpay') {
             return false;
         }
 
-        return DB::transaction(function () use ($deposit, $adminRemark) {
-            $deposit->update([
+        return DB::transaction(function () use ($deposit, $adminRemark): bool {
+            $lockedDeposit = Deposit::query()->lockForUpdate()->find($deposit->id);
+            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || $lockedDeposit->payment_provider === 'razorpay') {
+                return false;
+            }
+            $lockedDeposit->update([
                 'status' => 'approved',
                 'admin_remark' => $adminRemark ?? 'Approved by Admin & credited to Fund Wallet.',
             ]);
 
-            // Credit Fund Wallet
-            $user = $deposit->user;
+            $user = $lockedDeposit->user()->lockForUpdate()->firstOrFail();
             $user->increment('deposit_wallet', $deposit->final_amount);
 
-            // Log Transaction
             Transaction::create([
                 'user_id' => $user->id,
-                'amount' => $deposit->final_amount,
+                'amount' => $lockedDeposit->final_amount,
                 'wallet_type' => 'deposit_wallet',
                 'type' => 'deposit',
-                'description' => "Direct Fund Deposit via {$deposit->payment_method} (Ref: {$deposit->deposit_ref}, UTR/Hash: {$deposit->trx_hash})",
-                'trx_id' => $deposit->deposit_ref,
+                'description' => "Direct Fund Deposit via {$lockedDeposit->payment_method} (Ref: {$lockedDeposit->deposit_ref}, UTR/Hash: {$lockedDeposit->trx_hash})",
+                'trx_id' => $lockedDeposit->deposit_ref,
             ]);
 
             return true;
@@ -90,15 +74,21 @@ class DepositService
      */
     public function rejectDeposit(Deposit $deposit, ?string $adminRemark = null): bool
     {
-        if ($deposit->status !== 'pending') {
+        if ($deposit->status !== 'pending' || $deposit->payment_provider === 'razorpay') {
             return false;
         }
 
-        $deposit->update([
-            'status' => 'rejected',
-            'admin_remark' => $adminRemark ?? 'Deposit request rejected by Admin.',
-        ]);
+        return DB::transaction(function () use ($deposit, $adminRemark): bool {
+            $lockedDeposit = Deposit::query()->lockForUpdate()->find($deposit->id);
+            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || $lockedDeposit->payment_provider === 'razorpay') {
+                return false;
+            }
+            $lockedDeposit->update([
+                'status' => 'rejected',
+                'admin_remark' => $adminRemark ?? 'Deposit request rejected by Admin.',
+            ]);
 
-        return true;
+            return true;
+        });
     }
 }

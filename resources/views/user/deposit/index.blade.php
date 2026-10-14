@@ -3,7 +3,7 @@
 @section('title', 'Add Fund (Fund Wallet) - ZIVO PAY')
 
 @section('content')
-<div class="max-w-6xl mx-auto space-y-5 font-sans">
+<div class="w-full max-w-[1600px] mx-auto space-y-6 font-sans">
     <!-- Header Banner -->
     <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -13,7 +13,7 @@
                 </span>
             </div>
             <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-heading">ADD FUND TO WALLET</h1>
-            <p class="text-xs text-neutral-300 mt-0.5">Instant automated wallet recharge via UPI, QR Code, USDT (BEP20), or Merchant Gateway.</p>
+            <p class="text-xs text-neutral-300 mt-0.5">Add funds securely with Razorpay using UPI, cards, netbanking, or wallets.</p>
         </div>
 
         <div class="px-4 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/40 text-right shrink-0">
@@ -22,22 +22,26 @@
         </div>
     </div>
 
-    @if(!config('app.add_fund_enabled', false))
+    @if(!$gatewaySettings->enabled || !filled($gatewaySettings->keyId()) || !filled($gatewaySettings->keySecret()))
         <div class="p-4 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-bold flex items-center gap-2.5 shadow-lg shadow-amber-500/10">
             <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 shrink-0"></i>
             <div>
-                <span class="block font-black uppercase text-amber-400 tracking-wider">NOTICE: ONLINE PAYMENT GATEWAY DISABLED</span>
-                <span class="text-neutral-200 font-medium leading-relaxed">Online Add Fund Payment Gateway is currently under maintenance / coming soon. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.</span>
+                <span class="block font-black uppercase text-amber-400 tracking-wider">RAZORPAY CHECKOUT UNAVAILABLE</span>
+                <span class="text-neutral-200 font-medium leading-relaxed">Online payment is not enabled yet. Please contact Admin or use P2P Member Transfer to top up your Fund Wallet.</span>
             </div>
         </div>
     @endif
 
     <!-- Alert Messages -->
-    @if(session('success'))
+    @if(session('success') || request('payment') === 'success')
         <div class="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold flex items-center gap-2">
             <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-            <span>{{ session('success') }}</span>
+            <span>{{ session('success', 'Payment received and verified. Your Fund Wallet has been updated.') }}</span>
         </div>
+    @endif
+
+    @if(session('error'))
+        <div class="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold">{{ session('error') }}</div>
     @endif
 
     @if($errors->any())
@@ -52,7 +56,7 @@
     @endif
 
     <!-- Main Add Fund 50%-50% Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)] gap-6 items-start">
         
         <!-- Left Column (50%): Add Fund Form -->
         <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
@@ -62,13 +66,11 @@
                 </div>
                 <div>
                     <h2 class="text-base font-black text-white uppercase tracking-tight font-heading">ADD FUND FORM</h2>
-                    <p class="text-[11px] text-neutral-400">Select payment gateway method and enter deposit details.</p>
+            <p class="text-[11px] text-neutral-400">Choose an amount and continue to secure Razorpay checkout.</p>
                 </div>
             </div>
 
-            <form action="{{ route('user.deposit.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-                
+            <div class="space-y-4">
                 <!-- Deposit Amount -->
                 <div>
                     <div class="flex items-center justify-between mb-1">
@@ -93,105 +95,51 @@
                     </div>
                 </div>
 
-                <!-- Payment Method Selection -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1.5">
-                        Select Payment Gateway *
-                    </label>
-                    <div class="grid grid-cols-3 gap-2.5">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="UPI" checked onclick="togglePaymentDetails('UPI')" class="peer sr-only">
-                            <div class="p-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-center peer-checked:border-emerald-400 peer-checked:bg-emerald-500/20 peer-checked:text-white transition">
-                                <i data-lucide="qr-code" class="w-4 h-4 mx-auto mb-1 text-emerald-400"></i>
-                                <span class="text-[11px] font-extrabold uppercase block">UPI / QR</span>
-                            </div>
-                        </label>
-
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="USDT" onclick="togglePaymentDetails('USDT')" class="peer sr-only">
-                            <div class="p-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-center peer-checked:border-emerald-400 peer-checked:bg-emerald-500/20 peer-checked:text-white transition">
-                                <i data-lucide="coins" class="w-4 h-4 mx-auto mb-1 text-teal-400"></i>
-                                <span class="text-[11px] font-extrabold uppercase block">USDT (Crypto)</span>
-                            </div>
-                        </label>
-
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="Online Gateway" onclick="togglePaymentDetails('Online Gateway')" class="peer sr-only">
-                            <div class="p-2.5 rounded-xl bg-[#01140c] border border-emerald-500/30 text-center peer-checked:border-emerald-400 peer-checked:bg-emerald-500/20 peer-checked:text-white transition">
-                                <i data-lucide="credit-card" class="w-4 h-4 mx-auto mb-1 text-amber-400"></i>
-                                <span class="text-[11px] font-extrabold uppercase block">Online API</span>
-                            </div>
-                        </label>
+                <div class="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-[#01140c] p-3.5">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-[11px] font-bold text-emerald-300 uppercase">Secure Razorpay Checkout</span>
                     </div>
+                    <span class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase {{ $gatewaySettings->mode === 'test' ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300' }}">{{ $gatewaySettings->mode }} mode</span>
                 </div>
 
-                <!-- Dynamic Gateway Details Box -->
-                <div id="upiDetailsBox" class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-neutral-300 uppercase">Official Admin UPI ID</span>
-                        <button type="button" onclick="copyText('{{ config('gateway.upi_id') }}', 'UPI ID')" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold border border-emerald-500/40 transition">
-                            Copy UPI ID
-                        </button>
-                    </div>
-                    <p class="text-xs font-mono font-bold text-emerald-300">{{ config('gateway.upi_id') }}</p>
-                    <p class="text-[10px] text-neutral-400">Pay via GooglePay, PhonePe, or Paytm using UPI ID, then enter UTR number below.</p>
-                </div>
-
-                <div id="usdtDetailsBox" class="hidden p-3.5 rounded-xl bg-[#01140c] border border-teal-500/30 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-neutral-300 uppercase">USDT Wallet Address (BEP20)</span>
-                        <button type="button" onclick="copyText('{{ config('gateway.usdt_wallet') }}', 'USDT Wallet')" class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 font-bold border border-teal-500/40 transition">
-                            Copy Address
-                        </button>
-                    </div>
-                    <p class="text-xs font-mono font-bold text-teal-300 break-all">{{ config('gateway.usdt_wallet') }}</p>
-                    <p class="text-[10px] text-neutral-400">Network: BEP20 (Binance Smart Chain). Enter transaction Hash ID below.</p>
-                </div>
-
-                <div id="gatewayDetailsBox" class="hidden p-3.5 rounded-xl bg-[#01140c] border border-amber-500/30 space-y-1.5">
-                    <div class="flex items-center gap-1.5">
-                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-400"></i>
-                        <span class="text-[11px] font-bold text-amber-300 uppercase">Merchant API Key Active</span>
-                    </div>
-                    <p class="text-xs text-neutral-300 font-mono">Merchant ID: {{ config('gateway.merchant_id') }}</p>
-                    <p class="text-[10px] text-neutral-400">Instant gateway processing enabled with API Secret validation.</p>
-                </div>
-
-                <!-- Transaction UTR / Reference -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
-                        Transaction UTR / Reference No. / Hash *
-                    </label>
-                    <input type="text" 
-                        name="trx_hash" 
-                        value="{{ old('trx_hash') }}" 
-                        required 
-                        placeholder="e.g. 123456789012 or 0x8392a..." 
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono font-bold text-xs focus:outline-none focus:border-emerald-400 transition"
-                        style="background-color: #01140c !important;">
-                </div>
-
-                <!-- Proof File Upload -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
-                        Payment Proof Screenshot (Optional)
-                    </label>
-                    <input type="file" 
-                        name="proof_file" 
-                        accept="image/*"
-                        class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-neutral-300 text-xs font-bold file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-black file:bg-emerald-500 file:text-black hover:file:bg-emerald-400 transition cursor-pointer"
-                        style="background-color: #01140c !important;">
+                <div class="rounded-xl border border-emerald-500/20 bg-[#01140c] p-3.5 text-[10px] text-neutral-400">
+                    Pay using UPI, cards, netbanking, or wallets. Your Fund Wallet is credited only after Razorpay confirms the captured payment with the server.
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(16,185,129,0.35)] hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2">
-                    <i data-lucide="send" class="w-4 h-4 text-black"></i>
-                    SUBMIT ADD FUND REQUEST
+                <button type="button" id="razorpayCheckoutButton" @disabled(!$gatewaySettings->isReady()) class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(16,185,129,0.35)] hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="lock-keyhole" class="w-4 h-4 text-black"></i>
+                    <span id="razorpayCheckoutLabel">PAY SECURELY WITH RAZORPAY</span>
                 </button>
-            </form>
+                <p id="razorpayCheckoutError" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold"></p>
+            </div>
         </div>
 
         <!-- Right Column (50%): Fund Wallet Daily Profit Slabs & Features Card -->
+        <div class="space-y-5">
+        <div class="rounded-2xl border border-emerald-500/30 bg-[#042718] p-5 sm:p-6 shadow-xl">
+            <div class="mb-4 flex items-center justify-between border-b border-emerald-500/20 pb-3">
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-wider text-emerald-300">Order Summary</h2>
+                    <p class="mt-1 text-[11px] text-neutral-400">Secure Razorpay wallet top-up</p>
+                </div>
+                <i data-lucide="receipt-text" class="h-5 w-5 text-emerald-400"></i>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div class="flex justify-between text-neutral-300"><span>Fund Wallet top-up</span><strong id="razorpaySummaryAmount" class="font-mono text-white">₹{{ number_format(old('amount', 3000), 2) }}</strong></div>
+                <div class="flex justify-between text-neutral-400"><span>Gateway fee</span><strong class="font-mono text-emerald-300">₹0.00</strong></div>
+                <div class="mt-4 flex items-center justify-between border-t border-emerald-500/20 pt-4 text-white"><span class="font-bold">Total payable</span><strong id="razorpaySummaryTotal" class="font-mono text-xl">₹{{ number_format(old('amount', 3000), 2) }}</strong></div>
+            </div>
+            <div class="mt-5 rounded-xl border border-emerald-500/20 bg-[#01140c] p-3 text-[10px] text-neutral-400">
+                <div class="flex items-center gap-2 font-bold text-emerald-300"><i data-lucide="shield-check" class="h-4 w-4"></i> Pay securely with Razorpay</div>
+                <div class="mt-3 grid grid-cols-2 gap-2 text-center font-semibold">
+                    <span class="rounded-lg bg-white/5 p-2">UPI</span><span class="rounded-lg bg-white/5 p-2">Cards</span>
+                    <span class="rounded-lg bg-white/5 p-2">Netbanking</span><span class="rounded-lg bg-white/5 p-2">Wallets</span>
+                </div>
+                <p class="mt-3">ZIVO PAY never receives or stores your card details or UPI PIN. Wallet credit follows server verification.</p>
+            </div>
+        </div>
         <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
             <!-- Header -->
             <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3">
@@ -287,6 +235,7 @@
                 </div>
             </div>
 
+        </div>
         </div>
 
     </div>
@@ -412,27 +361,89 @@
     </div>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-function togglePaymentDetails(method) {
-    document.getElementById('upiDetailsBox').classList.add('hidden');
-    document.getElementById('usdtDetailsBox').classList.add('hidden');
-    document.getElementById('gatewayDetailsBox').classList.add('hidden');
-
-    if (method === 'UPI') {
-        document.getElementById('upiDetailsBox').classList.remove('hidden');
-    } else if (method === 'USDT') {
-        document.getElementById('usdtDetailsBox').classList.remove('hidden');
-    } else if (method === 'Online Gateway') {
-        document.getElementById('gatewayDetailsBox').classList.remove('hidden');
+document.getElementById('razorpayCheckoutButton')?.addEventListener('click', async function () {
+    const button = this;
+    const error = document.getElementById('razorpayCheckoutError');
+    const label = document.getElementById('razorpayCheckoutLabel');
+    const amount = Number(document.getElementById('depositAmount').value);
+    error.classList.add('hidden');
+    if (!Number.isFinite(amount) || amount < {{ (float) config('gateway.min_deposit', 100) }} || amount > {{ (float) config('gateway.max_deposit', 500000) }}) {
+        error.textContent = 'Enter an amount between ₹{{ number_format(config('gateway.min_deposit', 100)) }} and ₹{{ number_format(config('gateway.max_deposit', 500000)) }}.';
+        error.classList.remove('hidden');
+        return;
     }
-}
+    if (!window.Razorpay) {
+        error.textContent = 'Razorpay checkout could not load. Check the internet connection and retry.';
+        error.classList.remove('hidden');
+        return;
+    }
+    button.disabled = true;
+    label.textContent = 'CREATING SECURE ORDER…';
+    try {
+        const response = await fetch('{{ route('user.deposit.razorpay.order') }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+            body: JSON.stringify({amount})
+        });
+        const result = await response.json();
+        const data = result.data ?? result;
+        if (!response.ok || !data.order_id || !data.key_id) {
+            throw new Error(result.message || 'Could not start payment. Please try again.');
+        }
+        const checkout = new Razorpay({
+            key: data.key_id,
+            amount: data.amount,
+            currency: data.currency,
+            name: 'ZIVO PAY',
+            description: 'Fund Wallet top-up',
+            order_id: data.order_id,
+            prefill: {name: @json($user->name), email: @json($user->email), contact: @json($user->mobile ?? '')},
+            theme: {color: '#00c995'},
+            handler: async function (payment) {
+                label.textContent = 'VERIFYING PAYMENT…';
+                try {
+                    const verifyResponse = await fetch('{{ route('user.deposit.razorpay.verify') }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                        body: JSON.stringify({deposit_ref: data.deposit_ref, razorpay_payment_id: payment.razorpay_payment_id, razorpay_order_id: payment.razorpay_order_id, razorpay_signature: payment.razorpay_signature})
+                    });
+                    const verifyResult = await verifyResponse.json();
+                    if (!verifyResponse.ok) {
+                        throw new Error(verifyResult.message || 'Payment verification failed. Contact support before retrying.');
+                    }
+                    window.location.assign('{{ route('user.deposit.index') }}?payment=success');
+                } catch (exception) {
+                    error.textContent = 'Payment was submitted but could not be confirmed right now. Please wait for verification or contact support before making another payment.';
+                    error.classList.remove('hidden');
+                    button.disabled = true;
+                    label.textContent = 'PAYMENT UNDER REVIEW';
+                }
+            },
+            modal: {ondismiss: function () {button.disabled = false; label.textContent = 'PAY SECURELY WITH RAZORPAY';}}
+        });
+        checkout.on('payment.failed', function (payment) {
+            error.textContent = payment.error?.description || 'Payment failed. Please try again.';
+            error.classList.remove('hidden');
+            button.disabled = false;
+            label.textContent = 'PAY SECURELY WITH RAZORPAY';
+        });
+        checkout.open();
+    } catch (exception) {
+        error.textContent = exception.message || 'Could not start payment. Please try again.';
+        error.classList.remove('hidden');
+        button.disabled = false;
+        label.textContent = 'PAY SECURELY WITH RAZORPAY';
+    }
+});
 
-function copyText(text, label) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert(label + ' copied to clipboard:\n' + text);
-    }).catch(function() {
-        prompt('Copy ' + label + ':', text);
-    });
-}
+document.getElementById('depositAmount')?.addEventListener('input', function () {
+    const amount = Number(this.value) || 0;
+    const formatted = new Intl.NumberFormat('en-IN', {style: 'currency', currency: 'INR', minimumFractionDigits: 2}).format(amount);
+    document.getElementById('razorpaySummaryAmount').textContent = formatted;
+    document.getElementById('razorpaySummaryTotal').textContent = formatted;
+});
+
 </script>
 @endsection

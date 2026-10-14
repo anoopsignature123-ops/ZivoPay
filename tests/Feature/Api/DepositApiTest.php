@@ -25,7 +25,7 @@ class DepositApiTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/add-fund', [
+        $response = $this->postJson('/api/manual-add-fund', [
             'amount' => 500.00,
             'payment_method' => 'UPI',
             'trx_hash' => 'UTR123456789',
@@ -53,14 +53,14 @@ class DepositApiTest extends TestCase
             'remark' => 'Test Add Fund',
         ];
 
-        $response = $this->postJson('/api/add-fund', $payload);
+        $response = $this->postJson('/api/manual-add-fund', $payload);
 
         $response->assertStatus(201)
             ->assertJson([
                 'success' => true,
-                'message' => 'Success! ₹500.00 has been credited to your Fund Wallet.',
+                'message' => 'Add Fund request submitted. Your wallet will be credited after admin verifies the payment.',
                 'data' => [
-                    'deposit_wallet_balance' => 600.00,
+                    'deposit_wallet_balance' => 100.00,
                 ],
             ]);
 
@@ -69,10 +69,10 @@ class DepositApiTest extends TestCase
             'amount' => 500.00,
             'payment_method' => 'UPI',
             'trx_hash' => 'UTR998877665544',
-            'status' => 'approved',
+            'status' => 'pending',
         ]);
 
-        $this->assertEquals(600.00, (float) $user->fresh()->deposit_wallet);
+        $this->assertEquals(100.00, (float) $user->fresh()->deposit_wallet);
     }
 
     public function test_user_can_submit_add_fund_with_proof_file(): void
@@ -91,7 +91,7 @@ class DepositApiTest extends TestCase
             'proof_file' => $file,
         ];
 
-        $response = $this->postJson('/api/add-fund', $payload);
+        $response = $this->postJson('/api/manual-add-fund', $payload);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -101,6 +101,8 @@ class DepositApiTest extends TestCase
         $deposit = Deposit::where('trx_hash', '0x1234567890abcdef')->first();
         $this->assertNotNull($deposit);
         $this->assertNotNull($deposit->proof_file);
+        $this->assertSame('pending', $deposit->status);
+        $this->assertSame(0.0, (float) $user->fresh()->deposit_wallet);
 
         Storage::disk('public')->assertExists($deposit->proof_file);
     }
@@ -111,7 +113,7 @@ class DepositApiTest extends TestCase
         Sanctum::actingAs($user);
 
         // Min deposit validation test
-        $response = $this->postJson('/api/add-fund', [
+        $response = $this->postJson('/api/manual-add-fund', [
             'amount' => 10.00, // Below min 100
             'payment_method' => 'UPI',
             'trx_hash' => 'UTR1122334455',
@@ -132,7 +134,7 @@ class DepositApiTest extends TestCase
             'status' => 'approved',
         ]);
 
-        $dupResponse = $this->postJson('/api/add-fund', [
+        $dupResponse = $this->postJson('/api/manual-add-fund', [
             'amount' => 200.00,
             'payment_method' => 'UPI',
             'trx_hash' => 'EXISTING_UTR_123',

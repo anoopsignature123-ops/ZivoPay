@@ -133,7 +133,9 @@
                                 {{ $dep->admin_remark ?? '-' }}
                             </td>
                             <td class="p-3.5 text-center">
-                                @if($dep->status === 'pending')
+                                @if($dep->status === 'pending' && $dep->payment_provider === 'razorpay')
+                                    <span class="text-[10px] font-bold text-sky-300">Awaiting Razorpay verification</span>
+                                @elseif($dep->status === 'pending')
                                     <div class="flex items-center justify-center gap-1.5">
                                         <!-- Approve Form -->
                                         <form action="{{ route('admin.deposits.approve', $dep) }}" method="POST" class="inline" onsubmit="return confirm('Approve deposit #{{ $dep->deposit_ref }} and credit ₹{{ number_format($dep->final_amount, 2) }} to {{ addslashes($dep->user->name ?? 'User') }}\'s Fund Wallet?');">

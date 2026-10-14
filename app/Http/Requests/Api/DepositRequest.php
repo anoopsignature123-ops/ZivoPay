@@ -26,8 +26,7 @@ class DepositRequest extends BaseApiRequest
 
         return [
             'amount' => "required|numeric|min:{$minDeposit}|max:{$maxDeposit}",
-            'payment_method' => 'required|string|in:UPI,USDT,Online Gateway',
-            'trx_hash' => 'required|string|min:6|max:100|unique:deposits,trx_hash',
+
             'proof_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'remark' => 'nullable|string|max:255',
         ];
@@ -49,7 +48,7 @@ class DepositRequest extends BaseApiRequest
             'amount.min' => 'Minimum Add Fund amount is ₹'.number_format($minDeposit, 2).'.',
             'amount.max' => 'Maximum Add Fund amount is ₹'.number_format($maxDeposit, 2).'.',
             'payment_method.required' => 'Please select a valid payment method.',
-            'payment_method.in' => 'Selected payment method is invalid. Allowed: UPI, USDT, Online Gateway.',
+            'payment_method.in' => 'Selected payment method is invalid. Allowed: UPI or USDT.',
             'trx_hash.required' => 'Please enter the UTR / Transaction Reference Number / Hash.',
             'trx_hash.unique' => 'This UTR / Transaction Reference Number has already been submitted for verification.',
             'proof_file.image' => 'Payment proof must be a valid image file (JPG, PNG, WEBP).',

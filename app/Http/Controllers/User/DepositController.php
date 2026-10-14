@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deposit;
+use App\Models\PaymentGatewaySetting;
 use App\Services\DepositService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,7 +52,9 @@ class DepositController extends Controller
             'total_count' => Deposit::where('user_id', $user->id)->count(),
         ];
 
-        return view('user.deposit.index', compact('user', 'deposits', 'stats'));
+        $gatewaySettings = PaymentGatewaySetting::razorpay();
+
+        return view('user.deposit.index', compact('user', 'deposits', 'stats', 'gatewaySettings'));
     }
 
     /**
@@ -71,7 +74,7 @@ class DepositController extends Controller
 
         $request->validate([
             'amount' => "required|numeric|min:{$minDeposit}|max:{$maxDeposit}",
-            'payment_method' => 'required|string|in:UPI,USDT,Online Gateway',
+            'payment_method' => 'required|string|in:UPI,USDT',
             'trx_hash' => 'required|string|min:6|max:100|unique:deposits,trx_hash',
             'proof_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'remark' => 'nullable|string|max:255',
@@ -104,7 +107,7 @@ class DepositController extends Controller
 
         return redirect()->route('user.deposit.index')->with(
             'success',
-            'Success! ₹'.number_format($amount, 2)." has been instantly added & credited to your Fund Wallet! (Ref: {$deposit->deposit_ref})"
+            'Success! ₹'.number_format($amount, 2)." is awaiting admin verification before wallet credit. (Ref: {$deposit->deposit_ref})"
         );
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\PageApiController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\SupportController;
@@ -34,6 +35,7 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
+Route::post('payment/razorpay/webhook', [PaymentController::class, 'webhook'])->middleware('throttle:60,1');
 
 // Authenticated Sanctum Protected Endpoints
 Route::middleware('auth:sanctum')->group(function () {
@@ -60,7 +62,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Add Fund / Deposit Endpoints
     Route::get('fund-history', [DepositController::class, 'index']);
-    Route::post('add-fund', [DepositController::class, 'store']);
+
+    Route::post('add-fund', [PaymentController::class, 'createOrder'])
+        ->middleware('throttle:10,1')->name('api.add-fund.start');
+    Route::post('add-fund-verify', [PaymentController::class, 'verify'])
+        ->middleware('throttle:20,1')->name('api.add-fund.verify');
+    Route::get('add-fund-status', [PaymentController::class, 'status'])
+        ->middleware('throttle:30,1')->name('api.add-fund.status');
 
     // Master & Unified Recharge Endpoints
     Route::get('recharge/operators', [RechargeController::class, 'operators']);

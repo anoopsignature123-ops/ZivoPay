@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\IncomeController;
@@ -50,6 +51,8 @@ Route::prefix('user')->name('user.')->group(function () {
         // User Add Fund / Deposit Wallet Routes
         Route::get('deposit', [DepositController::class, 'index'])->name('deposit.index');
         Route::post('deposit', [DepositController::class, 'store'])->name('deposit.store');
+        Route::post('deposit/razorpay/order', [PaymentController::class, 'createOrder'])->middleware('throttle:10,1')->name('deposit.razorpay.order');
+        Route::post('deposit/razorpay/verify', [PaymentController::class, 'verify'])->middleware('throttle:20,1')->name('deposit.razorpay.verify');
 
         // Fund & Wallet Transfer Routes
         Route::get('wallet/transfer', [WalletController::class, 'showTransferForm'])->name('wallet.transfer');

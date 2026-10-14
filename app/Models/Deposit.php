@@ -20,6 +20,10 @@ class Deposit extends Model
         'trx_hash',
         'proof_file',
         'gateway_reference',
+        'payment_provider',
+        'payment_order_id',
+        'payment_id',
+        'payment_metadata',
         'status',
         'admin_remark',
     ];
@@ -28,6 +32,7 @@ class Deposit extends Model
         'amount' => 'decimal:2',
         'charge' => 'decimal:2',
         'final_amount' => 'decimal:2',
+        'payment_metadata' => 'array',
     ];
 
     public function user(): BelongsTo
