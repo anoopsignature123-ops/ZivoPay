@@ -4,6 +4,7 @@
 
 @section('content')
 @php($activeCredentialMode = old('mode', $settings->mode))
+@php($gatewayEnabled = (bool) old('enabled', $settings->enabled))
 <div class="mx-auto w-full max-w-7xl space-y-4">
     <header
         class="flex flex-col justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-[#042718] p-4 shadow-xl sm:flex-row sm:items-center sm:p-5">
@@ -35,12 +36,12 @@
     class="space-y-4 rounded-2xl border border-emerald-500/30 bg-[#042718] p-3 sm:p-4">
         @csrf
         @method('PUT')
-<div class="grid gap-3 md:grid-cols-2">
+<div class="grid gap-3 md:grid-cols-3">
     <label
         class="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-[#01140c] px-3 py-2.5 text-sm font-bold text-white">
         <span>Gateway enabled <span class="block pt-0.5 text-[11px] font-normal text-neutral-400">Allow users to
                 start checkout</span></span>
-        <input type="checkbox" name="enabled" value="1" @checked(old('enabled', $settings->enabled))
+        <input type="checkbox" name="enabled" value="1" @checked($gatewayEnabled)
             class="h-5 w-5 accent-emerald-400">
             </label>
             <div class="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-[#01140c] px-3 py-2.5">
@@ -48,6 +49,13 @@
                 <span id="selectedGatewayModeLabel"
                     class="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-300">{{ $activeCredentialMode }}</span>
                 <input type="hidden" name="mode" id="activeGatewayMode" value="{{ $activeCredentialMode }}">
+            </div>
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-rose-500/25 bg-[#01140c] px-3 py-2.5">
+                <span class="text-[11px] font-bold text-neutral-300">Emergency control</span>
+                <button type="button" id="gatewayToggleButton"
+                    class="rounded-lg px-3 py-2 text-[10px] font-black uppercase tracking-wide transition {{ $gatewayEnabled ? 'bg-rose-500/15 text-rose-200 hover:bg-rose-500/25' : 'bg-emerald-400/15 text-emerald-200 hover:bg-emerald-400/25' }}">
+                    {{ $gatewayEnabled ? 'Turn gateway off' : 'Turn gateway on' }}
+                </button>
             </div>
         </div>
 
@@ -135,8 +143,7 @@
         style="background-color: #042718; color: #fff;">
         <div>
             <p class="text-[10px] font-black uppercase tracking-[2px] text-emerald-300">Confirm gateway change</p>
-            <h2 id="gatewayConfirmTitle" class="mt-1 text-lg font-black">Use <span id="confirmGatewayMode"
-                    class="capitalize"></span> mode?</h2>
+            <h2 id="gatewayConfirmTitle" class="mt-1 text-lg font-black">Save gateway settings?</h2>
             <p id="confirmGatewayDescription" class="mt-2 text-sm text-neutral-300"></p>
         </div>
         <div class="flex justify-end gap-2">
@@ -157,10 +164,32 @@
             const formSubmitter = document.getElementById('gatewayFormSubmitter');
             const modeInput = document.getElementById('activeGatewayMode');
             const modeLabel = document.getElementById('selectedGatewayModeLabel');
+            const gatewayEnabledInput = form.querySelector('[name="enabled"]');
+            const gatewayToggleButton = document.getElementById('gatewayToggleButton');
             const dialog = document.getElementById('gatewayConfirmDialog');
-            const confirmMode = document.getElementById('confirmGatewayMode');
+            const confirmTitle = document.getElementById('gatewayConfirmTitle');
             const confirmDescription = document.getElementById('confirmGatewayDescription');
             let confirmed = false;
+            let togglePreviousValue = null;
+
+            const syncToggleButton = () => {
+                gatewayToggleButton.textContent = gatewayEnabledInput.checked ? 'Turn gateway off' : 'Turn gateway on';
+                gatewayToggleButton.classList.toggle('bg-rose-500/15', gatewayEnabledInput.checked);
+                gatewayToggleButton.classList.toggle('text-rose-200', gatewayEnabledInput.checked);
+                gatewayToggleButton.classList.toggle('hover:bg-rose-500/25', gatewayEnabledInput.checked);
+                gatewayToggleButton.classList.toggle('bg-emerald-400/15', !gatewayEnabledInput.checked);
+                gatewayToggleButton.classList.toggle('text-emerald-200', !gatewayEnabledInput.checked);
+                gatewayToggleButton.classList.toggle('hover:bg-emerald-400/25', !gatewayEnabledInput.checked);
+            };
+
+            gatewayToggleButton.addEventListener('click', () => {
+                togglePreviousValue = gatewayEnabledInput.checked;
+                gatewayEnabledInput.checked = !gatewayEnabledInput.checked;
+                syncToggleButton();
+                form.requestSubmit(formSubmitter);
+            });
+
+            gatewayEnabledInput.addEventListener('change', syncToggleButton);
 
             const selectMode = (mode) => {
                 modeInput.value = mode;
@@ -203,8 +232,18 @@
                 dialog.classList.remove('flex');
             };
 
+            const cancelFallbackDialog = () => {
+                closeFallbackDialog();
+                if (togglePreviousValue !== null) {
+                    gatewayEnabledInput.checked = togglePreviousValue;
+                    togglePreviousValue = null;
+                    syncToggleButton();
+                }
+            };
+
             const submitAfterConfirmation = () => {
                 confirmed = true;
+                togglePreviousValue = null;
                 form.requestSubmit(formSubmitter);
             };
 
@@ -221,11 +260,21 @@
 
                 const mode = modeInput.value;
                 const activeCard = document.querySelector(`[data-gateway-mode="${mode}"]`);
-                const keyId = activeCard.querySelector(`[name="${mode}_key_id"]`).value.trim();
+                const keyIdInput = activeCard.querySelector(`[name="${mode}_key_id"]`);
+                const keyId = keyIdInput.value.trim();
                 const keySecret = activeCard.querySelector(`[name="${mode}_key_secret"]`);
 
-                if (document.querySelector('[name="enabled"]').checked && (!keyId || (!keySecret.value.trim() && keySecret.dataset.configured !== 'true'))) {
-                    const message = `${mode === 'test' ? 'Test' : 'Live'} mode needs both a Key ID and Key Secret before the gateway can be enabled.`;
+                const invalidCredentialInput = [...form.querySelectorAll('input[pattern], input[minlength]')]
+                    .find((input) => input.value.trim() !== '' && !input.checkValidity());
+
+                if (invalidCredentialInput) {
+                    invalidCredentialInput.reportValidity();
+
+                    return;
+                }
+
+                if (gatewayEnabledInput.checked && (!keyId || (!keySecret.value.trim() && keySecret.dataset.configured !== 'true'))) {
+                    const message = `${mode === 'test' ? 'Test' : 'Live'} mode needs both a valid Key ID and Key Secret before the gateway can be enabled.`;
 
                     if (window.Swal) {
                         await window.Swal.fire({
@@ -241,20 +290,37 @@
                         window.showToast?.('Credentials required', message, 'error');
                     }
 
+                    if (togglePreviousValue !== null) {
+                        gatewayEnabledInput.checked = togglePreviousValue;
+                        togglePreviousValue = null;
+                        syncToggleButton();
+                    }
+
                     activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                     return;
                 }
 
-                const description = mode === 'live'
-                    ? 'Live credentials will be used for user payments. Confirm that your Live keys are correct before switching.'
-                    : 'Razorpay Test mode will be used. Test transactions do not charge real money.';
+                const isEnabled = gatewayEnabledInput.checked;
+                const isToggleAction = togglePreviousValue !== null;
+                const description = isToggleAction
+                    ? (isEnabled
+                        ? 'Users will be able to start Razorpay payments using the selected mode.'
+                        : 'New Razorpay payments will be blocked until you turn the gateway back on. Existing payment verification will continue.')
+                    : (isEnabled && mode === 'live'
+                        ? 'Live credentials will be used for user payments. Confirm that your Live keys are correct before switching.'
+                        : (isEnabled
+                            ? 'Razorpay Test mode will be used. Test transactions do not charge real money.'
+                            : 'The gateway remains off. Users will not be able to start new Razorpay payments.'));
+                const confirmationTitle = isToggleAction
+                    ? (isEnabled ? 'Enable Razorpay gateway?' : 'Turn off Razorpay gateway?')
+                    : `Save ${mode.toUpperCase()} gateway settings?`;
 
                 if (window.Swal) {
                     const result = await window.Swal.fire({
-                        title: `Save ${mode.toUpperCase()} gateway settings?`,
+                        title: confirmationTitle,
                         text: description,
-                        icon: mode === 'live' ? 'warning' : 'question',
+                        icon: isToggleAction || (isEnabled && mode === 'live') ? 'warning' : 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Confirm and save',
                         cancelButtonText: 'Cancel',
@@ -269,31 +335,35 @@
 
                     if (result.isConfirmed) {
                         submitAfterConfirmation();
+                    } else if (togglePreviousValue !== null) {
+                        gatewayEnabledInput.checked = togglePreviousValue;
+                        togglePreviousValue = null;
+                        syncToggleButton();
                     }
 
                     return;
                 }
 
-                confirmMode.textContent = mode;
+                confirmTitle.textContent = confirmationTitle;
                 confirmDescription.textContent = description;
                 dialog.classList.remove('hidden');
                 dialog.classList.add('flex');
                 document.getElementById('confirmGatewaySave').focus();
             });
 
-            document.getElementById('cancelGatewaySave').addEventListener('click', closeFallbackDialog);
+            document.getElementById('cancelGatewaySave').addEventListener('click', cancelFallbackDialog);
             document.getElementById('confirmGatewaySave').addEventListener('click', () => {
                 closeFallbackDialog();
                 submitAfterConfirmation();
             });
             dialog.addEventListener('click', (event) => {
                 if (event.target === dialog) {
-                    closeFallbackDialog();
+                    cancelFallbackDialog();
                 }
             });
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && !dialog.classList.contains('hidden')) {
-                    closeFallbackDialog();
+                    cancelFallbackDialog();
                 }
             });
         })();
