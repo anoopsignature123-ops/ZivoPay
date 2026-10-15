@@ -93,13 +93,13 @@
                 <i data-lucide="users-round" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Team Bonus Referral</span>
-            </a>
+        </a>
 
         <!-- FUND WALLET 24H ROI INCOME AUDIT -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             FUND WALLET ROI INCOME
         </div>
-        
+
         <a class='nav-item {{ request()->routeIs("admin.reports.roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.reports.roi") }}'>
             <div
@@ -158,7 +158,7 @@
             </div>
             <span class="nav-text">Business Level Income</span>
         </a>
-        
+
         <a class='nav-item {{ request()->routeIs("admin.reports.level-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.reports.level-roi") }}'>
             <div
@@ -190,7 +190,7 @@
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             WITHDRAWAL MANAGEMENT
         </div>
-        
+
         <a class='nav-item {{ request()->routeIs("admin.withdrawals*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.withdrawals") }}'>
             <div
@@ -247,7 +247,8 @@
 
         <a class='nav-item {{ request()->routeIs("admin.payment-gateway*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.payment-gateway.index") }}'>
-            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="credit-card" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Payment Gateway</span>
@@ -287,6 +288,52 @@
                 <i data-lucide="file-text" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Static Pages & WebViews</span>
+        </a>
+
+        <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
+        
+            <span>E-COMMERCE MANAGEMENT</span>
+        </div>
+        <a class='nav-item {{ request()->routeIs("admin.shop.categories*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.shop.categories.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="tags" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Categories</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.shop.products*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.shop.products.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Products</span>
+        </a>
+        
+        <a class='nav-item {{ request()->routeIs("admin.shop.orders*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.shop.orders.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="package-check" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Orders History</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.shop.promos*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.shop.promos.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="badge-percent" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Promo Codes</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.shop.banners*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.shop.banners.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="images" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Home Banners</span>
         </a>
 
         <!-- ACCOUNT SETTINGS -->

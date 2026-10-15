@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RechargeAdminController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceAdminController;
+use App\Http\Controllers\Admin\Shop\BannerController as ShopBannerController;
+use App\Http\Controllers\Admin\Shop\CategoryController as ShopCategoryController;
+use App\Http\Controllers\Admin\Shop\OrderController as ShopOrderController;
+use App\Http\Controllers\Admin\Shop\ProductController as ShopProductController;
+use App\Http\Controllers\Admin\Shop\PromoCodeController as ShopPromoCodeController;
 use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\AdminAuth;
@@ -64,6 +69,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // App Services Management Routes
         Route::get('payment-gateway', [PaymentGatewayController::class, 'index'])->name('payment-gateway.index');
         Route::put('payment-gateway', [PaymentGatewayController::class, 'update'])->name('payment-gateway.update');
+        Route::prefix('shop')->name('shop.')->group(function (): void {
+            Route::resource('categories', ShopCategoryController::class)->except('show');
+            Route::resource('products', ShopProductController::class)->except('show');
+            Route::get('orders', [ShopOrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [ShopOrderController::class, 'show'])->name('orders.show');
+            Route::patch('orders/{order}', [ShopOrderController::class, 'update'])->name('orders.update');
+            Route::resource('promos', ShopPromoCodeController::class)->except('show');
+            Route::resource('banners', ShopBannerController::class)->except('show');
+        });
         Route::get('services', [ServiceAdminController::class, 'index'])->name('services.index');
         Route::post('services/{service}/toggle-status', [ServiceAdminController::class, 'toggleStatus'])->name('services.toggle-status');
 

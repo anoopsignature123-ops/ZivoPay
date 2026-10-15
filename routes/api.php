@@ -7,6 +7,12 @@ use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
+use App\Http\Controllers\Api\Shop\AddressController as ShopAddressController;
+use App\Http\Controllers\Api\Shop\CartController as ShopCartController;
+use App\Http\Controllers\Api\Shop\CatalogController as ShopCatalogController;
+use App\Http\Controllers\Api\Shop\OrderController as ShopOrderController;
+use App\Http\Controllers\Api\Shop\PaymentController as ShopPaymentController;
+use App\Http\Controllers\Api\Shop\PromoCodeController as ShopPromoCodeController;
 use App\Http\Controllers\Api\SupportController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,9 +42,42 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
 Route::post('payment/razorpay/webhook', [PaymentController::class, 'webhook'])->middleware('throttle:60,1');
+Route::post('shop/payments/razorpay/webhook', [ShopPaymentController::class, 'webhook'])
+    ->middleware('throttle:60,1')
+    ->name('api.shop.payments.webhook');
 
 // Authenticated Sanctum Protected Endpoints
 Route::middleware('auth:sanctum')->group(function () {
+    // E-commerce shop APIs
+    Route::prefix('shop')->group(function (): void {
+        Route::get('products', [ShopCatalogController::class, 'home']);
+        Route::get('products/{product}', [ShopCatalogController::class, 'show']);
+        Route::get('my-cart', [ShopCartController::class, 'show']);
+        Route::post('add-to-cart', [ShopCartController::class, 'addItem'])->middleware('throttle:60,1');
+        Route::post('update-cart', [ShopCartController::class, 'updateItem']);
+        Route::post('remove-from-cart', [ShopCartController::class, 'removeItem']);
+        Route::post('clear-cart', [ShopCartController::class, 'clear']);
+        Route::post('address-get', [ShopAddressController::class, 'index']);
+        Route::post('addresses-store', [ShopAddressController::class, 'store']);
+        Route::post('addresses-update', [ShopAddressController::class, 'update']);
+        Route::post('addresses-delete', [ShopAddressController::class, 'destroy']);
+        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])->middleware('throttle:30,1');
+        Route::post('checkout', [ShopOrderController::class, 'checkout'])->middleware('throttle:10,1')
+            ->name('api.shop.checkout');
+        Route::post('payments-verify', [ShopOrderController::class, 'verifyPayment'])->middleware('throttle:20,1')
+            ->name('api.shop.payments.verify');
+        Route::post('payments-history', [ShopOrderController::class, 'paymentHistory'])
+            ->name('api.shop.payments.history');
+        Route::post('payments-status', [ShopOrderController::class, 'paymentStatus']);
+        Route::post('orders/{order}/payment/retry', [ShopOrderController::class, 'retryPayment'])
+            ->middleware('throttle:10,1');
+        Route::get('orders', [ShopOrderController::class, 'index']);
+        Route::get('orders/{order}', [ShopOrderController::class, 'show']);
+        Route::post('orders-cancel', [ShopOrderController::class, 'cancel'])->middleware('throttle:10,1');
+        Route::post('orders-return', [ShopOrderController::class, 'requestReturn'])
+            ->middleware('throttle:10,1');
+    });
+
     // Help & Support Endpoints
     Route::get('support/tickets', [SupportController::class, 'tickets']);
     Route::post('support/tickets', [SupportController::class, 'createTicket']);
@@ -64,11 +103,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('fund-history', [DepositController::class, 'index']);
 
     Route::post('add-fund', [PaymentController::class, 'createOrder'])
-        ->middleware('throttle:10,1')->name('api.add-fund.start');
+        ->middleware('throttle:10,1')
+        ->name('api.add-fund.start');
     Route::post('add-fund-verify', [PaymentController::class, 'verify'])
-        ->middleware('throttle:20,1')->name('api.add-fund.verify');
+        ->middleware('throttle:20,1')
+        ->name('api.add-fund.verify');
     Route::get('add-fund-status', [PaymentController::class, 'status'])
-        ->middleware('throttle:30,1')->name('api.add-fund.status');
+        ->middleware('throttle:30,1')
+        ->name('api.add-fund.status');
 
     // Master & Unified Recharge Endpoints
     Route::get('recharge/operators', [RechargeController::class, 'operators']);

@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models\Shop;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Banner extends Model
+{
+    protected $table = 'shop_banners';
+
+    protected $fillable = ['title', 'subtitle', 'image_path', 'target_url', 'sort_order', 'is_active', 'starts_at', 'ends_at'];
+
+    protected function casts(): array
+    {
+        return ['sort_order' => 'integer', 'is_active' => 'boolean', 'starts_at' => 'datetime', 'ends_at' => 'datetime'];
+    }
+}
