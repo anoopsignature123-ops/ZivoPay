@@ -49,16 +49,24 @@ class StaticContentSeeder extends Seeder
                 'meta_description' => 'Learn about ZIVO PAY, India\'s trusted digital payments and utility recharge portal.',
                 'is_active' => true,
             ],
-            // [
-
-            //     'slug' => 'refund-policy',
-            //     'title' => 'Refund & Cancellation Policy',
-            //     'category' => 'legal',
-            //     'content' => '<h2>Refund & Cancellation Policy</h2><p>All transaction refund requests are processed according to our automated wallet refund guidelines.</p><h3>1. Failed Recharges</h3><p>If money is deducted from your wallet but the operator recharge fails, funds are automatically returned to your Deposit Wallet within 5 minutes.</p><h3>2. Pending Transactions</h3><p>Transactions marked as pending are automatically reconciled with the operator gateway within 24 hours.</p>',
-            //     'meta_title' => 'Refund & Cancellation Policy - ZIVO PAY',
-            //     'meta_description' => 'ZIVO PAY refund policy for failed recharges and wallet transactions.',
-            //     'is_active' => true,
-            // ],
+            [
+                'slug' => 'refund-policy',
+                'title' => 'Refund Policy',
+                'category' => 'legal',
+                'content' => '<h2>Refund &amp; Cancellation Policy</h2><p>This policy explains how ZIVO PAY handles cancellations, returns, and refunds for services and shop orders. Refund eligibility depends on the product or service and the transaction status.</p><h3>1. Recharge and bill payments</h3><p>Completed recharges and bill payments generally cannot be cancelled. If a transaction is marked failed but money was debited, its status will be checked with the relevant payment or service provider and any confirmed refund will be processed to the original payment source or applicable account.</p><h3>2. Shop orders</h3><p>Cancellation, return, replacement, and refund eligibility for shop purchases depends on the item, order status, and applicable return conditions shown for that order. Contact support with your order ID before sending an item back. Refunds are initiated after the return or cancellation is reviewed and approved.</p><h3>3. Refund timelines</h3><p>After approval, the time for the funds to appear depends on the payment method, bank, and payment provider. Please allow the provider’s normal processing time and retain your transaction reference.</p><h3>4. Request help</h3><p>For a refund or transaction review, contact <a href="mailto:support@zivopay.com">support@zivopay.com</a> with your registered mobile number, transaction or order reference, date, and a short description. Do not send your password, OTP, card PIN, or UPI PIN.</p>',
+                'meta_title' => 'Refund Policy - ZIVO PAY',
+                'meta_description' => 'ZIVO PAY refund, cancellation, and return information for payments and shop orders.',
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'grievance-redressal',
+                'title' => 'Grievance Redressal',
+                'category' => 'legal',
+                'content' => '<h2>Grievance Redressal</h2><p>We aim to review and resolve concerns about ZIVO PAY services fairly. Please first contact our support team so we can locate the account or transaction and investigate.</p><h3>1. Submit a complaint</h3><p>Email <a href="mailto:support@zivopay.com">support@zivopay.com</a> using your registered email address. Include your name, registered mobile number, transaction or order reference, relevant dates, and a clear description of the issue. Attach only information needed to investigate; never share passwords, OTPs, card PINs, or UPI PINs.</p><h3>2. Review and updates</h3><p>Our team will acknowledge the complaint and review the available account and transaction records. We may contact you if more details are needed. We will communicate the outcome and any next steps through your registered contact details.</p><h3>3. Escalation</h3><p>If your concern remains unresolved after contacting support, reply to the same email thread and mark it for escalation. Include the earlier complaint reference and explain what remains unresolved.</p><p>Applicable laws and payment-provider processes may prescribe additional channels or timelines for particular services. Where relevant, those details will be provided in the applicable service terms.</p>',
+                'meta_title' => 'Grievance Redressal - ZIVO PAY',
+                'meta_description' => 'How to submit and escalate a complaint to ZIVO PAY support.',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($pages as $page) {

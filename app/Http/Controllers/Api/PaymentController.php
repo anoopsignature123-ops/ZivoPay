@@ -99,7 +99,7 @@ class PaymentController extends Controller
             report($exception);
             $verified = false;
         }
-        if (! $verified) {
+        if (!$verified) {
             $deposit->refresh();
 
             if ($deposit->status === 'pending') {

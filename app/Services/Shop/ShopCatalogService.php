@@ -24,10 +24,10 @@ class ShopCatalogService
                 ->withCount(['products' => fn (Builder $query) => $query->where('is_active', true)])
                 ->orderBy('sort_order')->get(),
             'featured' => Product::query()->where('is_active', true)->where('is_featured', true)
-                ->with('category')->latest()->limit(12)->get(),
+                ->with('category')->withCount('ratings')->withAvg('ratings', 'rating')->latest()->limit(12)->get(),
             'flash_deals' => Product::query()->where('is_active', true)->where('is_flash_deal', true)
                 ->where(fn (Builder $query) => $query->whereNull('flash_deal_ends_at')->orWhere('flash_deal_ends_at', '>', $now))
-                ->with('category')->latest()->limit(12)->get(),
+                ->with('category')->withCount('ratings')->withAvg('ratings', 'rating')->latest()->limit(12)->get(),
         ];
     }
 
@@ -35,6 +35,7 @@ class ShopCatalogService
     public function products(array $filters): LengthAwarePaginator
     {
         return Product::query()->where('is_active', true)->with('category')
+            ->withCount('ratings')->withAvg('ratings', 'rating')
             ->when($filters['category_id'] ?? null, fn (Builder $query, int $id) => $query->where('category_id', $id))
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where(fn (Builder $searchQuery) => $searchQuery->where('name', 'like', "%{$search}%")

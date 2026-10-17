@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Shop\Rating;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -108,6 +109,11 @@ class User extends Authenticatable
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function shopRatings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
     }
 
     /**

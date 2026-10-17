@@ -29,6 +29,8 @@ class ProductResource extends JsonResource
             'price' => (float) $this->price,
             'mrp' => (float) $this->mrp,
             'discount_percent' => $this->mrp > 0 ? (int) round((($this->mrp - $this->price) / $this->mrp) * 100) : 0,
+            'rating_average' => round((float) ($this->ratings_avg_rating ?? 0), 1),
+            'rating_count' => (int) ($this->ratings_count ?? 0),
             'stock' => $this->stock,
             'in_stock' => $this->stock > 0,
             'images' => collect($this->image_paths ?? [])->map(fn (string $path): ?string => $images->url($path))->all(),

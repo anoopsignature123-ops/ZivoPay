@@ -74,7 +74,7 @@
                     {{ $page->title }}
                 </h1>
                 <p class="text-xs text-neutral-400 mt-1">
-                    Last Updated: {{ $page->updated_at->format('F d, Y') }}
+                    Last Updated: {{ $page->updated_at?->format('F d, Y') ?? 'Recently' }}
                 </p>
             </div>
 

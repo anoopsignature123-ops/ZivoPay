@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\Shop\CategoryController as ShopCategoryController
 use App\Http\Controllers\Admin\Shop\OrderController as ShopOrderController;
 use App\Http\Controllers\Admin\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Admin\Shop\PromoCodeController as ShopPromoCodeController;
+use App\Http\Controllers\Admin\Shop\RatingController as ShopRatingController;
 use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\AdminAuth;
@@ -72,6 +73,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('shop')->name('shop.')->group(function (): void {
             Route::resource('categories', ShopCategoryController::class)->except('show');
             Route::resource('products', ShopProductController::class)->except('show');
+            Route::get('ratings', [ShopRatingController::class, 'index'])->name('ratings.index');
+            Route::get('ratings/{rating}/edit', [ShopRatingController::class, 'edit'])->name('ratings.edit');
+            Route::put('ratings/{rating}', [ShopRatingController::class, 'update'])->name('ratings.update');
+            Route::delete('ratings/{rating}', [ShopRatingController::class, 'destroy'])->name('ratings.destroy');
             Route::get('orders', [ShopOrderController::class, 'index'])->name('orders.index');
             Route::get('orders/{order}', [ShopOrderController::class, 'show'])->name('orders.show');
             Route::patch('orders/{order}', [ShopOrderController::class, 'update'])->name('orders.update');

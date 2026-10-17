@@ -23,6 +23,7 @@ Route::get('privacy', [PageController::class, 'show'])->defaults('slug', 'privac
 Route::get('contact-us', [PageController::class, 'show'])->defaults('slug', 'contact-us');
 Route::get('about-us', [PageController::class, 'show'])->defaults('slug', 'about-us');
 Route::get('refund-policy', [PageController::class, 'show'])->defaults('slug', 'refund-policy');
+Route::get('grievance-redressal', [PageController::class, 'show'])->defaults('slug', 'grievance-redressal');
 
 // Load Modular Admin & User Route Files
 require __DIR__.'/admin.php';

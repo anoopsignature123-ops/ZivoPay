@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Shop\CatalogController as ShopCatalogController;
 use App\Http\Controllers\Api\Shop\OrderController as ShopOrderController;
 use App\Http\Controllers\Api\Shop\PaymentController as ShopPaymentController;
 use App\Http\Controllers\Api\Shop\PromoCodeController as ShopPromoCodeController;
+use App\Http\Controllers\Api\Shop\RatingController as ShopRatingController;
 use App\Http\Controllers\Api\SupportController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('shop')->group(function (): void {
         Route::get('products', [ShopCatalogController::class, 'home']);
         Route::get('products/{product}', [ShopCatalogController::class, 'show']);
+        Route::post('ratings', [ShopRatingController::class, 'store'])->middleware('throttle:10,1');
         Route::get('my-cart', [ShopCartController::class, 'show']);
         Route::post('add-to-cart', [ShopCartController::class, 'addItem'])->middleware('throttle:60,1');
         Route::post('update-cart', [ShopCartController::class, 'updateItem']);
@@ -61,11 +63,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('addresses-store', [ShopAddressController::class, 'store']);
         Route::post('addresses-update', [ShopAddressController::class, 'update']);
         Route::post('addresses-delete', [ShopAddressController::class, 'destroy']);
-        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])->middleware('throttle:30,1');
-        Route::post('checkout', [ShopOrderController::class, 'checkout'])->middleware('throttle:10,1')
-            ->name('api.shop.checkout');
-        Route::post('payments-verify', [ShopOrderController::class, 'verifyPayment'])->middleware('throttle:20,1')
-            ->name('api.shop.payments.verify');
+        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])
+            ->middleware('throttle:30,1');
+        Route::post('checkout', [ShopOrderController::class, 'checkout'])
+            ->middleware('throttle:10,1')->name('api.shop.checkout');
+        Route::post('payments-verify', [ShopOrderController::class, 'verifyPayment'])->middleware('throttle:20,1')->name('api.shop.payments.verify');
         Route::post('payments-history', [ShopOrderController::class, 'paymentHistory'])
             ->name('api.shop.payments.history');
         Route::post('payments-status', [ShopOrderController::class, 'paymentStatus']);

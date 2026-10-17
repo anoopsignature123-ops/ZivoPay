@@ -37,7 +37,6 @@ class CatalogController extends Controller
                 'title' => $banner->title,
                 'subtitle' => $banner->subtitle,
                 'image' => $images->url($banner->image_path),
-                'target_url' => $banner->target_url,
             ])->values(),
             'categories' => CategoryResource::collection($home['categories'])->resolve(),
             'flash_deals' => ProductResource::collection($home['flash_deals'])->resolve(),
@@ -56,7 +55,8 @@ class CatalogController extends Controller
 
     public function show(string $product): JsonResponse
     {
-        $query = Product::query()->where('is_active', true)->with('category');
+        $query = Product::query()->where('is_active', true)->with('category')
+            ->withCount('ratings')->withAvg('ratings', 'rating');
         $item = ctype_digit($product)
             ? $query->whereKey((int) $product)->firstOrFail()
             : $query->where('slug', $product)->firstOrFail();

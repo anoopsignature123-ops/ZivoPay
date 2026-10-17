@@ -2466,11 +2466,9 @@
                     Pay.
                 </p>
                 <div class="socials">
-                    <a href="#" class="soc" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="soc" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="soc" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="soc" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                    <a href="#" class="soc" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.facebook.com/zivopay5/" class="soc" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/zivopay5/" class="soc" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.youtube.com/@zivopay5" class="soc" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
                 </div>
                 </div>
                 <div class="fc">
@@ -2505,10 +2503,10 @@
             <div class="fcon"><i class="fas fa-map-marker-alt"></i>India</div>
             <br>
             <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms &amp; Conditions</a></li>
-                <li><a href="#">Refund Policy</a></li>
-                <li><a href="#">Grievance Redressal</a></li>
+                <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
+                <li><a href="{{ url('/terms-conditions') }}">Terms &amp; Conditions</a></li>
+                <li><a href="{{ url('/refund-policy') }}">Refund Policy</a></li>
+                <li><a href="{{ url('/grievance-redressal') }}">Grievance Redressal</a></li>
             </ul>
         </div>
         </div>
