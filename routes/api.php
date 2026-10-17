@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
+use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
@@ -26,6 +27,8 @@ use Illuminate\Support\Facades\Route;
 // Public Authentication & Verification Endpoints
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendLink'])
+    ->middleware('throttle:5,1');
 Route::post('send-otp', [AuthController::class, 'sendOtp']);
 Route::post('login/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('verify-otp', [AuthController::class, 'verifyOtp']);

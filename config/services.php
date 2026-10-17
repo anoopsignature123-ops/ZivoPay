@@ -28,6 +28,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'zeptomail' => [
+        'api_key' => env('ZEPTO_MAIL_API_KEY'),
+        'api_base' => env('ZEPTO_MAIL_API_BASE', 'https://api.zeptomail.in/v1.1/email'),
+        'from_address' => env('ZEPTO_MAIL_FROM_ADDRESS'),
+        'from_name' => env('ZEPTO_MAIL_FROM_NAME', env('APP_NAME', 'ZIVO PAY')),
+        'verify_ssl' => env('ZEPTO_MAIL_VERIFY_SSL', true),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

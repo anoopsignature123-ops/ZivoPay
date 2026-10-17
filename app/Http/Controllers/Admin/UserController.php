@@ -278,7 +278,7 @@ class UserController extends Controller
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'mobile' => 'required|string|max:20|unique:users,mobile,'.$user->id,
             'sponsor_code' => 'required|string',
-            'position' => 'required|in:left,right,direct',
+
             'password' => 'nullable|min:6|confirmed',
         ], [
             'email.unique' => 'This email address is already in use by another user account.',
@@ -290,7 +290,7 @@ class UserController extends Controller
             'email' => $request->email,
             'mobile' => $request->mobile,
             'sponsor_code' => $request->sponsor_code,
-            'position' => strtolower($request->position),
+            // 'position' => strtolower($request->position),
         ];
 
         if ($request->filled('password')) {
