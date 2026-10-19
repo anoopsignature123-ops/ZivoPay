@@ -121,6 +121,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reports/subscription-direct', [ReportController::class, 'directSubscriptionHistory'])->name('reports.subscription-direct');
         Route::get('reports/subscription-team', [ReportController::class, 'teamSubscriptionHistory'])->name('reports.subscription-team');
         Route::get('reports/roi', [ReportController::class, 'roiHistory'])->name('reports.roi');
+        Route::get('reports/daily-roi', [ReportController::class, 'dailyRoiHistory'])->name('reports.daily-roi');
         Route::get('reports/level-direct', [ReportController::class, 'levelDirectHistory'])->name('reports.level-direct');
         Route::get('reports/direct-business', [ReportController::class, 'directBusinessHistory'])->name('reports.direct-business');
         Route::get('reports/level-roi', [ReportController::class, 'levelRoiHistory'])->name('reports.level-roi');

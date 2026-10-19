@@ -271,8 +271,10 @@ class ReportController extends Controller
 
     public function roiHistory(Request $request)
     {
+        // Fund Wallet ROI Payouts — transactions with FWPROFIT- prefix
         $query = Transaction::with(['user'])
-            ->where('type', 'daily_roi');
+            ->where('type', 'daily_roi')
+            ->where('trx_id', 'like', 'FWPROFIT-%');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -297,6 +299,41 @@ class ReportController extends Controller
         $totalAmount = (clone $query)->sum('amount');
 
         return view('admin.reports.roi', compact('rois', 'totalAmount'));
+    }
+
+    public function dailyRoiHistory(Request $request)
+    {
+        // Investment Daily ROI Income — DROI- and ROI- prefixes (package-based ROI)
+        $query = Transaction::with(['user'])
+            ->where('type', 'daily_roi')
+            ->where(function ($q) {
+                $q->where('trx_id', 'like', 'DROI-%')
+                    ->orWhere('trx_id', 'like', 'ROI-%');
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('trx_id', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $rois = $query->orderBy('id', 'desc')->paginate(20);
+        $totalAmount = (clone $query)->sum('amount');
+
+        return view('admin.reports.daily_roi', compact('rois', 'totalAmount'));
     }
 
     public function levelDirectHistory(Request $request)
