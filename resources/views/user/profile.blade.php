@@ -12,11 +12,11 @@
                     <span class="pdf-num-badge">👤</span>
                     <span class="text-xs text-emerald-400 font-extrabold tracking-[3px] uppercase">ZIVO PAY MEMBER
                         PORTAL</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">MY PROFILE & ACCOUNT SETTINGS</h1>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">MY PROFILE & ACCOUNT SETTINGS</h1>
                 <p class="text-xs text-neutral-300 mt-1">Manage personal details, set withdrawal wallet address, and update
                     security password.</p>
-                </div>
+            </div>
 
             <div class="flex items-center gap-3">
                 <div
@@ -24,20 +24,20 @@
                     <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
                     <span>Status: <strong
                             class="{{ $user->status === 'active' ? 'text-emerald-400' : 'text-emerald-300' }} text-xs font-black uppercase">{{ $user->status === 'active' ? 'ACTIVE MEMBER' : 'INACTIVE MEMBER' }}</strong></span>
-                    </div>
-                    </div>
-                    </div>
+                </div>
+                </div>
+                </div>
 
-        @if(session('success'))
+        @if (session('success'))
             <div
                 class="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> {{ session('success') }}
             </div>
         @endif
 
-        @if($errors->any())
+        @if ($errors->any())
             <div class="p-4 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold space-y-1">
-                @foreach($errors->all() as $error)
+                @foreach ($errors->all() as $error)
                     <div class="flex items-center gap-2">
                         <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 shrink-0"></i> {{ $error }}
                     </div>
@@ -65,14 +65,15 @@
                                 class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-[10px]">CODE:
                                 {{ $user->referral_code }}</span>
                             <span
-                                class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-400 font-mono font-bold text-[10px]">FUND WALLET:
+                                class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-400 font-mono font-bold text-[10px]">FUND
+                                WALLET:
                                 ${{ number_format($user->deposit_wallet, 2) }}</span>
                             <span
                                 class="px-2.5 py-0.5 rounded bg-black/80 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-[10px]">EARNING:
                                 ${{ number_format($user->earning_wallet, 2) }}</span>
-                            </div>
-                            </div>
-                            </div>
+                        </div>
+                        </div>
+                        </div>
 
                 <!-- Quick Status Badge -->
                 <div
@@ -80,23 +81,23 @@
                     <i data-lucide="shield-check" class="w-4 h-4 text-white font-black"></i>
                     <span class="text-white font-black">USDT BEP20 READY</span>
                 </div>
-                </div>
+            </div>
 
             <!-- Account Meta Grid Overview -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
                 <div class="p-3.5 rounded-2xl bg-black/80 border border-emerald-500/30">
                     <span class="text-neutral-400 block text-[10px] uppercase font-sans font-bold">Sponsor Name:</span>
-                    @if($user->sponsor)
+                    @if ($user->sponsor)
                         <strong class="text-emerald-300 font-black text-sm block truncate">{{ $user->sponsor->name }}</strong>
-                        <span class="text-[10px] text-neutral-400">Code:
-                            {{ $user->sponsor_code ?? $user->sponsor->referral_code }}</span>
+                            <span class="text-[10px] text-neutral-400">Code:
+                                {{ $user->sponsor_code ?? $user->sponsor->referral_code }}</span>
                     @elseif($user->sponsor_code)
                         <strong class="text-emerald-300 font-black text-sm block truncate">{{ $user->sponsor_code }}</strong>
                         <span class="text-[10px] text-neutral-400">Code: {{ $user->sponsor_code }}</span>
                     @else
-                            <strong class="text-neutral-400 font-bold text-sm block truncate">No Sponsor</strong>
-                            <span class="text-[10px] text-neutral-400">Code: N/A</span>
-                        @endif
+                        <strong class="text-neutral-400 font-bold text-sm block truncate">No Sponsor</strong>
+                        <span class="text-[10px] text-neutral-400">Code: N/A</span>
+                    @endif
                         </div>
 
                 <div class="p-3.5 rounded-2xl bg-black/80 border border-emerald-500/30">
@@ -109,18 +110,18 @@
                 <div class="p-3.5 rounded-2xl bg-black/80 border border-emerald-500/30">
                     <span class="text-neutral-400 block text-[10px] uppercase font-sans font-bold">Withdrawal Wallet
                         Status:</span>
-                    @if($user->wallet_address)
+                    @if ($user->wallet_address)
                         <strong class="text-emerald-400 font-black text-sm block uppercase truncate" title="{{ $user->wallet_address }}">SAVED &
-                            READY</strong>
-                        <span class="text-[10px] text-emerald-400 truncate block">⚡
-                            {{ Str::limit($user->wallet_address, 18) }}</span>
+                                READY</strong>
+                            <span class="text-[10px] text-emerald-400 truncate block">⚡
+                                {{ Str::limit($user->wallet_address, 18) }}</span>
                     @else
                         <strong class="text-emerald-400 font-black text-sm block uppercase">NOT SET YET</strong>
                         <span class="text-[10px] text-emerald-400 block">Add address below for instant payouts</span>
                     @endif
-                        </div>
-                        </div>
-                        </div>
+                </div>
+                </div>
+                </div>
 
         <!-- DUAL REFERRAL LINK COPY CARDS -->
         <div class="p-6 rounded-3xl bg-panel border border-emerald-500/30 shadow-2xl space-y-4">
@@ -133,8 +134,8 @@
                     <h3 class="text-base font-black text-white font-heading uppercase">OFFICIAL MEMBER REFERRAL LINKS</h3>
                     <p class="text-xs text-neutral-300">Share your official Team A (Left) or Team B (Right) referral links
                         to build your network</p>
-                    </div>
-                    </div>
+                </div>
+                </div>
 
             <div class="p-4 rounded-2xl bg-black/80 border border-emerald-500/40 space-y-2">
                 <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider block">OFFICIAL REFERRAL
@@ -168,8 +169,8 @@
                             <h3 class="text-base font-black text-white font-heading uppercase">PROFILE & PAYOUT SETTINGS
                             </h3>
                             <p class="text-xs text-neutral-300">Update personal info and saved Withdrawal Wallet Address</p>
-                            </div>
-                            </div>
+                        </div>
+                        </div>
 
                     <form action="{{ route('user.profile.update') }}" method="POST" class="space-y-4">
                         @csrf
@@ -180,14 +181,14 @@
                             <input type="text" name="name" value="{{ old('name', $user->name) }}" placeholder="Enter your full name..."
                                 class="w-full px-4 py-2.5 rounded-xl bg-black/80 border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400"
                                 required>
-                            </div>
+                        </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Email Address <span
                                     class="text-[10px] text-neutral-400 font-normal">(Read-only)</span></label>
                             <input type="email" value="{{ $user->email }}" readonly
                                 class="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-neutral-700 text-neutral-400 font-mono text-xs cursor-not-allowed">
-                            </div>
+                        </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Mobile Number
@@ -195,7 +196,7 @@
                             <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="Enter mobile phone number..."
                                 class="w-full px-4 py-2.5 rounded-xl bg-black/80 border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400"
                                 required>
-                            </div>
+                        </div>
 
                         <!-- WITHDRAWAL USDT (BEP20) WALLET ADDRESS -->
                         <div class="space-y-1 p-3.5 rounded-2xl bg-black/90 border-2 border-emerald-500/50">
@@ -203,23 +204,24 @@
                                 <label class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
                                     💎 USDT (BEP20) WITHDRAWAL ADDRESS
                                 </label>
-                                @if($user->wallet_address)
+                                @if ($user->wallet_address)
                                     <span class="text-[9px] text-emerald-400 font-mono font-bold">AUTO-FETCH ACTIVE</span>
                                 @endif
-                                </div>
+                            </div>
                             <input type="text" name="wallet_address" value="{{ old('wallet_address', $user->wallet_address) }}"
                                 placeholder="Enter USDT BEP20 Wallet Address (0x...)"
                                 class="w-full px-4 py-2.5 rounded-xl bg-black border border-emerald-500/40 text-emerald-300 font-mono text-xs focus:outline-none focus:border-emerald-400">
-                            <p class="text-[10px] text-neutral-400 mt-1">Saved address will automatically auto-fill whenever
+                            <p class="text-[10px] text-neutral-400 mt-1">Saved address will automatically auto-fill
+                                whenever
                                 you make a withdrawal request!</p>
-                            </div>
+                        </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Referral Code <span
                                     class="text-[10px] text-neutral-400 font-normal">(Read-only)</span></label>
                             <input type="text" value="{{ $user->referral_code }}" readonly
                                 class="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-neutral-700 text-emerald-300 font-mono font-bold text-xs cursor-not-allowed">
-                            </div>
+                        </div>
 
                         <div class="pt-2 flex justify-end">
                             <button type="submit"
@@ -227,10 +229,10 @@
                                 <i data-lucide="save" class="w-4 h-4 text-white font-black"></i>
                                 <span class="text-white font-black">Save Profile & Wallet Address</span>
                             </button>
-                            </div>
-                            </form>
-                            </div>
-                            </div>
+                        </div>
+                        </form>
+                        </div>
+                        </div>
 
             <!-- RIGHT FORM: Change Password -->
             <div
@@ -268,8 +270,8 @@
                                         <circle cx="12" cy="12" r="3" stroke="#34d399"></circle>
                                     </svg>
                                 </button>
-                                </div>
-                                </div>
+                            </div>
+                            </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">New Password
@@ -288,8 +290,8 @@
                                         <circle cx="12" cy="12" r="3" stroke="#34d399"></circle>
                                     </svg>
                                 </button>
-                                </div>
-                                </div>
+                            </div>
+                            </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Confirm New Password
@@ -308,8 +310,8 @@
                                         <circle cx="12" cy="12" r="3" stroke="#34d399"></circle>
                                     </svg>
                                 </button>
-                                </div>
-                                </div>
+                            </div>
+                            </div>
 
                         <div class="pt-2 flex justify-end">
                             <button type="submit"
@@ -317,11 +319,10 @@
                                 <i data-lucide="key-round" class="w-4 h-4 text-white font-black"></i>
                                 <span class="text-white font-black">Update Security Password</span>
                             </button>
-                            </div>
-                            </form>
-                            </div>
-                            </div>
-
+                        </div>
+                        </form>
+                        </div>
+                        </div>
         </div>
 
     </div>
@@ -335,11 +336,13 @@
 
             if (input.type === 'password') {
                 input.type = 'text';
-                svg.innerHTML = `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" stroke="#34d399" stroke-width="2.5"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" stroke="#34d399" stroke-width="2.5"></path><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" stroke="#34d399" stroke-width="2.5"></path><line x1="2" y1="2" x2="22" y2="22" stroke="#34d399" stroke-width="2.5"></line>`;
+                svg.innerHTML =
+                    `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" stroke="#34d399" stroke-width="2.5"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" stroke="#34d399" stroke-width="2.5"></path><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" stroke="#34d399" stroke-width="2.5"></path><line x1="2" y1="2" x2="22" y2="22" stroke="#34d399" stroke-width="2.5"></line>`;
             } else {
                 input.type = 'password';
-                            svg.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke="#34d399" stroke-width="2.5"></path><circle cx="12" cy="12" r="3" stroke="#34d399" stroke-width="2.5"></circle>`;
-                        }
-                    }
+                svg.innerHTML =
+                    `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke="#34d399" stroke-width="2.5"></path><circle cx="12" cy="12" r="3" stroke="#34d399" stroke-width="2.5"></circle>`;
+            }
+        }
                 </script>
 @endsection

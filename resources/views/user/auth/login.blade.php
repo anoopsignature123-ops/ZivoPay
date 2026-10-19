@@ -26,16 +26,17 @@
                     Email</label>
                 <div class="relative">
                     <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
                     </div>
-                    <input type="text" name="email" value="{{ old('email') }}" required placeholder="Enter referral code or email..."
+                    <input type="text" name="email" value="{{ old('email') }}" required
+                        placeholder="Enter referral code or email..."
                         class="w-full pl-11 pr-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
                 </div>
-                </div>
+            </div>
 
             <!-- Password Field -->
             <div>
@@ -43,8 +44,8 @@
                 <div class="relative">
                     <div
                         class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center text-emerald-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="5" y="10" width="14" height="11" rx="2" />
                             <path d="M8 10V7a4 4 0 0 1 8 0v3" />
                         </svg>
@@ -57,19 +58,21 @@
                         class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
                         style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 70% !important; transform: translateY(-50%) !important;"
                         aria-label="Toggle Password Visibility">
-                        <svg id="userEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg id="userEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                             <circle cx="12" cy="12" r="3" />
                         </svg>
-                        <svg id="userEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-emerald-300" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg id="userEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-emerald-300"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
                             <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
                             <line x1="2" y1="2" x2="22" y2="22" />
                         </svg>
                     </button>
-                    </div>
-                    </div>
+                </div>
+            </div>
 
             <!-- Options -->
             <div class="flex items-center justify-between text-xs pt-1">

@@ -12,221 +12,216 @@
         </div>
 
         @if(!isset($showModal) || !$showModal)
-                        <!-- Main Registration Form Container (Hidden when Modal is active) -->
-                        <div class="w-full relative z-10 my-4 sm:my-6">
+            <!-- Main Registration Form Container (Hidden when Modal is active) -->
+            <div class="w-full relative z-10 my-4 sm:my-6">
 
-                            <!-- Form Card -->
-                            <div class="p-6 sm:p-10 border border-emerald-500/30 shadow-2xl space-y-6 relative bg-[#042718] rounded-3xl">
-                                <!-- Card Header with Embedded Brand Logo -->
-                                <div class="text-center space-y-3">
-                                    <a href="{{ url('/') }}" class="inline-block group mb-1">
-                                        <img src="{{ asset('images/logo.png') }}?v=1000" alt="ZIVO PAY"
-                                            class="h-14 sm:h-18 w-auto max-w-[220px] sm:max-w-[280px] mx-auto object-contain drop-shadow-[0_4px_20px_rgba(16,185,129,0.7)] group-hover:scale-105 transition-transform duration-200">
-                                    </a>
+                <!-- Form Card -->
+                <div class="p-6 sm:p-10 border border-emerald-500/30 shadow-2xl space-y-6 relative bg-[#042718] rounded-3xl">
+                    <!-- Card Header with Embedded Brand Logo -->
+                    <div class="text-center space-y-3">
+                        <a href="{{ url('/') }}" class="inline-block group mb-1">
+                            <img src="{{ asset('images/logo.png') }}?v=1000" alt="ZIVO PAY"
+                                class="h-14 sm:h-18 w-auto max-w-[220px] sm:max-w-[280px] mx-auto object-contain drop-shadow-[0_4px_20px_rgba(16,185,129,0.7)] group-hover:scale-105 transition-transform duration-200">
+                        </a>
 
-                                    <div>
-                                        @if(Auth::check())
-                                            <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">REGISTER
-                                                MEMBER</h2>
-                                            <p class="text-xs text-neutral-300 mt-1">Register new member sponsored under your network
-                                                ({{ Auth::user()->referral_code }})</p>
-                                        @else
-                <span
-                    class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
-                    CREATE NEW ACCOUNT
-                </span>
-                <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">MEMBER
-                    REGISTRATION</h2>
-            @endif
-            </div>
-            </div>
-
-            <!-- Global Validation Error Messages Alert -->
-            @if($errors->any())
-                <div
-                    class="p-4 rounded-2xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold space-y-1 shadow-md">
-                    @foreach($errors->all() as $error)
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" y1="8" x2="12" y2="12" />
-                                <line x1="12" y1="16" x2="12.01" y2="16" />
-                            </svg>
-                            <span>{{ $error }}</span>
+                        <div>
+                            @if(Auth::check())
+                                <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">REGISTER
+                                    MEMBER</h2>
+                                <p class="text-xs text-neutral-300 mt-1">Register new member sponsored under your network
+                                    ({{ Auth::user()->referral_code }})</p>
+                            @else
+                                <span
+                                    class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
+                                    CREATE NEW ACCOUNT
+                                </span>
+                                <h2 class="text-2xl font-black text-white uppercase tracking-tight font-heading mt-2">MEMBER
+                                    REGISTRATION</h2>
+                            @endif
                         </div>
-                    @endforeach
-                </div>
-            @endif
-
-            <!-- Form -->
-            <form action="{{ route('user.register') }}" method="POST" class="space-y-4">
-                @csrf
-
-                <!-- Sponsor ID Input & Live Verification Box -->
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-bold text-emerald-400 uppercase">Sponsor Code / ID *</label>
-                        @if(isset($isLockedSponsor) && $isLockedSponsor)
-                            <span
-                                class="text-[10px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40 uppercase flex items-center gap-1">
-                                🔒 Locked Sponsor
-                            </span>
-                        @endif
-                    </div>
-                    <div class="relative">
-                        <input type="text" id="sponsorInput" name="sponsor_id" value="{{ old('sponsor_id', $sponsor ?? '') }}"
-                            required {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'readonly' : '' }}
-                            placeholder="Enter Sponsor Code (e.g. ZIVO-0000001)"
-                            class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400 {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'opacity-85 cursor-not-allowed bg-emerald-500/10' : '' }}">
-                    </div>
-                    @error('sponsor_id')
-                        <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
-                    @enderror
-
-                    <!-- Live Sponsor Info Card AJAX output -->
-                    <div id="sponsorInfoBox" class="mt-2 hidden p-3 rounded-xl border text-xs font-medium transition-all">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Full Name & Email -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Full Name *</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. John Doe"
-                            class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
-                        @error('name')
-                            <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Email Address *</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="john@example.com"
-                            class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
-                        @error('email')
-                            <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Phone -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone *</label>
-                    <input type="text" name="mobile" value="{{ old('mobile') }}" required placeholder="e.g. +91 9876543210"
-                        class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
-                    @error('mobile')
-                        <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Password & Confirm Password -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Password *</label>
-                        <div class="relative">
-                            <input type="password" id="regPassword" name="password" placeholder="••••••••"
-                                class="w-full pl-4 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
-
-                            <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeOpen', 'regEyeClosed')"
-                                class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
-                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
-                                aria-label="Toggle Password Visibility">
-                                <svg id="regEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
-                                <svg id="regEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-emerald-300"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                                    <line x1="2" y1="2" x2="22" y2="22" />
-                                </svg>
-                            </button>
                         </div>
-                        @error('password')
-                            <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Confirm Password
-                            *</label>
-                        <div class="relative">
-                            <input type="password" id="regPasswordConfirm" name="password_confirmation" required
-                                placeholder="••••••••"
-                                class="w-full pl-4 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
-
-                            <button type="button"
-                                onclick="togglePassVisibility('regPasswordConfirm', 'regConfirmEyeOpen', 'regConfirmEyeClosed')"
-                                class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
-                                style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
-                                aria-label="Toggle Password Visibility">
-                                <svg id="regConfirmEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
-                                <svg id="regConfirmEyeClosed" xmlns="http://www.w3.org/2000/svg"
-                                    class="w-5 h-5 hidden text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                                    <line x1="2" y1="2" x2="22" y2="22" />
-                                </svg>
-                            </button>
+                    <!-- Global Validation Error Messages Alert -->
+                    @if($errors->any())
+                        <div
+                            class="p-4 rounded-2xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold space-y-1 shadow-md">
+                            @foreach($errors->all() as $error)
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="12" />
+                                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                    <span>{{ $error }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                    </div>
-                </div>
+                    @endif
 
-                <!-- Terms Checkbox -->
-                <div class="pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-neutral-300">
-                        <input type="checkbox" required checked class="w-4 h-4 rounded accent-emerald-500">
-                        <span>I agree to the <a href="javascript:void(0)" class="text-emerald-400 font-bold hover:underline">Terms &
-                                Conditions</a> of ZIVO PAY.</span>
-                    </label>
-                </div>
+                    <!-- Form -->
+                    <form action="{{ route('user.register') }}" method="POST" class="space-y-4">
+                        @csrf
 
-                <!-- Submit Button -->
-                <button type="submit"
-                    class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm uppercase tracking-wider shadow-xl hover:from-emerald-400 hover:to-teal-500 transition flex items-center justify-center gap-2 mt-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <line x1="19" x2="19" y1="8" y2="14" />
-                        <line x1="22" x2="16" y1="11" y2="11" />
-                    </svg>
-                    REGISTER & GET MEMBER ID
-                </button>
-            </form>
+                        <!-- Sponsor ID Input & Live Verification Box -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-emerald-400 uppercase">Sponsor Code / ID *</label>
+                                @if(isset($isLockedSponsor) && $isLockedSponsor)
+                                    <span
+                                        class="text-[10px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40 uppercase flex items-center gap-1">
+                                        🔒 Locked Sponsor
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="sponsorInput" name="sponsor_id" value="{{ old('sponsor_id', $sponsor ?? '') }}" required {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'readonly' : '' }}
+                                    placeholder="Enter Sponsor Code (e.g. ZIVO-0000001)"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400 {{ (isset($isLockedSponsor) && $isLockedSponsor) ? 'opacity-85 cursor-not-allowed bg-emerald-500/10' : '' }}">
+                                </div>
+                                @error('sponsor_id')
+                                    <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
+                                @enderror
 
-            <div class="text-center pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
-                @if(Auth::check())
-                    <a href="{{ route('user.dashboard') }}" class="text-emerald-400 font-black hover:underline flex items-center gap-1">
-                        &larr; Return to Dashboard
-                    </a>
-                @else
-                    <p class="text-neutral-400">
-                        Already have an account?
-                        <a href="{{ route('user.login') }}" class="text-emerald-400 font-black hover:underline ml-1">LOG IN
-                            HERE</a>
-                    </p>
-                @endif
-                <a href="{{ url('/') }}" class="text-neutral-300 font-bold hover:text-emerald-400 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                                            <polyline points="9 22 9 12 15 12 15 22" />
+                            <!-- Live Sponsor Info Card AJAX output -->
+                            <div id="sponsorInfoBox" class="mt-2 hidden p-3 rounded-xl border text-xs font-medium transition-all">
+                                <!-- Populated by JS -->
+                            </div>
+                            </div>
+
+                        <!-- Full Name & Email -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Full Name *</label>
+                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. John Doe"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+                                @error('name')
+                                    <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Email Address *</label>
+                                <input type="email" name="email" value="{{ old('email') }}" required placeholder="john@example.com"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+                                @error('email')
+                                    <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
+                                @enderror
+                                </div>
+                                </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone *</label>
+                            <input type="text" name="mobile" value="{{ old('mobile') }}" required placeholder="e.g. +91 9876543210"
+                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+                            @error('mobile')
+                                <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                            </div>
+
+                        <!-- Password & Confirm Password -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Password *</label>
+                                <div class="relative">
+                                    <input type="password" id="regPassword" name="password" placeholder="••••••••"
+                                        class="w-full pl-4 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+
+                                    <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeOpen', 'regEyeClosed')"
+                                        class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
+                                        style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
+                                        aria-label="Toggle Password Visibility">
+                                        <svg id="regEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                            <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        Back to Home
-                                    </a>
+                                        <svg id="regEyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-emerald-300" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                                            <line x1="2" y1="2" x2="22" y2="22" />
+                                        </svg>
+                                        </button>
+                                        </div>
+                                        @error('password')
+                                            <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
+                                        @enderror
+                                        </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Confirm Password
+                                    *</label>
+                                <div class="relative">
+                                    <input type="password" id="regPasswordConfirm" name="password_confirmation" required placeholder="••••••••"
+                                        class="w-full pl-4 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+
+                                    <button type="button" onclick="togglePassVisibility('regPasswordConfirm', 'regConfirmEyeOpen', 'regConfirmEyeClosed')"
+                                        class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
+                                        style="position: absolute !important; right: 0.875rem !important; left: auto !important; top: 80% !important; transform: translateY(-50%) !important;"
+                                        aria-label="Toggle Password Visibility">
+                                        <svg id="regConfirmEyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                        <svg id="regConfirmEyeClosed" xmlns="http://www.w3.org/2000/svg"
+                                            class="w-5 h-5 hidden text-emerald-300" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                                            <line x1="2" y1="2" x2="22" y2="22" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div class="pt-1">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs text-neutral-300">
+                                <input type="checkbox" required checked class="w-4 h-4 rounded accent-emerald-500">
+                                <span>I agree to the <a href="javascript:void(0)" class="text-emerald-400 font-bold hover:underline">Terms &
+                                        Conditions</a> of ZIVO PAY.</span>
+                                </label>
+                                </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit"
+                            class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm uppercase tracking-wider shadow-xl hover:from-emerald-400 hover:to-teal-500 transition flex items-center justify-center gap-2 mt-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <line x1="19" x2="19" y1="8" y2="14" />
+                                <line x1="22" x2="16" y1="11" y2="11" />
+                            </svg>
+                            REGISTER & GET MEMBER ID
+                        </button>
+                        </form>
+
+                    <div class="text-center pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
+                        @if(Auth::check())
+                            <a href="{{ route('user.dashboard') }}" class="text-emerald-400 font-black hover:underline flex items-center gap-1">
+                                &larr; Return to Dashboard
+                            </a>
+                        @else
+                                <p class="text-neutral-400">
+                                    Already have an account?
+                                    <a href="{{ route('user.login') }}" class="text-emerald-400 font-black hover:underline ml-1">LOG IN
+                                        HERE</a>
+                                </p>
+                            @endif
+                        <a href="{{ url('/') }}" class="text-neutral-300 font-bold hover:text-emerald-400 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                            </svg>
+                            Back to Home
+                        </a>
+                        </div>
+                        </div>
                         </div>
         @endif
 
@@ -332,10 +327,11 @@
 
                         <a href="{{ route('user.login') }}"
                             class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm uppercase tracking-wider shadow-lg hover:from-emerald-400 hover:to-teal-500 transition flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                                <polyline points="10 17 15 12 10 7"/>
-                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                <polyline points="10 17 15 12 10 7" />
+                                <line x1="15" y1="12" x2="3" y2="12" />
                             </svg>
                             PROCEED TO LOGIN
                         </a>
@@ -368,22 +364,22 @@
                             if (data.success) {
                                 box.className = 'mt-2 p-3 rounded-xl border bg-emerald-500/10 border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-between';
                                 box.innerHTML = `
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                                            <div>
-                                                <span class="font-black uppercase tracking-wider text-white block">✓ VERIFIED SPONSOR</span>
-                                                <span class="text-emerald-300 font-bold">${data.name}</span>
-                                                <span class="text-neutral-400 font-mono text-[11px] block">${data.email}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                                                <div>
+                                                    <span class="font-black uppercase tracking-wider text-white block">✓ VERIFIED SPONSOR</span>
+                                                    <span class="text-emerald-300 font-bold">${data.name}</span>
+                                                    <span class="text-neutral-400 font-mono text-[11px] block">${data.email}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <span class="text-[10px] font-mono bg-black/50 px-2 py-1 rounded text-emerald-400 border border-emerald-500/30">${data.referral_code}</span>
-                                    `;
+                                            <span class="text-[10px] font-mono bg-black/50 px-2 py-1 rounded text-emerald-400 border border-emerald-500/30">${data.referral_code}</span>
+                                        `;
                             } else {
                                 box.className = 'mt-2 p-3 rounded-xl border bg-rose-500/10 border-rose-500/40 text-rose-300 text-xs font-semibold flex items-center gap-2';
                                 box.innerHTML = `
-                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                                        <span>${data.message || 'Invalid Sponsor Code! User not found.'}</span>
-                                    `;
+                                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                            <span>${data.message || 'Invalid Sponsor Code! User not found.'}</span>
+                                        `;
                             }
                         })
                         .catch(() => {

@@ -9,13 +9,14 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/fav.png') }}?v=10" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/fav.png') }}?v=10" />
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=10" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
     <style>
         body.ng-auth-bg {
             background-color: #021c10 !important;
-            background-image: 
+            background-image:
                 linear-gradient(to bottom, rgba(2, 28, 16, 0.25), rgba(1, 15, 9, 0.45)),
                 url('{{ asset("images/zivo_auth_bg.jpg") }}?v=6') !important;
             background-size: cover !important;
@@ -32,7 +33,8 @@
     @stack('styles')
 </head>
 
-<body class="ng-auth-bg min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 py-6 sm:py-10 relative overflow-y-auto text-slate-100 font-sans">
+<body
+    class="ng-auth-bg min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 py-6 sm:py-10 relative overflow-y-auto text-slate-100 font-sans">
 
     <!-- Live Animated Background & Ambient Aurora Engine -->
     <div class="live-auth-bg-container"></div>
@@ -47,7 +49,7 @@
     <script src="{{ asset('js/app-validation.js') }}"></script>
     <script src="{{ asset('js/pull-to-refresh.js') }}"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             @if ($errors->any())
                 showToast('Authentication Error', "{{ $errors->first() }}", 'error');
             @endif

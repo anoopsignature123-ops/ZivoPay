@@ -11,7 +11,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=10" />
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dextrade-theme.css') }}" rel="stylesheet">
-    @if(request()->routeIs('user.deposit.index'))
+    @if (request()->routeIs('user.deposit.index'))
         @vite(['resources/css/app.css'])
     @endif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -77,7 +77,8 @@
                     if (window.innerWidth >= 1024) {
                         document.body.classList.toggle('sidebar-collapsed');
                         const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-                        localStorage.setItem('dextrade_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+                        localStorage.setItem('dextrade_sidebar_collapsed', isCollapsed ? 'true' :
+                            'false');
                     } else {
                         if (sidebar) sidebar.classList.toggle('mobile-sidebar-open');
                         if (overlay) {

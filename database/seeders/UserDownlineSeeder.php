@@ -16,11 +16,11 @@ class UserDownlineSeeder extends Seeder
         // 1. Get or create Root User (Top Sponsor)
         $rootUser = User::where('email', 'root@zivopay.net')->first();
 
-        if (! $rootUser) {
+        if (!$rootUser) {
             $rootUser = User::where('referral_code', 'ZIVO-0000001')->first();
         }
 
-        if (! $rootUser) {
+        if (!$rootUser) {
             $rootUser = User::create([
                 'role_id' => 2,
                 'name' => 'Root User',
@@ -41,9 +41,9 @@ class UserDownlineSeeder extends Seeder
 
         // 2. Create 150 Users sequentially (User 1 to User 150) - Each sponsored by previous user
         for ($i = 1; $i <= 150; $i++) {
-            $referralCode = 'ZIVO-'.str_pad((string) (1000000 + $i), 7, '0', STR_PAD_LEFT);
+            $referralCode = 'ZIVO-' . str_pad((string) (1000000 + $i), 7, '0', STR_PAD_LEFT);
             $email = "user{$i}@zivopay.net";
-            $mobile = '91'.str_pad((string) $i, 8, '0', STR_PAD_LEFT);
+            $mobile = '91' . str_pad((string) $i, 8, '0', STR_PAD_LEFT);
             $name = "User {$i}";
 
             $user = User::updateOrCreate(

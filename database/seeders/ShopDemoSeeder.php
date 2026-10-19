@@ -59,7 +59,7 @@ class ShopDemoSeeder extends Seeder
 
         foreach ($products as [$categorySlug, $name, $sku, $emoji, $price, $mrp, $stock, $featured, $flashDeal]) {
             [$background, $accent] = $this->categoryColors($categorySlug);
-            $imagePath = $this->artwork('products/'.Str::slug($sku), $name, $emoji, $background, $accent);
+            $imagePath = $this->artwork('products/' . Str::slug($sku), $name, $emoji, $background, $accent);
             Product::firstOrCreate(['slug' => Str::slug($name)], [
                 'category_id' => $categoryIds[$categorySlug],
                 'name' => $name,
@@ -133,7 +133,7 @@ class ShopDemoSeeder extends Seeder
 
     private function artwork(string $slug, string $title, string $graphic, string $background, string $accent): string
     {
-        $path = 'shop/demo/'.str_replace('/', '-', $slug).'.svg';
+        $path = 'shop/demo/' . str_replace('/', '-', $slug) . '.svg';
         $title = htmlspecialchars($title, ENT_QUOTES | ENT_XML1, 'UTF-8');
         $graphic = htmlspecialchars($graphic, ENT_QUOTES | ENT_XML1, 'UTF-8');
         $svg = <<<SVG
