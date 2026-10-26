@@ -174,7 +174,7 @@
             <!-- Direct Income -->
             <div class="p-5 rounded-2xl bg-[#01140c] border border-emerald-500/30 hover:border-emerald-500/60 transition shadow-lg flex items-center justify-between">
                 <div>
-                    <span class="text-neutral-400 text-[11px] font-bold uppercase tracking-wider block">Direct Referral Income</span>
+                    <span class="text-neutral-400 text-[11px] font-bold uppercase tracking-wider block">30-Level Business Income</span>
                     <strong class="text-emerald-400 font-black text-xl font-mono block mt-1">${{ number_format((float)$totalDirectIncome, 2) }}</strong>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">

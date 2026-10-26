@@ -32,7 +32,7 @@ class DashboardController extends Controller
         // Capital Investments & Earnings Metrics
         $totalInvestmentsSum = UserInvestment::where('status', 'active')->sum('amount');
         $totalRoiDistributed = Transaction::where('type', 'daily_roi')->sum('amount');
-        $totalCommissionsPaid = Transaction::whereIn('type', ['direct_bonus', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income'])->sum('amount');
+        $totalCommissionsPaid = Transaction::whereIn('type', ['level_income', 'subscription_level', 'level_roi', 'roi_level_income'])->sum('amount');
 
         // Withdrawals & Recharges Summary
         $pendingWithdrawalsSum = Withdrawal::where('status', 'pending')->sum('amount');

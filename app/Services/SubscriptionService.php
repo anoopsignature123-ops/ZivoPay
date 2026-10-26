@@ -42,7 +42,7 @@ class SubscriptionService
                 'description' => 'Mandatory ₹3,000 Zivo Family Kit Account Activation Subscription',
             ]);
 
-            // Distribute 15-Level Referral Incomes (5% Level 1 = ₹150, 0.50% Levels 2-15 = ₹15 per level)
+            // Distribute 30-Level Referral Incomes (L1: 0% band, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%)
             $this->distributeSubscriptionReferralIncome($user);
 
             return true;
@@ -54,7 +54,7 @@ class SubscriptionService
         $currentSponsorCode = $user->sponsor_code;
         $level = 1;
 
-        while (! empty($currentSponsorCode) && $level <= 15) {
+        while (! empty($currentSponsorCode) && $level <= 30) {
             $sponsor = User::where('referral_code', $currentSponsorCode)->first();
             if (! $sponsor) {
                 break;
@@ -68,15 +68,28 @@ class SubscriptionService
                 continue;
             }
 
-            // Level 1 gets 5% (₹150), Level 2-15 gets 0.50% (₹15)
-            $percentage = ($level === 1) ? 5.00 : 0.50;
+            // L1: 0% (band — no income), L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
+            if ($level === 1) {
+                // L1 is banded — no income on ₹3,000 activation for direct referrer
+                $currentSponsorCode = $sponsor->sponsor_code;
+                $level++;
+
+                continue;
+            } elseif ($level === 2) {
+                $percentage = 8.00;
+            } elseif ($level <= 8) {
+                $percentage = 2.00;
+            } elseif ($level <= 16) {
+                $percentage = 1.00;
+            } else {
+                $percentage = 0.50;
+            }
+
             $commission = (self::ACTIVATION_FEE * $percentage) / 100;
 
             if ($commission > 0) {
                 $sponsor->earning_wallet += $commission;
                 $sponsor->save();
-
-                $typeLabel = ($level === 1) ? 'Direct Bonus Referral Income' : 'Team Level Bonus Referral Income';
 
                 Transaction::create([
                     'user_id' => $sponsor->id,
@@ -88,7 +101,7 @@ class SubscriptionService
                     'amount' => $commission,
                     'charge' => 0.00,
                     'post_balance' => $sponsor->earning_wallet,
-                    'description' => "Level {$level} {$typeLabel} ({$percentage}%) from ₹3,000 package activation of {$user->name} ({$user->referral_code})",
+                    'description' => "Level {$level} Team Level Bonus Referral Income ({$percentage}%) from ₹3,000 package activation of {$user->name} ({$user->referral_code})",
                 ]);
             }
 

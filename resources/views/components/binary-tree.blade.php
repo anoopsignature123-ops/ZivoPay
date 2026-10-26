@@ -442,7 +442,7 @@
                 <span id="mobileModalDailyRoi" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">🎁</span> Direct Income:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">🎁</span> 30-Level Business Income:</span>
                 <span id="mobileModalDirectIncome" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">

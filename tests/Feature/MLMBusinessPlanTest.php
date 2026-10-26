@@ -29,7 +29,7 @@ class MLMBusinessPlanTest extends TestCase
     {
         $service = new MLMIncomeService;
 
-        // Build 15-Level Sponsor Chain
+        // Build 30-Level Sponsor Chain (using 15 for this test)
         $sponsors = [];
         $previousCode = null;
         $uid = uniqid();
@@ -62,15 +62,23 @@ class MLMBusinessPlanTest extends TestCase
         $this->assertEquals('active', $investor->fresh()->status);
         $this->assertEquals(100000.00, $investor->fresh()->deposit_wallet);
 
-        // 2. Assert Level 1 Direct Sponsor (User 14) gets 5% = ₹5,000
-        $this->assertEquals(5000.00, $sponsors[14]->fresh()->earning_wallet);
+        // 2. Assert Level 1 Direct Sponsor (User 14) gets 8% = ₹8,000
+        $this->assertEquals(8000.00, $sponsors[14]->fresh()->earning_wallet);
 
-        // 3. Assert Level 2 to Level 15 Sponsors (Users 1 to 13) get 0.50% = ₹500
-        for ($lvl = 1; $lvl <= 13; $lvl++) {
-            $this->assertEquals(500.00, $sponsors[$lvl]->fresh()->earning_wallet, "User level {$lvl} failed to receive 0.50% direct level income");
+        // 3. Assert Level 2 Sponsor (User 13) gets 8% = ₹8,000
+        $this->assertEquals(8000.00, $sponsors[13]->fresh()->earning_wallet);
+
+        // 4. Assert Level 3 to Level 8 Sponsors get 2% = ₹2,000 each
+        for ($lvl = 7; $lvl <= 12; $lvl++) {
+            $this->assertEquals(2000.00, $sponsors[$lvl]->fresh()->earning_wallet, "User level {$lvl} failed to receive 2% direct level income");
         }
 
-        // 4. Assert 14 level income transactions created for the sponsor chain
+        // 5. Assert Level 9 to Level 15 Sponsors get 1% = ₹1,000 each
+        for ($lvl = 1; $lvl <= 6; $lvl++) {
+            $this->assertEquals(1000.00, $sponsors[$lvl]->fresh()->earning_wallet, "User level {$lvl} failed to receive 1% direct level income");
+        }
+
+        // 6. Assert 14 level income transactions created for the sponsor chain
         $sponsorIds = array_map(fn ($u) => $u->id, $sponsors);
         $this->assertEquals(14, Transaction::where('type', 'level_income')->whereIn('user_id', $sponsorIds)->count());
     }
@@ -120,8 +128,8 @@ class MLMBusinessPlanTest extends TestCase
         // Investor invests ₹100,000
         $service->createInvestment($investor, 100000.00, 'deposit_wallet');
 
-        // Active Sponsor (Level 1) receives 5% = ₹5,000
-        $this->assertEquals(5000.00, $activeSponsor->fresh()->earning_wallet);
+        // Active Sponsor (Level 1) receives 8% = ₹8,000
+        $this->assertEquals(8000.00, $activeSponsor->fresh()->earning_wallet);
 
         // Inactive Sponsor (Level 2) receives NOTHING = ₹0.00
         $this->assertEquals(0.00, $inactiveSponsor->fresh()->earning_wallet);
@@ -168,18 +176,24 @@ class MLMBusinessPlanTest extends TestCase
         // 1. Investor (User 15) receives ₹200.00 Daily ROI
         $this->assertEquals(200.00, $investor->fresh()->earning_wallet);
 
-        // 2. Level 1 Sponsor (User 14) receives 10% of ₹200 = ₹20.00
-        $this->assertEquals(20.00, $sponsors[14]->fresh()->earning_wallet);
+        // 2. Level 1 Sponsor (User 14) receives 15% of ₹200 = ₹30.00
+        $this->assertEquals(30.00, $sponsors[14]->fresh()->earning_wallet);
 
-        // 3. Level 2 Sponsor (User 13) receives 3% of ₹200 = ₹6.00
-        $this->assertEquals(6.00, $sponsors[13]->fresh()->earning_wallet);
+        // 3. Level 2 Sponsor (User 13) receives 8% of ₹200 = ₹16.00
+        $this->assertEquals(16.00, $sponsors[13]->fresh()->earning_wallet);
 
-        // 4. Level 3 to Level 15 Sponsors (Users 1 to 12) receive 1% of ₹200 = ₹2.00
-        for ($lvl = 1; $lvl <= 12; $lvl++) {
-            $this->assertEquals(2.00, $sponsors[$lvl]->fresh()->earning_wallet, "User level {$lvl} failed to receive 1% ROI matching income");
+        // 4. Level 3 to Level 8 Sponsors receive 2% of ₹200 = ₹4.00 each
+        // Sponsors[7] to Sponsors[12] are at levels 3-8 in chain from investor
+        for ($lvl = 7; $lvl <= 12; $lvl++) {
+            $this->assertEquals(4.00, $sponsors[$lvl]->fresh()->earning_wallet, "Sponsor [{$lvl}] failed to receive 2% ROI matching income");
         }
 
-        // 5. Assert ROI transaction logs created
+        // 5. Level 9 to Level 15 Sponsors receive 1% of ₹200 = ₹2.00 each
+        for ($lvl = 1; $lvl <= 6; $lvl++) {
+            $this->assertEquals(2.00, $sponsors[$lvl]->fresh()->earning_wallet, "Sponsor [{$lvl}] failed to receive 1% ROI matching income");
+        }
+
+        // 6. Assert ROI transaction logs created
         $sponsorIds = array_map(fn ($u) => $u->id, $sponsors);
         $this->assertEquals(1, Transaction::where('type', 'daily_roi')->where('user_id', $investor->id)->count());
         $this->assertEquals(14, Transaction::whereIn('type', ['level_roi', 'roi_level_income'])->whereIn('user_id', $sponsorIds)->count());

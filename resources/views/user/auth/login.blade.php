@@ -20,22 +20,25 @@
         <!-- Form -->
         <form action="{{ route('user.login') }}" method="POST" class="space-y-4">
             @csrf
-            <!-- User ID / Email Field -->
+            <!-- Mobile Number Field -->
             <div>
-                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Referral Code / Registered
-                    Email</label>
+                <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Number</label>
                 <div class="relative">
                     <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
+                            <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                            <path d="M12 18h.01" />
                         </svg>
                     </div>
-                    <input type="text" name="email" value="{{ old('email') }}" required
-                        placeholder="Enter referral code or email..."
-                        class="w-full pl-11 pr-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+                    <input type="tel" name="mobile" value="{{ old('mobile') }}" required
+                        placeholder="Enter your registered mobile number..."
+                        maxlength="15"
+                        class="w-full pl-11 pr-4 py-3 rounded-xl bg-[#01140c] border {{ $errors->has('mobile') ? 'border-red-500' : 'border-emerald-500/40' }} text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
                 </div>
+                @error('mobile')
+                    <p class="text-red-400 text-xs font-bold mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Password Field -->
@@ -52,7 +55,7 @@
                     </div>
 
                     <input type="password" id="userPassword" name="password" required placeholder="Enter your password..."
-                        class="w-full pl-11 pr-12 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+                        class="w-full pl-11 pr-12 py-3 rounded-xl bg-[#01140c] border {{ $errors->has('password') ? 'border-red-500' : 'border-emerald-500/40' }} text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
 
                     <button type="button" onclick="toggleUserPassword()"
                         class="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 p-1 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition focus:outline-none cursor-pointer"
@@ -72,6 +75,9 @@
                         </svg>
                     </button>
                 </div>
+                @error('password')
+                    <p class="text-red-400 text-xs font-bold mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Options -->

@@ -10,13 +10,13 @@
             <div>
                 <span
                     class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
-                    12% TOTAL 15-LEVEL REFERRAL COMMISSIONS
+                    30-LEVEL ₹3000 ACTIVATION INCOME (L1 BAND)
                 </span>
                 <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">
-                    {{ $reportTitle ?? '15-LEVEL SUBSCRIPTION INCOME' }}
+                    {{ $reportTitle ?? '30-LEVEL SUBSCRIPTION INCOME' }}
                 </h1>
-                <p class="text-xs text-neutral-300 mt-1">Instant referral commissions (Level 1: 5%, Levels 2-15: 0.50%)
-                    earned on mandatory ₹3,000 package activations.</p>
+                <p class="text-xs text-neutral-300 mt-1">Team referral commissions (L1: 0% band, L2: 8%, L3-L8: 2%,
+                    L9-L16: 1%, L17-L30: 0.5%) earned on mandatory ₹3,000 package activations.</p>
                 </div>
 
             <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">

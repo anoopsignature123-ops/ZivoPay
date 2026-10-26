@@ -420,11 +420,7 @@ class ReportController extends Controller
     public function directSubscriptionHistory(Request $request)
     {
         $query = Transaction::with(['user', 'fromUser'])
-            ->where('type', 'subscription_level')
-            ->where(function ($q) {
-                $q->where('description', 'like', '%Level 1%')
-                    ->orWhere('description', 'like', '%Direct%');
-            });
+            ->where('type', 'subscription_level');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -447,7 +443,7 @@ class ReportController extends Controller
 
         $subscriptions = $query->orderBy('id', 'desc')->paginate(20);
         $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Direct Bonus Referral Income Audit';
+        $reportTitle = '₹3000 Activation Income Audit (L2–L30)';
 
         return view('admin.reports.subscriptions', compact('subscriptions', 'totalAmount', 'reportTitle'));
     }

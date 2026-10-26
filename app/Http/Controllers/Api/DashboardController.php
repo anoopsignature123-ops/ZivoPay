@@ -44,7 +44,7 @@ class DashboardController extends Controller
                 ->take(8)
                 ->get()
                 ->map(function ($t) {
-                    $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'direct_bonus', 'level_income']);
+                    $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
                     $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
                     return [
@@ -185,7 +185,9 @@ class DashboardController extends Controller
             'p2p_receive' => 'P2P Transfer Received',
             'withdrawal' => 'Wallet Withdrawal',
             'daily_roi' => 'Daily ROI Income',
-            'direct_bonus' => 'Direct Referral Income',
+            'level_income' => '30-Level Business Income',
+            'subscription_level' => '₹3000 Activation Level Income',
+            'level_roi', 'roi_level_income' => '30-Level ROI Matching Income',
             default => ucfirst(str_replace('_', ' ', $t->type)),
         };
     }
@@ -233,7 +235,7 @@ class DashboardController extends Controller
                 return $this->errorResponse('Transaction record not found.', 404);
             }
 
-            $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'direct_bonus', 'level_income']);
+            $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
             $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
             $rechargeDetails = null;

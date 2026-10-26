@@ -29,7 +29,7 @@ class RoiIncomeService
 
         // 1. Process Daily ROI for Active Capital Investments
         $activeInvestments = UserInvestment::where('status', 'active')
-            ->where('days_completed', '<', 730)
+            ->where('days_completed', '<', 750)
             ->get();
 
         foreach ($activeInvestments as $investment) {
@@ -48,7 +48,7 @@ class RoiIncomeService
                 $investment->days_completed += 1;
                 $investment->total_returned += $dailyAmount;
                 $investment->last_payout_at = now();
-                if ($investment->days_completed >= 730) {
+                if ($investment->days_completed >= 750) {
                     $investment->status = 'completed';
                 }
                 $investment->save();
@@ -63,7 +63,7 @@ class RoiIncomeService
                     'amount' => $dailyAmount,
                     'charge' => 0.00,
                     'post_balance' => $user->earning_wallet,
-                    'description' => "Daily ROI Income (Day {$investment->days_completed}/730) on Capital ₹".number_format($investment->amount, 2),
+                    'description' => "Daily ROI Income (Day {$investment->days_completed}/750) on Capital ₹".number_format($investment->amount, 2),
                 ]);
 
                 // Distribute 26% 15-Level Secondary ROI Matching Bonus (L1: 10%, L2: 3%, L3-L15: 1%)
@@ -115,7 +115,7 @@ class RoiIncomeService
         $currentSponsorCode = $user->sponsor_code;
         $level = 1;
 
-        while (! empty($currentSponsorCode) && $level <= 15) {
+        while (! empty($currentSponsorCode) && $level <= 30) {
             $sponsor = User::where('referral_code', $currentSponsorCode)->first();
             if (! $sponsor) {
                 break;
@@ -129,14 +129,18 @@ class RoiIncomeService
                 continue;
             }
 
-            // ROI Matching Table from official plan poster:
-            // Level 1: 10%, Level 2: 3%, Level 3-15: 1% each (Total 26%)
+            // ROI Matching Table:
+            // L1: 15%, L2: 8%, L3-L8: 2% each, L9-L16: 1% each, L17-L30: 0.5% each
             if ($level === 1) {
-                $percentage = 10.00;
+                $percentage = 15.00;
             } elseif ($level === 2) {
-                $percentage = 3.00;
-            } else {
+                $percentage = 8.00;
+            } elseif ($level <= 8) {
+                $percentage = 2.00;
+            } elseif ($level <= 16) {
                 $percentage = 1.00;
+            } else {
+                $percentage = 0.50;
             }
 
             $commission = ($dailyRoiAmount * $percentage) / 100;

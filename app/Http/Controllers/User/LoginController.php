@@ -26,19 +26,21 @@ class LoginController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => 'required',
+            'mobile'   => 'required|digits_between:10,15',
             'password' => 'required',
+        ], [
+            'mobile.required'        => 'Mobile number is required.',
+            'mobile.digits_between'  => 'Enter a valid mobile number.',
+            'password.required'      => 'Password is required.',
         ]);
 
-        $fieldType = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'referral_code';
-
-        if (Auth::attempt([$fieldType => $request->email, 'password' => $request->password], $request->remember)) {
+        if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password], $request->remember)) {
             $user = Auth::user();
 
             if ($user->isAdmin()) {
                 Auth::logout();
 
-                return back()->withErrors(['email' => 'Invalid user credentials provided.']);
+                return back()->withErrors(['mobile' => 'Invalid user credentials provided.']);
             }
 
             $request->session()->regenerate();
@@ -46,7 +48,7 @@ class LoginController extends Controller
             return redirect()->route('user.dashboard')->with('success', 'Welcome back, '.$user->name);
         }
 
-        return back()->withErrors(['email' => 'Invalid user credentials provided.']);
+        return back()->withErrors(['mobile' => 'Invalid mobile number or password.'])->withInput(['mobile' => $request->mobile]);
     }
 
     public function logout(Request $request): RedirectResponse

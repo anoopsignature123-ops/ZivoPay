@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Direct Business Level Income Report - ZIVO PAY')
+@section('title', '30-Level Business Income Report - ZIVO PAY')
 
 @section('content')
     <div class="space-y-6 font-sans">
@@ -10,16 +10,16 @@
             <div>
                 <span
                     class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
-                    12% TOTAL DIRECT BUSINESS REFERRAL BONUS
+                    30-LEVEL BUSINESS REFERRAL BONUS
                 </span>
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">DIRECT BUSINESS LEVEL
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">30-LEVEL BUSINESS
                     INCOME</h1>
-                <p class="text-xs text-neutral-300 mt-1">Instant 15-Level referral commissions (5% Level 1, 0.50% Levels
-                    2-15) earned on downline package investments.</p>
+                <p class="text-xs text-neutral-300 mt-1">30-Level referral commissions (L1=8%, L2=8%, L3-L8=2%,
+                    L9-L16=1%, L17-L30=0.5%) earned on downline package investments.</p>
             </div>
 
             <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">
-                <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">Total Direct
+                <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">Total 30-Level
                     Business Bonus</span>
                 <span class="text-2xl font-black text-white font-mono">₹{{ number_format($totalAmount, 2) }}</span>
             </div>
@@ -110,7 +110,7 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                    No direct business referral bonuses recorded yet matching your filter.
+                                    No 30-Level business income records found matching your filter.
                                 </td>
                             </tr>
                         @endforelse

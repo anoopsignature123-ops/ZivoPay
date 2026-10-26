@@ -45,7 +45,7 @@ class IncomeController extends Controller
 
         // Income Totals Summary
         $totalRoi = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->sum('amount');
-        $totalLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['direct_bonus', 'level_income'])->sum('amount');
+        $totalLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_income', 'direct_bonus', 'subscription_level'])->sum('amount');
         $totalRoiLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
         $totalSubscriptionIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['subscription_level', 'subscription'])->sum('amount');
 
@@ -433,7 +433,7 @@ class IncomeController extends Controller
     public function levelDirectIncome(Request $request)
     {
         $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->whereIn('type', ['direct_bonus', 'level_income']);
+        $query = Transaction::where('user_id', $user->id)->where('type', 'level_income');
 
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
@@ -509,12 +509,10 @@ class IncomeController extends Controller
     public function directSubscriptionIncome(Request $request)
     {
         $user = Auth::user();
+        // L1 is banded on ₹3000 activation — no direct income from subscription
+        // Show all subscription_level entries from L2 onwards (team income only)
         $query = Transaction::where('user_id', $user->id)
-            ->where('type', 'subscription_level')
-            ->where(function ($q) {
-                $q->where('description', 'like', '%Level 1%')
-                    ->orWhere('description', 'like', '%Direct%');
-            });
+            ->where('type', 'subscription_level');
 
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
@@ -533,7 +531,7 @@ class IncomeController extends Controller
 
         $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
         $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Direct Bonus Referral Income';
+        $reportTitle = '₹3000 Activation Team Level Income (L2–L30)';
 
         return view('user.income.subscription', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
     }
@@ -572,28 +570,6 @@ class IncomeController extends Controller
 
     public function directBusinessIncome(Request $request)
     {
-        $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->where('type', 'direct_bonus');
-
-        if ($request->filled('search')) {
-            $search = trim((string) $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Direct Business Income';
-
-        return view('user.income.level_direct', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
+        return redirect()->route('user.income.level-direct');
     }
 }

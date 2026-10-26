@@ -31,7 +31,7 @@ class InvestmentService
 
         $roiRate = $this->calculateRoiPercentage($amount);
         $dailyProfit = ($amount * $roiRate) / 100;
-        $totalReturn = $amount + ($dailyProfit * 730); // Principal Return + 730 Days ROI Profit
+        $totalReturn = $amount + ($dailyProfit * 750); // Principal Return + 750 Days ROI Profit
 
         return DB::transaction(function () use ($user, $amount, $roiRate) {
             // Deduct investment capital from user Fund Wallet
@@ -50,7 +50,7 @@ class InvestmentService
                 'monthly_amount' => $tierInfo['monthly_amount'],
                 'total_returned' => 0.00,
                 'days_completed' => 0,
-                'total_days' => 730,
+                'total_days' => 750,
                 'status' => 'active',
                 'activated_at' => now(),
             ]);
@@ -68,7 +68,7 @@ class InvestmentService
                 'description' => 'Capital Investment of ₹'.number_format($amount, 2).' at '.number_format($roiRate, 2).'% Daily ROI',
             ]);
 
-            // Distribute 15-Level Direct Business Bonus (12% total: 5% L1, 0.5% L2-L15)
+            // Distribute 30-Level Direct Business Bonus (L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%)
             $this->distributeDirectBusinessBonus($user, $amount);
 
             return $investment;
@@ -80,7 +80,7 @@ class InvestmentService
         $currentSponsorCode = $user->sponsor_code;
         $level = 1;
 
-        while (! empty($currentSponsorCode) && $level <= 15) {
+        while (! empty($currentSponsorCode) && $level <= 30) {
             $sponsor = User::where('referral_code', $currentSponsorCode)->first();
             if (! $sponsor) {
                 break;
@@ -94,8 +94,19 @@ class InvestmentService
                 continue;
             }
 
-            // Level 1 gets 5%, Level 2-15 gets 0.50%
-            $percentage = ($level === 1) ? 5.00 : 0.50;
+            // L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
+            if ($level === 1) {
+                $percentage = 8.00;
+            } elseif ($level === 2) {
+                $percentage = 8.00;
+            } elseif ($level <= 8) {
+                $percentage = 2.00;
+            } elseif ($level <= 16) {
+                $percentage = 1.00;
+            } else {
+                $percentage = 0.50;
+            }
+
             $commission = ($investmentAmount * $percentage) / 100;
 
             if ($commission > 0) {
@@ -105,8 +116,8 @@ class InvestmentService
                 Transaction::create([
                     'user_id' => $sponsor->id,
                     'from_user_id' => $user->id,
-                    'trx_id' => 'DIRBUS-L'.$level.'-'.strtoupper(Str::random(8)),
-                    'type' => 'direct_bonus',
+                    'trx_id' => 'INC-L'.$level.'-'.strtoupper(Str::random(8)),
+                    'type' => 'level_income',
                     'wallet_type' => 'earning',
                     'trx_type' => '+',
                     'amount' => $commission,

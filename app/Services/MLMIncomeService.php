@@ -157,7 +157,7 @@ class MLMIncomeService
                 'monthly_amount' => $tierInfo['monthly_amount'],
                 'total_returned' => 0.00,
                 'days_completed' => 0,
-                'total_days' => 730, // 24 Months
+                'total_days' => 750, // 25 Months
                 'status' => 'active',
                 'activated_at' => now(),
             ]);
@@ -196,10 +196,13 @@ class MLMIncomeService
     }
 
     /**
-     * Distribute 15-Level Direct Income on investment activation.
-     * Poster 2 Rules:
-     * Level 1: 5.00%
-     * Level 2 to 15: 0.50% per level (Total 12%)
+     * Distribute 30-Level Direct Income on investment activation.
+     * Rules:
+     * Level 1: 8.00%
+     * Level 2: 8.00%
+     * Level 3-8: 2.00% per level
+     * Level 9-16: 1.00% per level
+     * Level 17-30: 0.50% per level
      */
     public function distributeDirectLevelIncome(UserInvestment $investment): void
     {
@@ -207,26 +210,7 @@ class MLMIncomeService
         $currentSponsorCode = $investor->sponsor_code;
         $amount = $investment->amount;
 
-        // Level percentages array (Index 1 to 15)
-        $levelPercentages = [
-            1 => 5.00,
-            2 => 0.50,
-            3 => 0.50,
-            4 => 0.50,
-            5 => 0.50,
-            6 => 0.50,
-            7 => 0.50,
-            8 => 0.50,
-            9 => 0.50,
-            10 => 0.50,
-            11 => 0.50,
-            12 => 0.50,
-            13 => 0.50,
-            14 => 0.50,
-            15 => 0.50,
-        ];
-
-        for ($level = 1; $level <= 15; $level++) {
+        for ($level = 1; $level <= 30; $level++) {
             if (! $currentSponsorCode) {
                 break;
             }
@@ -243,7 +227,19 @@ class MLMIncomeService
                 continue;
             }
 
-            $percentage = $levelPercentages[$level];
+            // L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
+            if ($level === 1) {
+                $percentage = 8.00;
+            } elseif ($level === 2) {
+                $percentage = 8.00;
+            } elseif ($level <= 8) {
+                $percentage = 2.00;
+            } elseif ($level <= 16) {
+                $percentage = 1.00;
+            } else {
+                $percentage = 0.50;
+            }
+
             $incomeAmount = round($amount * ($percentage / 100), 2);
 
             if ($incomeAmount > 0) {
@@ -266,12 +262,14 @@ class MLMIncomeService
     }
 
     /**
-     * Distribute Daily ROI & 15-Level ROI Matching Income (26% Total).
-     * Poster 2 Rules:
+     * Distribute Daily ROI & 30-Level ROI Matching Income.
+     * Rules:
      * - Daily ROI to investor
-     * - Level 1 Sponsor: 10% of downline's daily ROI
-     * - Level 2 Sponsor: 3% of downline's daily ROI
-     * - Level 3 to 15 Sponsor: 1% of downline's daily ROI per level
+     * - Level 1 Sponsor: 15% of downline's daily ROI
+     * - Level 2 Sponsor: 8% of downline's daily ROI
+     * - Level 3-8 Sponsor: 2% of downline's daily ROI per level
+     * - Level 9-16 Sponsor: 1% of downline's daily ROI per level
+     * - Level 17-30 Sponsor: 0.5% of downline's daily ROI per level
      */
     public function distributeDailyROI(UserInvestment $investment): void
     {
@@ -303,28 +301,11 @@ class MLMIncomeService
                 $investment->update(['status' => 'completed']);
             }
 
-            // 2. Distribute 15-Level Secondary ROI Level Income (26% Total)
-            $roiLevelPercentages = [
-                1 => 10.00,
-                2 => 3.00,
-                3 => 1.00,
-                4 => 1.00,
-                5 => 1.00,
-                6 => 1.00,
-                7 => 1.00,
-                8 => 1.00,
-                9 => 1.00,
-                10 => 1.00,
-                11 => 1.00,
-                12 => 1.00,
-                13 => 1.00,
-                14 => 1.00,
-                15 => 1.00,
-            ];
-
+            // 2. Distribute 30-Level Secondary ROI Level Income
+            // L1: 15%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
             $currentSponsorCode = $investor->sponsor_code;
 
-            for ($level = 1; $level <= 15; $level++) {
+            for ($level = 1; $level <= 30; $level++) {
                 if (! $currentSponsorCode) {
                     break;
                 }
@@ -341,7 +322,18 @@ class MLMIncomeService
                     continue;
                 }
 
-                $percentage = $roiLevelPercentages[$level];
+                if ($level === 1) {
+                    $percentage = 15.00;
+                } elseif ($level === 2) {
+                    $percentage = 8.00;
+                } elseif ($level <= 8) {
+                    $percentage = 2.00;
+                } elseif ($level <= 16) {
+                    $percentage = 1.00;
+                } else {
+                    $percentage = 0.50;
+                }
+
                 $roiMatchingIncome = round($dailyRoiAmount * ($percentage / 100), 2);
 
                 if ($roiMatchingIncome > 0) {

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Direct Business Level Income Audit Log - Admin ZIVO PAY')
+@section('title', '30-Level Business Income Audit Log - Admin ZIVO PAY')
 
 @section('content')
 <div class="w-full space-y-6 font-sans">
@@ -9,14 +9,14 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">AUDIT LOG</span>
-                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY DIRECT LEVEL BONUS</span>
+                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY 30-LEVEL BUSINESS BONUS</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">DIRECT BUSINESS LEVEL INCOME REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit log of 12% total 15-level direct referral commissions (5% Level 1, 0.50% Levels 2-15) paid on investment packages.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">30-LEVEL BUSINESS INCOME REPORT</h1>
+            <p class="text-xs text-neutral-300 mt-1">Audit log of 30-level business referral commissions (L1=8%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%) paid on investment packages.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
-            <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Total Direct Bonus Volume</span>
+            <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Total Business Level Bonus Volume</span>
             <span class="text-xl sm:text-2xl font-black text-white">₹{{ number_format($totalAmount, 2) }}</span>
         </div>
     </div>
@@ -91,7 +91,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                No direct business level income records found.
+                                No 30-level business income records found.
                             </td>
                         </tr>
                     @endforelse

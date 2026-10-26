@@ -35,20 +35,20 @@
 
                 <!-- 2. Direct Level Income -->
                 <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">15-Level Direct
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level Business
                         Income</span>
                     <span
                         class="text-2xl font-black text-emerald-300 font-mono mt-1 block">₹{{ number_format($totalLevelIncome, 2) }}</span>
-                    <span class="text-[10px] text-neutral-400">5% L1, 0.5% L2-L15 (12% Total)</span>
+                    <span class="text-[10px] text-neutral-400">L1=8%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%</span>
                     </div>
 
                 <!-- 3. ROI Level Income -->
                 <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">15-Level ROI
-                        Income</span>
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level ROI
+                        Matching</span>
                     <span
                         class="text-2xl font-black text-teal-300 font-mono mt-1 block">₹{{ number_format($totalRoiLevelIncome, 2) }}</span>
-                    <span class="text-[10px] text-neutral-400">10% L1, 3% L2, 1% L3-L15 (26% Total)</span>
+                    <span class="text-[10px] text-neutral-400">L1=15%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%</span>
                     </div>
 
                 <!-- 4. Earning Wallet -->
@@ -89,17 +89,12 @@
                         <option value="">All Income Types</option>
                         <option value="daily_roi" {{ request('type') === 'daily_roi' ? 'selected' : '' }}>Daily ROI Income
                         </option>
-                        <option value="direct_bonus" {{ request('type') === 'direct_bonus' ? 'selected' : '' }}>Direct Bonus
-                        </option>
-                        <option value="level_income" {{ request('type') === 'level_income' ? 'selected' : '' }}>15-Level
-                            Subscription</option>
-                        <option value="roi_level_income" {{ request('type') === 'roi_level_income' ? 'selected' : '' }}>ROI
+                        <option value="level_income" {{ request('type') === 'level_income' ? 'selected' : '' }}>30-Level Business Income</option>
+                        <option value="subscription_level" {{ request('type') === 'subscription_level' ? 'selected' : '' }}>30-Level Subscription Income</option>
+                        <option value="level_roi" {{ request('type') === 'level_roi' ? 'selected' : '' }}>ROI
                             Level Matching</option>
-                        <option value="direct_reward" {{ request('type') === 'direct_reward' ? 'selected' : '' }}>Direct
-                            Business Reward</option>
-                        <option value="team_reward" {{ request('type') === 'team_reward' ? 'selected' : '' }}>Team
-                            Leadership
-                            Reward</option>
+                        <option value="roi_level_income" {{ request('type') === 'roi_level_income' ? 'selected' : '' }}>ROI
+                            on ROI Level Matching</option>
                         </select>
                         </div>
 

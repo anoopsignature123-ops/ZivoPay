@@ -14,14 +14,14 @@
                         class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
                         CAPITAL GROWTH TIERS
                     </span>
-                    <span class="text-xs text-emerald-400 font-black tracking-wider uppercase">&bull; 24 MONTHS
+                    <span class="text-xs text-emerald-400 font-black tracking-wider uppercase">&bull; 25 MONTHS
                         RETURNS</span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-heading">
                         INVESTMENT TIERS & DAILY PROFIT PLANS
                     </h1>
                     <p class="text-xs text-neutral-300 mt-0.5">
-                        Earn 0.15% to 0.30% Daily Profit for 730 Days (24 Months) + 15-Level Downline Matching Income.
+                        Earn 0.15% to 0.30% Daily Profit for 750 Days (25 Months) + 30-Level Downline Matching Income.
                     </p>
                     </div>
 
@@ -127,7 +127,7 @@
                             <strong id="calcMonthly" class="text-emerald-300 font-mono">₹0.00 / month</strong>
                         </div>
                         <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-sm">
-                            <span class="text-white font-bold">Total 24 Months Profit + Principal:</span>
+                            <span class="text-white font-bold">Total 25 Months Estimated Profit:</span>
                             <strong id="calcTotal" class="text-emerald-400 font-mono font-black text-base">₹0.00</strong>
                         </div>
                     </div>
@@ -257,7 +257,7 @@
 
                 let daily = amt * (rate / 100);
                 let monthly = daily * 30;
-                let total24Mo = (daily * 730) + amt;
+                let total24Mo = (daily * 750);
 
                 calcRate.innerText = rateText;
                 calcDaily.innerText = '₹' + daily.toLocaleString('en-IN', {

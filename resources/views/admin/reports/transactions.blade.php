@@ -44,7 +44,7 @@
                     <option value="">All Types</option>
                     <option value="subscription" {{ request('type') == 'subscription' ? 'selected' : '' }}>Subscription Activation</option>
                     <option value="daily_roi" {{ request('type') == 'daily_roi' ? 'selected' : '' }}>Daily ROI Bonus</option>
-                    <option value="direct_bonus" {{ request('type') == 'direct_bonus' ? 'selected' : '' }}>Direct Referral Bonus</option>
+                    <option value="level_income" {{ request('type') == 'level_income' ? 'selected' : '' }}>30-Level Business Income</option>
                     <option value="level_roi" {{ request('type') == 'level_roi' ? 'selected' : '' }}>Level ROI Bonus</option>
                     <option value="admin_credit" {{ request('type') == 'admin_credit' ? 'selected' : '' }}>Admin Credit</option>
                     <option value="admin_deduct" {{ request('type') == 'admin_deduct' ? 'selected' : '' }}>Admin Deduct</option>

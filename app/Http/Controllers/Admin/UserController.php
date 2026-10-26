@@ -145,11 +145,11 @@ class UserController extends Controller
 
         // Income breakdown sums
         $totalDirectIncome = Transaction::where('user_id', $user->id)
-            ->whereIn('type', ['direct_commission', 'referral_income', 'direct_income'])
+            ->whereIn('type', ['level_income', 'subscription_level'])
             ->sum('amount');
 
         $totalLevelIncome = Transaction::where('user_id', $user->id)
-            ->where('type', 'level_income')
+            ->whereIn('type', ['level_income', 'subscription_level', 'level_roi', 'roi_level_income'])
             ->sum('amount');
 
         $totalRoiIncome = Transaction::where('user_id', $user->id)

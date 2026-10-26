@@ -88,11 +88,11 @@ class DashboardController extends Controller
         $todayRoi = $todayFundRoi + $todayInvestmentRoi;
         $totalRoiIncome = $totalFundRoi + $totalInvestmentRoi;
 
-        $todayDirect = $user->transactions()->where('type', 'direct_bonus')->whereDate('created_at', now())->sum('amount');
-        $totalDirectIncome = $user->transactions()->where('type', 'direct_bonus')->sum('amount');
+        $todayDirect = $user->transactions()->whereIn('type', ['level_income', 'subscription_level'])->whereDate('created_at', now())->sum('amount');
+        $totalDirectIncome = $user->transactions()->whereIn('type', ['level_income', 'subscription_level'])->sum('amount');
 
-        $todaySubLevel = $user->transactions()->whereIn('type', ['subscription_level', 'level_income'])->whereDate('created_at', now())->sum('amount');
-        $totalSubLevelIncome = $user->transactions()->whereIn('type', ['subscription_level', 'level_income'])->sum('amount');
+        $todaySubLevel = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
+        $totalSubLevelIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
 
         $todayLevelRoi = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
         $totalLevelRoiIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');

@@ -117,7 +117,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="user-plus" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Direct Bonus Referral Income</span>
+            <span class="nav-text">₹3000 Activation Income (L2-L30)</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs('user.income.subscription-team') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -208,7 +208,7 @@
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="award" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Direct Business Income</span>
+            <span class="nav-text">30-Level Business Income</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs('user.rewards*') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
