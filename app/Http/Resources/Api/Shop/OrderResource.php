@@ -23,6 +23,7 @@ class OrderResource extends JsonResource
             'subtotal' => (float) $this->subtotal,
             'delivery_fee' => (float) $this->delivery_fee,
             'discount' => (float) $this->discount,
+            'shopping_discount' => (float) ($this->shopping_discount ?? 0),
             'total' => (float) $this->total,
             'promo_code' => $this->promo_code,
             'tracking' => ['carrier' => $this->carrier, 'tracking_number' => $this->tracking_number],
@@ -38,7 +39,11 @@ class OrderResource extends JsonResource
                 'country' => $this->country,
             ],
             'return_reason' => $this->return_reason,
-            'return_status' => $this->status === 'return_requested' ? 'pending_review' : ($this->status === 'returned' ? 'refunded' : null),
+            'return_status' => match ($this->status) {
+                'return_requested' => 'pending_review',
+                'returned' => $this->payment_status,
+                default => null,
+            },
             'return_items' => $this->return_items,
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item) => [
                 'product_id' => $item->product_id,

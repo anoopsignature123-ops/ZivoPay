@@ -13,17 +13,15 @@ class SubscriptionService
 
     public function activateSubscription(User $user): bool
     {
-        if ($user->is_subscription_active) {
-            return false;
-        }
+        return DB::transaction(function () use ($user): bool {
+            $user = User::query()->lockForUpdate()->findOrFail($user->id);
+            if ($user->is_subscription_active || (float) $user->deposit_wallet < self::ACTIVATION_FEE) {
+                return false;
+            }
 
-        if ($user->deposit_wallet < self::ACTIVATION_FEE) {
-            return false;
-        }
-
-        return DB::transaction(function () use ($user) {
             // Deduct ₹3,000 mandatory package activation fee from user's Fund Wallet
             $user->deposit_wallet -= self::ACTIVATION_FEE;
+            $user->shopping_wallet = round((float) $user->shopping_wallet + self::ACTIVATION_FEE, 2);
             $user->is_subscription_active = true;
             $user->status = 'active';
             $user->activated_at = now();
@@ -40,6 +38,18 @@ class SubscriptionService
                 'charge' => 0.00,
                 'post_balance' => $user->deposit_wallet,
                 'description' => 'Mandatory ₹3,000 Zivo Family Kit Account Activation Subscription',
+            ]);
+
+            Transaction::create([
+                'user_id' => $user->id,
+                'trx_id' => 'SHOPCREDIT-'.strtoupper(Str::random(12)),
+                'type' => 'shopping_wallet_credit',
+                'wallet_type' => 'shopping_wallet',
+                'trx_type' => '+',
+                'amount' => self::ACTIVATION_FEE,
+                'charge' => 0.00,
+                'post_balance' => $user->shopping_wallet,
+                'description' => '₹3,000 Shopping Wallet credit from Zivo Family Kit activation',
             ]);
 
             // Distribute 30-Level Referral Incomes (L1: 0% band, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%)

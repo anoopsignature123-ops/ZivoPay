@@ -26,6 +26,9 @@ class DashboardController extends Controller
             // Fetch Recent Transactions (only Recharge and Deposit types)
             $allowedTypes = [
                 'deposit',
+                'shopping_wallet_credit',
+                'shop_order',
+                'shop_order_refund',
                 'recharge',
                 'recharge_refund',
                 'mobile',
@@ -44,7 +47,7 @@ class DashboardController extends Controller
                 ->take(8)
                 ->get()
                 ->map(function ($t) {
-                    $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
+                    $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
                     $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
                     return [
@@ -161,6 +164,7 @@ class DashboardController extends Controller
                     'image_url' => $imageUrl,
                     'deposit_wallet' => (float) $user->deposit_wallet,
                     'earning_wallet' => (float) $user->earning_wallet,
+                    'shopping_wallet' => (float) $user->shopping_wallet,
                     'formatted_balance' => '₹'.number_format((float) $user->deposit_wallet, 2),
                 ],
                 'special_offers' => $specialOffers,
@@ -179,6 +183,9 @@ class DashboardController extends Controller
     {
         return match (strtolower($t->type)) {
             'deposit' => 'Add Fund / Deposit',
+            'shopping_wallet_credit' => 'Shopping Wallet Activation Credit',
+            'shop_order' => 'Shopping Wallet Product Order',
+            'shop_order_refund' => 'Shopping Wallet Refund',
             'recharge' => 'Mobile / Utility Recharge',
             'recharge_refund' => 'Recharge Auto-Refund',
             'p2p_transfer', 'p2p_send' => 'P2P Transfer Sent',
@@ -235,7 +242,7 @@ class DashboardController extends Controller
                 return $this->errorResponse('Transaction record not found.', 404);
             }
 
-            $isCredit = in_array(strtolower($t->type), ['deposit', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
+            $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_income', 'subscription_level', 'level_roi', 'roi_level_income']);
             $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
             $rechargeDetails = null;
@@ -277,7 +284,11 @@ class DashboardController extends Controller
                 'amount_formatted' => $amountPrefix.number_format((float) $t->amount, 2),
                 'is_credit' => $isCredit,
                 'wallet_type' => $t->wallet_type ?? 'deposit_wallet',
-                'wallet_type_formatted' => ($t->wallet_type === 'earning_wallet') ? 'Earning Wallet' : 'Fund Wallet',
+                'wallet_type_formatted' => match ($t->wallet_type) {
+                    'earning_wallet', 'earning' => 'Earning Wallet',
+                    'shopping_wallet' => 'Shopping Wallet',
+                    default => 'Fund Wallet',
+                },
                 'post_balance' => (float) $t->post_balance,
                 'post_balance_formatted' => '₹'.number_format((float) $t->post_balance, 2),
                 'status' => $transactionStatus,

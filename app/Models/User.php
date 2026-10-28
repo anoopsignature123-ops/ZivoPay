@@ -68,6 +68,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'deposit_wallet' => 'decimal:2',
             'earning_wallet' => 'decimal:2',
+            'shopping_wallet' => 'decimal:2',
         ];
     }
 

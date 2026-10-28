@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Shop\OrderResource;
 use App\Http\Resources\Api\Shop\PaymentResource;
 use App\Models\Shop\Order;
-use App\Models\Shop\Payment;
 use App\Services\Shop\ShopOrderService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -18,52 +17,29 @@ class OrderController extends Controller
 {
     use ApiResponse;
 
-    public function checkout(Request $request, ShopOrderService $shopOrders): JsonResponse
+    public function store(Request $request, ShopOrderService $shopOrders): JsonResponse
     {
         $data = $request->validate([
             'address_id' => ['required', 'integer', 'exists:shop_addresses,id'],
-            'payment_method' => ['sometimes', 'in:cod,fund_wallet'],
+            'payment_method' => ['sometimes', 'in:shopping_wallet'],
             'items' => ['sometimes', 'array', 'min:1', 'max:50'],
             'items.*.product_id' => ['required_with:items', 'integer', 'exists:shop_products,id', 'distinct'],
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1', 'max:99'],
             'promo_code' => ['nullable', 'string', 'max:50'],
             'customer_note' => ['nullable', 'string', 'max:2000'],
         ]);
-        $data['payment_method'] ??= 'cod';
+        $data['payment_method'] ??= 'shopping_wallet';
         $order = $shopOrders->placeOrder($request->user(), $data);
         $payment = $order->payments()->firstOrFail();
 
         return $this->successResponse([
             'order' => OrderResource::make($order->fresh()->load('items'))->resolve(),
             'payment' => PaymentResource::make($payment->fresh()->load('order'))->resolve(),
-        ], 'Shop checkout started.', 201);
-    }
-
-    public function paymentHistory(Request $request): JsonResponse
-    {
-        $payments = Payment::query()->where('user_id', $request->user()->id)->with('order')->latest()->paginate(20);
-
-        return $this->successResponse([
-            'items' => PaymentResource::collection($payments->getCollection())->resolve(),
-            'pagination' => ['current_page' => $payments->currentPage(), 'last_page' => $payments->lastPage(), 'total' => $payments->total()],
-        ], 'Shop payment history retrieved.');
-    }
-
-    public function paymentStatus(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'payment_id' => ['required', 'integer', 'min:1'],
-        ]);
-        $payment = Payment::query()
-            ->where('user_id', $request->user()->id)
-            ->with('order')
-            ->find($data['payment_id']);
-
-        if (! $payment) {
-            return $this->errorResponse('Shop payment not found. Use the payment_id returned by checkout.', 404);
-        }
-
-        return $this->successResponse(PaymentResource::make($payment->load('order'))->resolve(), 'Shop payment status retrieved.');
+            'wallets' => [
+                'shopping_wallet' => (float) $request->user()->fresh()->shopping_wallet,
+                'currency' => 'INR',
+            ],
+        ], 'Order placed successfully.', 201);
     }
 
     public function index(Request $request): JsonResponse

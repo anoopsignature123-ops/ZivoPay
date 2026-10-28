@@ -72,15 +72,24 @@ class ShopOrderService
                 $promo = PromoCode::query()->whereRaw('UPPER(code) = ?', [Str::upper($data['promo_code'])])->lockForUpdate()->first();
                 $discount = $this->calculatePromoDiscount($promo, $subtotal);
             }
+            $promoDiscount = $discount;
+            $shoppingDiscount = 0.0;
+            if ($subtotal >= (float) config('shop.shopping_discount_threshold')) {
+                $shoppingDiscount = min((float) config('shop.shopping_discount_amount'), $subtotal);
+                $discount = round($shoppingDiscount + min($promoDiscount, $subtotal - $shoppingDiscount), 2);
+            }
 
             $deliveryFee = $subtotal >= (float) config('shop.free_delivery_threshold')
                 ? 0.0
                 : (float) config('shop.delivery_fee');
             $total = round(max(0, $subtotal + $deliveryFee - $discount), 2);
-            $paymentMethod = $data['payment_method'] ?? 'cod';
-            if ($paymentMethod === 'fund_wallet' && (float) $customer->deposit_wallet < $total) {
+            $paymentMethod = $data['payment_method'] ?? 'shopping_wallet';
+            if ($paymentMethod !== 'shopping_wallet') {
+                throw ValidationException::withMessages(['payment_method' => 'Shop orders can only be paid from the Shopping Wallet.']);
+            }
+            if ((float) $customer->shopping_wallet < $total) {
                 throw ValidationException::withMessages([
-                    'payment_method' => 'Insufficient Fund Wallet balance. Available ₹'.number_format((float) $customer->deposit_wallet, 2).'; required ₹'.number_format($total, 2).'.',
+                    'payment_method' => 'Insufficient Shopping Wallet balance. Available ₹'.number_format((float) $customer->shopping_wallet, 2).'; required ₹'.number_format($total, 2).'.',
                 ]);
             }
 
@@ -91,10 +100,11 @@ class ShopOrderService
                 'order_number' => $orderNumber,
                 'status' => 'placed',
                 'payment_method' => $paymentMethod,
-                'payment_status' => $paymentMethod === 'fund_wallet' ? 'paid' : 'pending',
+                'payment_status' => 'paid',
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'discount' => $discount,
+                'shopping_discount' => $shoppingDiscount,
                 'total' => $total,
                 'promo_code' => $promo?->code,
                 'recipient_name' => $address->recipient_name,
@@ -124,18 +134,18 @@ class ShopOrderService
                 ]);
             }
 
-            if ($paymentMethod === 'fund_wallet') {
-                $customer->deposit_wallet = round((float) $customer->deposit_wallet - $total, 2);
+            if ($paymentMethod === 'shopping_wallet') {
+                $customer->shopping_wallet = round((float) $customer->shopping_wallet - $total, 2);
                 $customer->save();
                 Transaction::query()->create([
                     'user_id' => $customer->id,
                     'amount' => $total,
-                    'wallet_type' => 'deposit_wallet',
+                    'wallet_type' => 'shopping_wallet',
                     'type' => 'shop_order',
                     'trx_type' => '-',
                     'charge' => 0,
-                    'post_balance' => $customer->deposit_wallet,
-                    'description' => "Shop order payment ({$orderNumber})",
+                    'post_balance' => $customer->shopping_wallet,
+                    'description' => "Shopping Wallet order payment ({$orderNumber})",
                     'trx_id' => 'SHOP-'.$orderNumber,
                 ]);
             }
@@ -147,9 +157,9 @@ class ShopOrderService
                 'mode' => null,
                 'currency' => 'INR',
                 'amount' => $total,
-                'status' => $paymentMethod === 'fund_wallet' ? 'captured' : 'pending',
+                'status' => 'captured',
                 'method' => $paymentMethod,
-                'paid_at' => $paymentMethod === 'fund_wallet' ? now() : null,
+                'paid_at' => now(),
             ]);
 
             if ($promo) {
@@ -206,7 +216,7 @@ class ShopOrderService
             if (in_array($status, ['cancelled', 'returned'], true)) {
                 $this->restoreStock($lockedOrder, $status);
                 if ($lockedOrder->payment_status === 'paid') {
-                    $this->refundToFundWallet($lockedOrder, $status === 'returned' ? $this->returnRefundAmount($lockedOrder) : (float) $lockedOrder->total);
+                    $this->refundToShoppingWallet($lockedOrder, $status === 'returned' ? $this->returnRefundAmount($lockedOrder) : (float) $lockedOrder->total);
                 } else {
                     $lockedOrder->payment_status = 'cancelled';
                     $lockedOrder->payments()->whereIn('status', ['pending', 'failed'])->update(['status' => 'cancelled']);
@@ -265,25 +275,25 @@ class ShopOrderService
         return round(min((float) $order->total - (float) $order->refunded_amount, $refundAmount), 2);
     }
 
-    private function refundToFundWallet(Order $order, float $amount): void
+    private function refundToShoppingWallet(Order $order, float $amount): void
     {
         if ($amount <= 0 || in_array($order->payment_status, ['refunded', 'partially_refunded'], true)) {
             return;
         }
 
         $user = User::query()->lockForUpdate()->findOrFail($order->user_id);
-        $user->deposit_wallet = round((float) $user->deposit_wallet + $amount, 2);
+        $user->shopping_wallet = round((float) $user->shopping_wallet + $amount, 2);
         $user->save();
 
         Transaction::query()->create([
             'user_id' => $user->id,
             'amount' => $amount,
-            'wallet_type' => 'deposit_wallet',
+            'wallet_type' => 'shopping_wallet',
             'type' => 'shop_order_refund',
             'trx_type' => '+',
             'charge' => 0,
-            'post_balance' => $user->deposit_wallet,
-            'description' => "Fund Wallet refund for shop order ({$order->order_number})",
+            'post_balance' => $user->shopping_wallet,
+            'description' => "Shopping Wallet refund for shop order ({$order->order_number})",
             'trx_id' => 'SHOP-REF-'.$order->order_number,
         ]);
 

@@ -42,6 +42,7 @@ class CatalogController extends Controller
         $products = $catalog->products($filters);
 
         return $this->successResponse([
+            'wallets' => $this->walletSummary($request),
             'banners' => $home['banners']->map(fn ($banner) => [
                 'id' => $banner->id,
                 'title' => $banner->title,
@@ -63,7 +64,7 @@ class CatalogController extends Controller
         ], 'Shop home retrieved.');
     }
 
-    public function show(string $product): JsonResponse
+    public function show(Request $request, string $product): JsonResponse
     {
         $query = Product::query()->where('is_active', true)->with('category')
             ->withCount('ratings')->withAvg('ratings', 'rating');
@@ -71,7 +72,10 @@ class CatalogController extends Controller
             ? $query->whereKey((int) $product)->firstOrFail()
             : $query->where('slug', $product)->firstOrFail();
 
-        return $this->successResponse(ProductResource::make($item)->resolve(), 'Shop product retrieved.');
+        return $this->successResponse([
+            ...ProductResource::make($item)->resolve(),
+            'wallets' => $this->walletSummary($request),
+        ], 'Shop product retrieved.');
     }
 
     public function search(Request $request, ShopCatalogService $catalog): JsonResponse
@@ -97,6 +101,7 @@ class CatalogController extends Controller
         $products = $catalog->products($filters);
 
         return $this->successResponse([
+            'wallets' => $this->walletSummary($request),
             'items' => ProductResource::collection($products->getCollection())->resolve(),
             'pagination' => [
                 'current_page' => $products->currentPage(),
@@ -144,6 +149,7 @@ class CatalogController extends Controller
         $products = $catalog->products($filters);
 
         return $this->successResponse([
+            'wallets' => $this->walletSummary($request),
             'category' => CategoryResource::make($categoryModel)->resolve(),
             'items' => ProductResource::collection($products->getCollection())->resolve(),
             'pagination' => [
@@ -153,5 +159,14 @@ class CatalogController extends Controller
                 'total' => $products->total(),
             ],
         ], 'Category products retrieved.');
+    }
+
+    /** @return array{shopping_wallet: float, currency: string} */
+    private function walletSummary(Request $request): array
+    {
+        return [
+            'shopping_wallet' => (float) $request->user()->shopping_wallet,
+            'currency' => 'INR',
+        ];
     }
 }

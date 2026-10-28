@@ -20,7 +20,7 @@
                     </div>
 
             <!-- Wallet Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-2">
                 <!-- 1. Fund Wallet -->
                 <div class="p-5 rounded-2xl bg-[#02180f] border-2 border-emerald-500/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
@@ -45,7 +45,18 @@
                     <span class="text-[10px] text-neutral-400 mt-1 block">Accumulated ROI & Level Referral Bonus</span>
                     </div>
 
-                <!-- 3. Account Activation Status -->
+                <!-- 3. Shopping Wallet -->
+                <div class="p-5 rounded-2xl bg-[#02180f] border-2 border-cyan-400/40 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">Shopping Wallet
+                            Balance</span>
+                        <i data-lucide="shopping-bag" class="w-5 h-5 text-cyan-300"></i>
+                    </div>
+                    <span class="text-3xl font-black text-white font-mono mt-2 block">₹{{ number_format($user->shopping_wallet, 2) }}</span>
+                    <span class="text-[10px] text-neutral-400 mt-1 block">Package activation credit for product orders</span>
+                </div>
+
+                <!-- 4. Account Activation Status -->
                 <div
                     class="p-5 rounded-2xl bg-[#02180f] border-2 {{ $user->is_subscription_active ? 'border-emerald-500/50' : 'border-rose-500/50' }} relative overflow-hidden">
                     <div class="flex items-center justify-between">
@@ -111,8 +122,7 @@
                     </div>
                     <div>
                         <h2 class="text-lg font-black text-white uppercase">MANDATORY ₹3,000 ZIVO FAMILY KIT ACTIVATION</h2>
-                        <p class="text-xs text-neutral-400">One-time account activation package fee deducted from Fund
-                            Wallet.</p>
+                        <p class="text-xs text-neutral-400">₹3,000 moves from Fund Wallet to Shopping Wallet when you activate.</p>
                         </div>
                         </div>
 

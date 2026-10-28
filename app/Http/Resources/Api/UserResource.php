@@ -31,6 +31,7 @@ class UserResource extends JsonResource
             'wallets' => [
                 'fund_wallet' => (float) $this->deposit_wallet,
                 'earning_wallet' => (float) $this->earning_wallet,
+                'shopping_wallet' => (float) $this->shopping_wallet,
             ],
             'created_at' => $this->created_at?->toIso8601String(),
         ];

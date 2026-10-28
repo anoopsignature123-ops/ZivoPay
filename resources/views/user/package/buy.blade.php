@@ -18,10 +18,17 @@
                     to unlock 15-level referral bonuses and 24H Fund Wallet profits.</p>
                 </div>
 
-            <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">
-                <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">Fund Wallet
-                    Balance</span>
-                <span class="text-2xl font-black text-white font-mono">₹{{ number_format($user->deposit_wallet, 2) }}</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full sm:w-auto">
+                <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">
+                    <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">Fund Wallet
+                        Balance</span>
+                    <span class="text-2xl font-black text-white font-mono">₹{{ number_format($user->deposit_wallet, 2) }}</span>
+                </div>
+                <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-cyan-400/40 text-right">
+                    <span class="text-[10px] text-cyan-300 font-extrabold uppercase tracking-wider block">Shopping Wallet
+                        Balance</span>
+                    <span class="text-2xl font-black text-white font-mono">₹{{ number_format($user->shopping_wallet, 2) }}</span>
+                </div>
                 </div>
                 </div>
 
@@ -109,7 +116,7 @@
                     </div>
                     <div>
                         <span class="font-bold text-white">Instant Account Activation</span>
-                        <p class="text-[10px] text-neutral-400">Deducted instantly from Fund Wallet balance</p>
+                        <p class="text-[10px] text-neutral-400">₹3,000 moves from Fund Wallet to Shopping Wallet</p>
                     </div>
                     </div>
                     </div>

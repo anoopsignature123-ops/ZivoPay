@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // E-commerce shop APIs
     Route::prefix('shop')->group(function (): void {
         Route::get('categories', [ShopCatalogController::class, 'categories']);
-        Route::get('categories/products/{category}', [ShopCatalogController::class, 'categoryProducts']);
+        Route::get('categories/{category}/products', [ShopCatalogController::class, 'categoryProducts']);
         Route::get('products/search', [ShopCatalogController::class, 'search']);
         Route::get('products', [ShopCatalogController::class, 'home']);
         Route::get('products/{product}', [ShopCatalogController::class, 'show']);
@@ -72,18 +72,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('addresses-store', [ShopAddressController::class, 'store']);
         Route::post('addresses-update', [ShopAddressController::class, 'update']);
         Route::post('addresses-delete', [ShopAddressController::class, 'destroy']);
-        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])
-            ->middleware('throttle:30,1');
-        Route::post('checkout', [ShopOrderController::class, 'checkout'])
-            ->middleware('throttle:10,1')->name('api.shop.checkout');
-        Route::post('payments-history', [ShopOrderController::class, 'paymentHistory'])
-            ->name('api.shop.payments.history');
-        Route::post('payments-status', [ShopOrderController::class, 'paymentStatus']);
+        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])->middleware('throttle:30,1');
+        Route::post('place/orders', [ShopOrderController::class, 'store'])->middleware('throttle:10,1')->name('api.shop.orders.store');
         Route::get('orders', [ShopOrderController::class, 'index']);
         Route::get('orders/{order}', [ShopOrderController::class, 'show']);
         Route::post('orders-cancel', [ShopOrderController::class, 'cancel'])->middleware('throttle:10,1');
-        Route::post('orders-return', [ShopOrderController::class, 'requestReturn'])
-            ->middleware('throttle:10,1');
+        Route::post('orders-return', [ShopOrderController::class, 'requestReturn'])->middleware('throttle:10,1');
     });
 
     // Help & Support Endpoints
