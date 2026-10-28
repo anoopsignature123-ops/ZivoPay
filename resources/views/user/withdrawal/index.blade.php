@@ -27,7 +27,7 @@
                 <span class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Available Earning
                     Wallet</span>
                 <span
-                    class="text-3xl font-black text-white font-mono mt-0.5 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
+                    class="text-3xl font-black text-white font-mono mt-0.5 block">${{ number_format($user->earning_wallet, 2) }}</span>
                 <span class="text-[10px] text-emerald-400 font-semibold mt-1 block">Ready for 24x7 Payout</span>
             </div>
         </div>
@@ -49,6 +49,12 @@
                         <span>{{ $error }}</span>
                     </div>
                 @endforeach
+            </div>
+        @endif
+
+        @if (!$payoutEnabled)
+            <div class="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+                Bank payouts are paused until iPaymentWallet’s official IMPS API endpoint, authentication, and status callback are confirmed. Your wallet will not be debited while payouts are unavailable.
             </div>
         @endif
 
@@ -95,7 +101,7 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Net Withdrawn</span>
                     <i data-lucide="check-circle-2" class="w-5 h-5"></i>
                 </div>
-                <h3 class="text-2xl font-black text-white font-mono">₹{{ number_format($stats['total_approved'], 2) }}</h3>
+                <h3 class="text-2xl font-black text-white font-mono">${{ number_format($stats['total_approved'], 2) }}</h3>
                 <span class="text-[10px] text-emerald-400 font-semibold mt-1 block">Successfully Credited</span>
             </div>
 
@@ -105,7 +111,7 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Pending Approvals</span>
                     <i data-lucide="clock" class="w-5 h-5"></i>
                 </div>
-                <h3 class="text-2xl font-black text-teal-300 font-mono">₹{{ number_format($stats['total_pending'], 2) }}
+                <h3 class="text-2xl font-black text-teal-300 font-mono">${{ number_format($stats['total_pending'], 2) }}
                 </h3>
                 <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">In Processing Queue</span>
             </div>
@@ -116,7 +122,7 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Rejected Requests</span>
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
                 </div>
-                <h3 class="text-2xl font-black text-rose-300 font-mono">₹{{ number_format($stats['total_rejected'], 2) }}
+                <h3 class="text-2xl font-black text-rose-300 font-mono">${{ number_format($stats['total_rejected'], 2) }}
                 </h3>
                 <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">Refunded to Wallet</span>
             </div>
@@ -160,26 +166,26 @@
                                 class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
                                 <option value="earning_wallet"
                                     {{ old('from_wallet', 'earning_wallet') === 'earning_wallet' ? 'selected' : '' }}>
-                                    Earning Wallet (Available: ₹{{ number_format($user->earning_wallet, 2) }})</option>
+                                    Earning Wallet (Available: ${{ number_format($user->earning_wallet, 2) }})</option>
                                 <option value="deposit_wallet"
                                     {{ old('from_wallet') === 'deposit_wallet' ? 'selected' : '' }}>Fund Wallet (Available:
-                                    ₹{{ number_format($user->deposit_wallet, 2) }})</option>
+                                    ${{ number_format($user->deposit_wallet, 2) }})</option>
                             </select>
                         </div>
 
                         <!-- Amount Field -->
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-bold text-emerald-400 uppercase">Withdrawal Amount (₹)
+                                <label class="block text-xs font-bold text-emerald-400 uppercase">Withdrawal Amount (USD)
                                     *</label>
                                 <span class="text-[11px] text-neutral-400">Min: <strong
-                                        class="text-white">₹500</strong></span>
+                                        class="text-white">$5</strong></span>
                             </div>
                             <div class="relative">
                                 <span
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold text-lg font-mono">₹</span>
-                                <input type="number" id="wthAmount" name="amount" min="500" step="50" required
-                                    value="{{ old('amount') }}" placeholder="e.g. 1000"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold text-lg font-mono">$</span>
+                                <input type="number" id="wthAmount" name="amount" min="5" step="0.01" required
+                                    value="{{ old('amount') }}" placeholder="e.g. 20"
                                     class="w-full pl-10 pr-20 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono font-bold text-base focus:outline-none focus:border-emerald-400 transition"
                                     oninput="calculateFee(this.value)">
                                 <button type="button" id="maxBtn" onclick="setMaxAmountCurrent()"
@@ -189,7 +195,7 @@
                             </div>
                             <p class="text-[11px] text-neutral-400 mt-1" id="walletBalanceHint">Available Balance: <strong
                                     class="text-emerald-400"
-                                    id="availBalDisplay">₹{{ number_format($user->earning_wallet, 2) }}</strong></p>
+                                    id="availBalDisplay">${{ number_format($user->earning_wallet, 2) }}</strong></p>
                         </div>
 
                         <!-- Payment Method Field -->
@@ -201,27 +207,12 @@
                                 <option value="Bank Transfer"
                                     {{ old('payment_method') === 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer (IMPS /
                                     NEFT / RTGS)</option>
-                                <option value="UPI" {{ old('payment_method') === 'UPI' ? 'selected' : '' }}>UPI (Google
-                                    Pay / PhonePe / Paytm / BHIM)</option>
-                                <option value="USDT (Crypto Wallet)"
-                                    {{ old('payment_method') === 'USDT (Crypto Wallet)' ? 'selected' : '' }}>USDT TRC20 /
-                                    BEP20 (Crypto Wallet)</option>
                             </select>
                         </div>
 
-                        <!-- Account / Wallet Details Field -->
+                        <!-- Bank Details Field -->
                         <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-bold text-emerald-400 uppercase">Account / UPI / Wallet
-                                    Address *</label>
-                                @if ($user->wallet_address)
-                                    <button type="button"
-                                        onclick="autofillDetails('{{ addslashes($user->wallet_address) }}')"
-                                        class="text-[10px] text-teal-300 hover:text-white font-bold underline flex items-center gap-1">
-                                        <i data-lucide="zap" class="w-3 h-3 text-teal-300"></i> Autofill Profile Address
-                                    </button>
-                                @endif
-                            </div>
+                            <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Bank account, holder name & IFSC *</label>
                             <textarea id="accountDetails" name="account_details" rows="3" required
                                 placeholder="Enter complete payment details e.g.&#10;Bank Name: HDFC Bank&#10;Account No: 1234567890&#10;IFSC Code: HDFC0001234&#10;Holder Name: John Doe"
                                 class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition">{{ old('account_details') }}</textarea>
@@ -231,17 +222,18 @@
                         <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40 space-y-2 text-xs">
                             <div class="flex justify-between text-neutral-300">
                                 <span>Gross Requested Amount:</span>
-                                <strong id="displayGross" class="text-white font-mono font-bold">₹0.00</strong>
+                                <strong id="displayGross" class="text-white font-mono font-bold">$0.00</strong>
                             </div>
                             <div class="flex justify-between text-neutral-300">
                                 <span>Admin Service Fee (5%):</span>
-                                <strong id="displayFee" class="text-rose-400 font-mono font-bold">-₹0.00</strong>
+                                <strong id="displayFee" class="text-rose-400 font-mono font-bold">-$0.00</strong>
                             </div>
                             <div class="border-t border-emerald-500/20 pt-2 flex justify-between text-sm">
-                                <span class="font-bold text-emerald-400">Net Amount You Receive:</span>
+                                <span class="font-bold text-emerald-400">Net after fee (USD):</span>
                                 <strong id="displayNet"
-                                    class="text-emerald-400 font-mono font-black text-base">₹0.00</strong>
+                                    class="text-emerald-400 font-mono font-black text-base">$0.00</strong>
                             </div>
+                            <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-neutral-300"><span>Estimated bank transfer (INR):</span><strong id="displayPayoutInr" class="font-mono text-white">₹0.00</strong></div>
                         </div>
 
                         @if (!$user->isKycApproved())
@@ -251,8 +243,8 @@
                                 Required - Click to Verify
                             </a>
                         @else
-                            <button type="submit"
-                                class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg">
+                            <button type="submit" @disabled(!$payoutEnabled)
+                                class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
                                 <i data-lucide="check-circle" class="w-4 h-4"></i> Submit 24x7 Payout Request
                             </button>
                         @endif
@@ -291,7 +283,7 @@
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             </div>
                             <span><strong>Minimum Limit:</strong> Minimum single withdrawal request is
-                                <strong>₹500</strong>.</span>
+                                <strong>$5</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <div
@@ -306,24 +298,11 @@
                                 class="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             </div>
-                            <span><strong>Multi-Channel Payout:</strong> Supported via Bank Account (IMPS/NEFT), UPI ID, or
-                                USDT Crypto Address.</span>
+                            <span><strong>Bank payout:</strong> Net USD after the fee converts to INR at the configured exchange rate.</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Profile Wallet Info Badge -->
-                <div class="p-4 rounded-2xl bg-[#01140c] border border-emerald-500/30 space-y-1">
-                    <span class="text-[10px] text-neutral-400 uppercase font-bold block">Saved Withdrawal Profile:</span>
-                    <strong class="text-xs text-emerald-400 font-mono block truncate"
-                        title="{{ $user->wallet_address ?? 'Not Set' }}">
-                        {{ $user->wallet_address ?? 'No default wallet address saved in profile.' }}
-                    </strong>
-                    <a href="{{ route('user.profile') }}"
-                        class="text-[10px] text-teal-300 hover:underline font-bold inline-block mt-1">
-                        Update Profile Details &rarr;
-                    </a>
-                </div>
             </div>
         </div>
 
@@ -406,9 +385,9 @@
                                 <th class="p-3.5">Trx ID</th>
                                 <th class="p-3.5">Payment Method</th>
                                 <th class="p-3.5">Account / Wallet Details</th>
-                                <th class="p-3.5">Gross Amount</th>
-                                <th class="p-3.5">Fee (5%)</th>
-                                <th class="p-3.5">Net Payable</th>
+                                <th class="p-3.5">Gross (USD)</th>
+                                <th class="p-3.5">Fee (USD)</th>
+                                <th class="p-3.5">Net payout (INR)</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Admin Remarks / UTR</th>
                                 <th class="p-3.5 text-right">Date & Time</th>
@@ -423,11 +402,11 @@
                                         title="{{ $wth->account_details }}">
                                         {{ $wth->account_details }}
                                     </td>
-                                    <td class="p-3.5 font-mono font-bold text-white">₹{{ number_format($wth->amount, 2) }}
+                                    <td class="p-3.5 font-mono font-bold text-white">${{ number_format($wth->amount, 2) }}
                                     </td>
-                                    <td class="p-3.5 font-mono text-rose-400">-₹{{ number_format($wth->charge, 2) }}</td>
+                                    <td class="p-3.5 font-mono text-rose-400">-${{ number_format($wth->charge, 2) }}</td>
                                     <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
-                                        ₹{{ number_format($wth->final_amount, 2) }}</td>
+                                        {{ $wth->amount_inr !== null ? '₹'.number_format((float) $wth->amount_inr, 2) : '—' }}</td>
                                     <td class="p-3.5">
                                         <span
                                             class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase
@@ -471,14 +450,15 @@
                 var fee = Math.round((amount * 0.05) * 100) / 100;
                 var net = Math.round((amount - fee) * 100) / 100;
 
-                document.getElementById('displayGross').innerText = '₹' + amount.toFixed(2);
-                document.getElementById('displayFee').innerText = '-₹' + fee.toFixed(2);
-                document.getElementById('displayNet').innerText = '₹' + net.toFixed(2);
+                document.getElementById('displayGross').innerText = '$' + amount.toFixed(2);
+                document.getElementById('displayFee').innerText = '-$' + fee.toFixed(2);
+                document.getElementById('displayNet').innerText = '$' + net.toFixed(2);
+                document.getElementById('displayPayoutInr').innerText = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(net * {{ (float) $exchangeRate }});
             }
 
             function updateWalletBalance(walletType) {
                 var bal = walletBalances[walletType] || 0;
-                document.getElementById('availBalDisplay').innerText = '₹' + bal.toFixed(2);
+                document.getElementById('availBalDisplay').innerText = '$' + bal.toFixed(2);
             }
 
             function setMaxAmountCurrent() {

@@ -76,7 +76,8 @@
                         <th class="p-3.5">Ref ID & Date</th>
                         <th class="p-3.5">Member Details</th>
                         <th class="p-3.5">Method & UTR / Hash</th>
-                        <th class="p-3.5">Amount (₹)</th>
+                        <th class="p-3.5">Wallet Credit (INR)</th>
+                        <th class="p-3.5">Gateway Amount</th>
                         <th class="p-3.5">Proof File</th>
                         <th class="p-3.5">Status</th>
                         <th class="p-3.5">Admin Remark / Note</th>
@@ -112,8 +113,9 @@
                                 </span>
                             </td>
                             <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
-                                ₹{{ number_format($dep->amount, 2) }}
+                                ₹{{ number_format($dep->final_amount, 2) }}
                             </td>
+                            <td class="p-3.5 font-mono text-neutral-300">{{ $dep->payment_provider === 'ipaymentwallet' ? '$'.number_format((float) $dep->amount, 2).' USD' : '₹'.number_format((float) ($dep->amount_inr ?? $dep->amount), 2) }}</td>
                             <td class="p-3.5">
                                 @if($dep->proof_file)
                                     <a href="{{ asset('storage/' . $dep->proof_file) }}" target="_blank" class="px-2.5 py-1 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[10px] font-bold hover:bg-teal-500 hover:text-black transition inline-flex items-center gap-1">
@@ -133,8 +135,8 @@
                                 {{ $dep->admin_remark ?? '-' }}
                             </td>
                             <td class="p-3.5 text-center">
-                                @if($dep->status === 'pending' && $dep->payment_provider === 'razorpay')
-                                    <span class="text-[10px] font-bold text-sky-300">Awaiting Razorpay verification</span>
+                                @if($dep->status === 'pending' && filled($dep->payment_provider))
+                                    <span class="text-[10px] font-bold text-sky-300">Awaiting {{ ucfirst($dep->payment_provider) }} verification</span>
                                 @elseif($dep->status === 'pending')
                                     <div class="flex items-center justify-center gap-1.5">
                                         <!-- Approve Form -->

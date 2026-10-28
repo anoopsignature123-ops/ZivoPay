@@ -4,18 +4,19 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\IpaymentWalletWebhookController;
 use App\Http\Controllers\Api\PageApiController;
-use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\Shop\AddressController as ShopAddressController;
 use App\Http\Controllers\Api\Shop\CartController as ShopCartController;
 use App\Http\Controllers\Api\Shop\CatalogController as ShopCatalogController;
 use App\Http\Controllers\Api\Shop\OrderController as ShopOrderController;
-use App\Http\Controllers\Api\Shop\PaymentController as ShopPaymentController;
 use App\Http\Controllers\Api\Shop\PromoCodeController as ShopPromoCodeController;
 use App\Http\Controllers\Api\Shop\RatingController as ShopRatingController;
 use App\Http\Controllers\Api\SupportController;
+use App\Http\Controllers\Api\UpigatewayPaymentController;
+use App\Http\Controllers\Api\UpigatewayWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,10 +46,12 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
-Route::post('payment/razorpay/webhook', [PaymentController::class, 'webhook'])->middleware('throttle:60,1');
-Route::post('shop/payments/razorpay/webhook', [ShopPaymentController::class, 'webhook'])
-    ->middleware('throttle:60,1')
-    ->name('api.shop.payments.webhook');
+Route::post('webhook/upigateway', UpigatewayWebhookController::class)
+    ->middleware('throttle:120,1')
+    ->name('api.upigateway.webhook');
+Route::post('webhook/ipaymentwallet', IpaymentWalletWebhookController::class)
+    ->middleware('throttle:120,1')
+    ->name('api.ipaymentwallet.webhook');
 
 // Authenticated Sanctum Protected Endpoints
 Route::middleware('auth:sanctum')->group(function () {
@@ -70,12 +73,9 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('throttle:30,1');
         Route::post('checkout', [ShopOrderController::class, 'checkout'])
             ->middleware('throttle:10,1')->name('api.shop.checkout');
-        Route::post('payments-verify', [ShopOrderController::class, 'verifyPayment'])->middleware('throttle:20,1')->name('api.shop.payments.verify');
         Route::post('payments-history', [ShopOrderController::class, 'paymentHistory'])
             ->name('api.shop.payments.history');
         Route::post('payments-status', [ShopOrderController::class, 'paymentStatus']);
-        Route::post('orders/{order}/payment/retry', [ShopOrderController::class, 'retryPayment'])
-            ->middleware('throttle:10,1');
         Route::get('orders', [ShopOrderController::class, 'index']);
         Route::get('orders/{order}', [ShopOrderController::class, 'show']);
         Route::post('orders-cancel', [ShopOrderController::class, 'cancel'])->middleware('throttle:10,1');
@@ -107,13 +107,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Add Fund / Deposit Endpoints
     Route::get('fund-history', [DepositController::class, 'index']);
 
-    Route::post('add-fund', [PaymentController::class, 'createOrder'])
+    Route::get('add-fund-config', [UpigatewayPaymentController::class, 'configuration'])
+        ->name('api.add-fund.config');
+    Route::post('add-fund', [UpigatewayPaymentController::class, 'createOrder'])
         ->middleware('throttle:10,1')
         ->name('api.add-fund.start');
-    Route::post('add-fund-verify', [PaymentController::class, 'verify'])
-        ->middleware('throttle:20,1')
-        ->name('api.add-fund.verify');
-    Route::get('add-fund-status', [PaymentController::class, 'status'])
+    Route::get('add-fund-status', [UpigatewayPaymentController::class, 'status'])
         ->middleware('throttle:30,1')
         ->name('api.add-fund.status');
 

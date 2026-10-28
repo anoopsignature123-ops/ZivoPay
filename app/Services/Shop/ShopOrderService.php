@@ -2,7 +2,6 @@
 
 namespace App\Services\Shop;
 
-use App\Models\PaymentGatewaySetting;
 use App\Models\Shop\Address;
 use App\Models\Shop\Cart;
 use App\Models\Shop\Order;
@@ -65,7 +64,7 @@ class ShopOrderService
                 'user_id' => $customer->id,
                 'address_id' => $address->id,
                 'order_number' => $orderNumber,
-                'status' => $paymentMethod === 'razorpay' ? 'pending_payment' : 'placed',
+                'status' => 'placed',
                 'payment_method' => $paymentMethod,
                 'payment_status' => 'pending',
                 'subtotal' => $subtotal,
@@ -102,7 +101,7 @@ class ShopOrderService
                 'order_id' => $order->id,
                 'user_id' => $customer->id,
                 'provider' => $paymentMethod,
-                'mode' => $paymentMethod === 'razorpay' ? PaymentGatewaySetting::razorpay()->mode : null,
+                'mode' => null,
                 'currency' => 'INR',
                 'amount' => $total,
                 'status' => 'pending',
@@ -155,9 +154,7 @@ class ShopOrderService
 
         if (in_array($status, ['cancelled', 'returned'], true) && $order->payment_status === 'paid') {
             $payment = $order->payments()->where('status', 'captured')->latest()->first();
-            if ($payment?->provider === 'razorpay') {
-                app(ShopRazorpayService::class)->refund($payment);
-            } elseif ($payment?->provider === 'cod') {
+            if ($payment?->provider === 'cod') {
                 $payment->update(['status' => 'refund_pending']);
             }
         }

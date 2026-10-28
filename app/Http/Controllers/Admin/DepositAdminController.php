@@ -39,8 +39,8 @@ class DepositAdminController extends Controller
 
         $stats = [
             'total_approved' => (float) Deposit::where('status', 'approved')->sum('final_amount'),
-            'total_pending' => (float) Deposit::where('status', 'pending')->sum('amount'),
-            'total_rejected' => (float) Deposit::where('status', 'rejected')->sum('amount'),
+            'total_pending' => (float) Deposit::where('status', 'pending')->sum('final_amount'),
+            'total_rejected' => (float) Deposit::where('status', 'rejected')->sum('final_amount'),
             'total_count' => Deposit::count(),
         ];
 

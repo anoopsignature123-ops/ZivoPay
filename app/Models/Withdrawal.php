@@ -15,6 +15,9 @@ class Withdrawal extends Model
         'amount',
         'charge',
         'final_amount',
+        'amount_inr',
+        'conversion_rate',
+        'provider_reference',
         'payment_method',
         'account_details',
         'trx_id',
@@ -27,6 +30,8 @@ class Withdrawal extends Model
         'amount' => 'decimal:2',
         'charge' => 'decimal:2',
         'final_amount' => 'decimal:2',
+        'amount_inr' => 'decimal:2',
+        'conversion_rate' => 'decimal:4',
         'processed_at' => 'datetime',
     ];
 

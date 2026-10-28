@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\IncomeController;
@@ -34,6 +33,11 @@ Route::prefix('user')->name('user.')->group(function () {
     Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [RegisterController::class, 'register']);
 
+    // UPIGateway redirects the browser back after checkout; payment is verified server-side.
+    Route::get('deposit/return', [DepositController::class, 'returnFromPayment'])
+        ->middleware('throttle:30,1')
+        ->name('deposit.return');
+
     // Guest User Routes (Redirects to User Dashboard if already logged in)
     Route::middleware(UserGuest::class)->group(function () {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -51,8 +55,10 @@ Route::prefix('user')->name('user.')->group(function () {
         // User Add Fund / Deposit Wallet Routes
         Route::get('deposit', [DepositController::class, 'index'])->name('deposit.index');
         Route::post('deposit', [DepositController::class, 'store'])->name('deposit.store');
-        Route::post('deposit/razorpay/order', [PaymentController::class, 'createOrder'])->middleware('throttle:10,1')->name('deposit.razorpay.order');
-        Route::post('deposit/razorpay/verify', [PaymentController::class, 'verify'])->middleware('throttle:20,1')->name('deposit.razorpay.verify');
+        Route::get('deposit/ipayment/{deposit}', [DepositController::class, 'payment'])->name('deposit.payment');
+        Route::get('deposit/upi/{deposit}', [DepositController::class, 'upiPayment'])->name('deposit.upi.payment');
+        Route::get('deposit/ipayment/{deposit}/status', [DepositController::class, 'ipaymentStatus'])->middleware('throttle:30,1')->name('deposit.ipayment.status');
+        Route::get('deposit/status', [DepositController::class, 'status'])->middleware('throttle:30,1')->name('deposit.status');
 
         // Fund & Wallet Transfer Routes
         Route::get('wallet/transfer', [WalletController::class, 'showTransferForm'])->name('wallet.transfer');

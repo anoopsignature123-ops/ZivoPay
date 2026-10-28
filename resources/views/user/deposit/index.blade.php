@@ -1,508 +1,217 @@
 @extends('user.layouts.app')
 
-@section('title', 'Add Fund (Fund Wallet) - ZIVO PAY')
+@section('title', 'Add Funds · ZIVO PAY')
 
 @section('content')
-    <div class="w-full max-w-[1600px] mx-auto space-y-6 font-sans">
-        <!-- Header Banner -->
-        <div
-            class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="mx-auto max-w-7xl space-y-6">
+        <header class="flex flex-col justify-between gap-4 rounded-2xl border border-emerald-500/30 bg-[#042718] p-5 shadow-xl sm:flex-row sm:items-center sm:p-6">
             <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span
-                        class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider border border-emerald-500/30">
-                        FUND WALLET RECHARGE
-                    </span>
-                    </div>
-                    <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-heading">ADD FUND TO
-                        WALLET</h1>
-                    <p class="text-xs text-neutral-300 mt-0.5">Add funds securely with Razorpay using UPI, cards, netbanking, or
-                        wallets.</p>
-                    </div>
+                <span class="rounded-full bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">Fund Wallet · Pay-in</span>
+                <h1 class="mt-3 text-2xl font-black text-white">Choose how to add funds</h1>
+                <p class="mt-1 text-sm text-neutral-400">Enter an amount, pay on the gateway QR, and your wallet updates after payment verification.</p>
+            </div>
+            <div class="rounded-xl border border-emerald-500/30 bg-[#01140c] px-5 py-3 sm:text-right">
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-400">Fund wallet balance</span>
+                <span class="font-mono text-2xl font-black text-white">₹{{ number_format((float) $user->deposit_wallet, 2) }}</span>
+            </div>
+        </header>
 
-                    <div class="px-4 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/40 text-right shrink-0">
-                        <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">Fund Wallet
-                            Balance</span>
-                        <span class="text-xl font-black text-white font-mono">₹{{ number_format($user->deposit_wallet, 2) }}</span>
-                    </div>
-                    </div>
+        @if (session('success'))
+            <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{{ session('error') }}</div>
+        @endif
+        @if (session('info'))
+            <div class="rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-100">{{ session('info') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{{ $errors->first() }}</div>
+        @endif
 
-                    @if(!$gatewaySettings->enabled || !filled($gatewaySettings->keyId()) || !filled($gatewaySettings->keySecret()))
-                        <div
-                            class="p-4 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-bold flex items-center gap-2.5 shadow-lg shadow-amber-500/10">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 shrink-0"></i>
-                            <div>
-                                <span class="block font-black uppercase text-amber-400 tracking-wider">RAZORPAY CHECKOUT UNAVAILABLE</span>
-                                <span class="text-neutral-200 font-medium leading-relaxed">Online payment is not enabled yet. Please contact
-                                    Admin or use P2P Member Transfer to top up your Fund Wallet.</span>
+        <div class="grid gap-6 lg:grid-cols-2">
+            <section class="rounded-2xl border border-emerald-500/30 bg-[#042718] p-5 shadow-xl sm:p-6">
+                <div class="mb-5 flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/15 text-xl text-emerald-300">▦</div>
+                    <div>
+                        <h2 class="font-bold text-white">Deposit INR · UPI</h2>
+                        <p class="text-xs text-neutral-400">Dynamic UPI QR · Google Pay · PhonePe · Paytm</p>
+                    </div>
+                </div>
+                @if ($gatewayEnabled)
+                    <form id="upiDepositForm" action="{{ route('user.deposit.store') }}" method="POST" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="currency" value="INR">
+                        <div>
+                            <label for="depositAmount" class="mb-2 block text-xs font-bold uppercase tracking-wider text-emerald-300">Payment amount (INR)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-lg font-bold text-emerald-400">₹</span>
+                                <input type="number" id="depositAmount" name="amount" min="{{ $minDeposit }}" max="{{ $maxDeposit }}" step="0.01" value="{{ old('currency') === 'INR' ? old('amount', 1000) : 1000 }}" required class="w-full rounded-xl border border-emerald-500/40 bg-[#01140c] py-3 pl-10 pr-4 font-mono text-lg font-bold text-white outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20">
                             </div>
                         </div>
-                    @endif
-
-                    <!-- Alert Messages -->
-                    @if(session('success') || request('payment') === 'success')
-                        <div
-                            class="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold flex items-center gap-2">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-                            <span>{{ session('success', 'Payment received and verified. Your Fund Wallet has been updated.') }}</span>
+                        <div class="space-y-3 rounded-xl border border-emerald-500/20 bg-[#01140c] p-4 text-sm">
+                            <div class="flex justify-between text-neutral-400"><span>You pay</span><span id="amountInr">₹1,000.00</span></div>
+                            <div class="flex justify-between border-t border-emerald-500/15 pt-3 font-semibold text-white"><span>Wallet credit after success</span><span id="upiWalletCredit">₹1,000.00</span></div>
                         </div>
-                    @endif
+                        <button id="upiDepositSubmit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-emerald-400 to-teal-300 px-5 py-3 font-black uppercase tracking-wider text-[#001b10] shadow-lg transition hover:brightness-110">Open UPI QR & Pay →</button>
+                    </form>
+                @else
+                    <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">UPIGateway is not enabled or configured. Contact your administrator.</div>
+                @endif
+            </section>
 
-                    @if(session('error'))
-                        <div class="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold">
-                            {{ session('error') }}
+            <section class="rounded-2xl border border-sky-500/30 bg-slate-900/80 p-5 shadow-xl sm:p-6">
+                <div class="mb-5 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 text-lg font-black text-sky-300">$</div>
+                        <div>
+                            <h2 class="font-bold text-white">Deposit USD · iPaymentWallet</h2>
+                            <p class="text-xs text-neutral-400">Scan the crypto QR; USD is converted to INR wallet credit</p>
                         </div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold space-y-1">
-                            @foreach($errors->all() as $error)
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="x-circle" class="w-4 h-4 text-rose-400 shrink-0"></i>
-                                    <span>{{ $error }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    <!-- Main Add Fund 50%-50% Layout -->
-                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)] gap-6 items-start">
-
-                        <!-- Left Column (50%): Add Fund Form -->
-                        <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
-                            <div class="flex items-center gap-2.5 border-b border-emerald-500/20 pb-3">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
-                                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-base font-black text-white uppercase tracking-tight font-heading">ADD FUND FORM</h2>
-                                    <p class="text-[11px] text-neutral-400">Choose an amount and continue to secure Razorpay checkout.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="space-y-4">
-                                <!-- Deposit Amount -->
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                                            Add Fund Amount (₹) *
-                                        </label>
-                                        <span class="text-[11px] text-neutral-400">Min: <strong
-                                                class="text-white">₹{{ number_format(config('gateway.min_deposit', 100)) }}</strong></span>
-                                    </div>
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 font-bold font-mono text-sm">₹</span>
-                                        <input type="number" name="amount" id="depositAmount" min="{{ config('gateway.min_deposit', 100) }}"
-                                            max="{{ config('gateway.max_deposit', 500000) }}" step="1" value="{{ old('amount', 3000) }}"
-                                            required placeholder="Enter amount..."
-                                            class="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono font-bold text-sm focus:outline-none focus:border-emerald-400 transition"
-                                            style="background-color: #01140c !important;">
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-[#01140c] p-3.5">
-                                    <div class="flex items-center gap-2">
-                                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-                                        <span class="text-[11px] font-bold text-emerald-300 uppercase">Secure Razorpay Checkout</span>
-                                    </div>
-                                    <span
-                                        class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase {{ $gatewaySettings->mode === 'test' ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300' }}">{{ $gatewaySettings->mode }}
-                                        mode</span>
-                                </div>
-
-                                <div class="rounded-xl border border-emerald-500/20 bg-[#01140c] p-3.5 text-[10px] text-neutral-400">
-                                    Pay using UPI, cards, netbanking, or wallets. Your Fund Wallet is credited only after Razorpay
-                                    confirms the captured payment with the server.
-                                </div>
-
-                                <!-- Submit Button -->
-                                <button type="button" id="razorpayCheckoutButton" @disabled(!$gatewaySettings->isReady())
-                                    class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(16,185,129,0.35)] hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <i data-lucide="lock-keyhole" class="w-4 h-4 text-black"></i>
-                                    <span id="razorpayCheckoutLabel">PAY SECURELY WITH RAZORPAY</span>
-                                </button>
-                                <p id="razorpayCheckoutError"
-                                    class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold">
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Right Column (50%): Fund Wallet Daily Profit Slabs & Features Card -->
-                        <div class="space-y-5">
-                            <div class="rounded-2xl border border-emerald-500/30 bg-[#042718] p-5 sm:p-6 shadow-xl">
-                                <div class="mb-4 flex items-center justify-between border-b border-emerald-500/20 pb-3">
-                                    <div>
-                                        <h2 class="text-sm font-black uppercase tracking-wider text-emerald-300">Order Summary</h2>
-                                        <p class="mt-1 text-[11px] text-neutral-400">Secure Razorpay wallet top-up</p>
-                                    </div>
-                                    <i data-lucide="receipt-text" class="h-5 w-5 text-emerald-400"></i>
-                                </div>
-                                <div class="space-y-3 text-xs">
-                                    <div class="flex justify-between text-neutral-300"><span>Fund Wallet top-up</span><strong
-                                            id="razorpaySummaryAmount"
-                                            class="font-mono text-white">₹{{ number_format(old('amount', 3000), 2) }}</strong></div>
-                                    <div class="flex justify-between text-neutral-400"><span>Gateway fee</span><strong
-                                            class="font-mono text-emerald-300">₹0.00</strong></div>
-                                    <div class="mt-4 flex items-center justify-between border-t border-emerald-500/20 pt-4 text-white">
-                                        <span class="font-bold">Total payable</span><strong id="razorpaySummaryTotal"
-                                            class="font-mono text-xl">₹{{ number_format(old('amount', 3000), 2) }}</strong>
-                                    </div>
-                                </div>
-                                <div class="mt-5 rounded-xl border border-emerald-500/20 bg-[#01140c] p-3 text-[10px] text-neutral-400">
-                                    <div class="flex items-center gap-2 font-bold text-emerald-300"><i data-lucide="shield-check"
-                                            class="h-4 w-4"></i> Pay securely with Razorpay</div>
-                                    <div class="mt-3 grid grid-cols-2 gap-2 text-center font-semibold">
-                                        <span class="rounded-lg bg-white/5 p-2">UPI</span><span
-                                            class="rounded-lg bg-white/5 p-2">Cards</span>
-                                        <span class="rounded-lg bg-white/5 p-2">Netbanking</span><span
-                                            class="rounded-lg bg-white/5 p-2">Wallets</span>
-                                    </div>
-                                    <p class="mt-3">ZIVO PAY never receives or stores your card details or UPI PIN. Wallet credit
-                                        follows server verification.</p>
-                                </div>
-                            </div>
-                            <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
-                                <!-- Header -->
-                                <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3">
-                                    <div class="flex items-center gap-2.5">
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
-                                            <i data-lucide="trending-up" class="w-4 h-4"></i>
-                                        </div>
-                                        <div>
-                                            <h2 class="text-base font-black text-white uppercase tracking-tight font-heading">DAILY
-                                                PROFIT SLABS</h2>
-                                            <p class="text-[11px] text-neutral-400">Wallet deposit balance auto-yields daily ROI profit.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span
-                                        class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase">
-                                        AUTO PROFIT ⚡
-                                    </span>
-                                </div>
-
-                                <!-- 4 Small Slabs Grid (2x2) -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                                    <!-- Slab 1 -->
-                                    <div
-                                        class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 1</span>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30">
-                                                0.15% DAILY
-                                            </span>
-                                        </div>
-                                        <div class="text-xs font-black text-white font-mono">₹1,000 – ₹99,999</div>
-                                        <p class="text-[10px] text-neutral-400 font-sans">Daily 0.15% profit credited automatically.</p>
-                                    </div>
-
-                                    <!-- Slab 2 -->
-                                    <div
-                                        class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 2</span>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[10px] font-black border border-teal-500/30">
-                                                0.20% DAILY
-                                            </span>
-                                        </div>
-                                        <div class="text-xs font-black text-white font-mono">₹1,00,000 – ₹4,99,999</div>
-                                        <p class="text-[10px] text-neutral-400 font-sans">Daily 0.20% profit credited automatically.</p>
-                                    </div>
-
-                                    <!-- Slab 3 -->
-                                    <div
-                                        class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 3</span>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
-                                                0.25% DAILY
-                                            </span>
-                                        </div>
-                                        <div class="text-xs font-black text-white font-mono">₹5,00,000 – ₹9,99,999</div>
-                                        <p class="text-[10px] text-neutral-400 font-sans">Daily 0.25% profit credited automatically.</p>
-                                    </div>
-
-                                    <!-- Slab 4 -->
-                                    <div
-                                        class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-1 hover:border-emerald-400 transition">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-wider">SLAB 4
-                                                (MAX)</span>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-black border border-emerald-400/40">
-                                                0.30% DAILY
-                                            </span>
-                                        </div>
-                                        <div class="text-xs font-black text-white font-mono">₹10,00,000 & Above</div>
-                                        <p class="text-[10px] text-neutral-400 font-sans">Maximum 0.30% daily yield credited.</p>
-                                    </div>
-
-                                </div>
-
-                                <!-- Features & Flexibility Cards -->
-                                <div class="p-4 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2.5">
-                                    <div class="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
-                                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-                                        <span>Wallet Flexibility & Benefits</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
-                                        <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
-                                            <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400 mb-1"></i>
-                                            <h4 class="text-[11px] font-bold text-white">24x7 Withdrawal</h4>
-                                            <p class="text-[9.5px] text-neutral-400">Profit withdraw facility anytime.</p>
-                                        </div>
-                                        <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
-                                            <i data-lucide="coins" class="w-3.5 h-3.5 text-teal-400 mb-1"></i>
-                                            <h4 class="text-[11px] font-bold text-white">Auto Compound</h4>
-                                            <p class="text-[9.5px] text-neutral-400">Daily yield on balance.</p>
-                                        </div>
-                                        <div class="p-2.5 rounded-lg bg-[#042718] border border-emerald-500/20">
-                                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-amber-400 mb-1"></i>
-                                            <h4 class="text-[11px] font-bold text-white">Multi-Utility</h4>
-                                            <p class="text-[9.5px] text-neutral-400">Bank, Recharge, Mart.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
                     </div>
-
-                    <!-- Bottom Section: MY ADD FUND REQUESTS HISTORY (Full Width Table) -->
-                    <div class="p-5 sm:p-6 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-xl space-y-4">
-                        <div
-                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-emerald-500/20 pb-3 gap-2">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-500/30">
-                                    <i data-lucide="history" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-base font-black text-white uppercase tracking-tight font-heading">MY ADD FUND
-                                        REQUESTS HISTORY</h3>
-                                    <p class="text-[11px] text-neutral-400">Track status of all your deposit wallet recharge requests.
-                                    </p>
-                                </div>
-                            </div>
-                            <span
-                                class="text-xs text-emerald-400 font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-                                Total Requests: {{ $deposits->total() }}
-                            </span>
-                        </div>
-
-                        <!-- Official Filter Bar Component -->
-                        <div class="p-4 rounded-2xl bg-[#01140c] border border-emerald-500/30 shadow-xl">
-                            <form action="{{ route('user.deposit.index') }}" method="GET" class="zivo-filter-bar">
-                                <!-- FROM DATE -->
-                                <div class="zivo-filter-field-date">
-                                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">FROM
-                                        DATE</label>
-                                    <input type="date" name="from_date" value="{{ request('from_date') }}"
-                                        class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
-                                </div>
-
-                                <!-- TO DATE -->
-                                <div class="zivo-filter-field-date">
-                                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">TO
-                                        DATE</label>
-                                    <input type="date" name="to_date" value="{{ request('to_date') }}"
-                                        class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
-                                </div>
-
-                                <!-- STATUS -->
-                                <div class="zivo-filter-field-select">
-                                    <label
-                                        class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">STATUS</label>
-                                    <select name="status"
-                                        class="w-full px-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400 transition cursor-pointer">
-                                        <option value="">All Statuses</option>
-                                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved
-                                        </option>
-                                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- SEARCH REF / UTR / METHOD -->
-                                <div class="zivo-filter-field-search">
-                                    <label class="block text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1">SEARCH
-                                        REF / UTR / METHOD</label>
-                                    <div class="relative">
-                                        <i data-lucide="search"
-                                            class="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                                        <input type="text" name="search" value="{{ request('search') }}"
-                                            placeholder="Ref ID, UTR Number, UPI..."
-                                            class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#042718] border border-emerald-500/40 text-white text-xs font-mono focus:outline-none focus:border-emerald-400 transition">
-                                    </div>
-                                </div>
-
-                                <!-- ACTION BUTTONS -->
-                                <div class="zivo-filter-actions">
-                                    <button type="submit"
-                                        class="py-2 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center justify-center gap-1.5 shadow cursor-pointer">
-                                        <i data-lucide="filter" class="w-3.5 h-3.5"></i> FILTER
-                                    </button>
-                                    <a href="{{ route('user.deposit.index') }}"
-                                        class="py-2 px-3.5 rounded-xl bg-black/60 border border-emerald-500/30 text-neutral-300 font-bold text-xs hover:text-white hover:border-emerald-400 transition text-center shrink-0">
-                                        Reset
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Requests Table -->
-                        <div class="overflow-x-auto rounded-xl border border-emerald-500/20">
-                            <table class="w-full text-left text-xs">
-                                <thead
-                                    class="bg-[#02180f] text-emerald-400 font-extrabold uppercase tracking-wider border-b border-emerald-500/30">
-                                    <tr>
-                                        <th class="px-4 py-3">REF CODE</th>
-                                        <th class="px-4 py-3">AMOUNT</th>
-                                        <th class="px-4 py-3">METHOD</th>
-                                        <th class="px-4 py-3">UTR / HASH</th>
-                                        <th class="px-4 py-3">STATUS</th>
-                                        <th class="px-4 py-3 text-right">DATE & TIME</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-emerald-500/10 text-neutral-200 font-medium bg-[#01140c]">
-                                    @forelse($deposits as $deposit)
-                                        <tr class="hover:bg-emerald-500/5 transition">
-                                            <td class="px-4 py-3 font-mono font-bold text-emerald-300">{{ $deposit->deposit_ref }}</td>
-                                            <td class="px-4 py-3 font-mono font-black text-white text-sm">
-                                                ₹{{ number_format($deposit->amount, 2) }}</td>
-                                            <td class="px-4 py-3">
-                                                <span
-                                                    class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                                    {{ $deposit->payment_method }}
-                                                </span>
-                                            </td>
-                                            <td class="px-4 py-3 font-mono text-neutral-300 text-xs">{{ $deposit->trx_hash ?? 'N/A' }}</td>
-                                            <td class="px-4 py-3">
-                                                <span
-                                                    class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase 
-                                                                    {{ $deposit->status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : ($deposit->status === 'pending' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40') }}">
-                                                    {{ $deposit->status }}
-                                                </span>
-                                            </td>
-                                            <td class="px-4 py-3 text-right">
-                                                <p class="text-white font-bold">{{ $deposit->created_at->format('d M Y') }}</p>
-                                                <p class="text-[10px] text-neutral-400 font-mono">
-                                                    {{ $deposit->created_at->format('h:i:s A') }}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="px-4 py-8 text-center text-neutral-400 font-bold">
-                                                No Add Fund requests found.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        @if($deposits->hasPages())
-                            <div class="pt-2">
-                                {{ $deposits->withQueryString()->links() }}
-                            </div>
-                        @endif
+                    <span class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider {{ $usdGatewayEnabled ? 'bg-emerald-500/15 text-emerald-200' : 'bg-amber-500/15 text-amber-200' }}">{{ $usdGatewayEnabled ? strtoupper(config('gateway.ipaymentwallet.mode')).' · READY' : 'SETUP PENDING' }}</span>
+                </div>
+                @if ($usdGatewayEnabled)
+                    <form action="{{ route('user.deposit.store') }}" method="POST" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="currency" value="USD">
+                        <label for="usdDepositAmount" class="block text-xs font-bold uppercase tracking-wider text-sky-300">Payment amount (USD)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-lg font-bold text-sky-400">$</span>
+                        <input type="number" id="usdDepositAmount" name="amount" min="1" max="50000" step="0.01" value="{{ old('currency') === 'USD' ? old('amount', 10) : 10 }}" required class="w-full rounded-xl border border-sky-500/40 bg-slate-950/70 py-3 pl-10 pr-4 font-mono text-lg font-bold text-white outline-none focus:border-sky-300 focus:ring-2 focus:ring-sky-400/20">
                     </div>
+                    <div class="rounded-xl border border-sky-500/20 bg-slate-950/70 p-4 text-sm text-slate-300">
+                        <div class="flex justify-between"><span>Wallet credit</span><span id="usdWalletCredit" class="font-mono font-bold text-white">₹{{ number_format(10 * $conversionRate, 2) }}</span></div>
+                        <p class="mt-3 border-t border-slate-700 pt-3 text-xs leading-relaxed text-slate-400">Pay the exact USD amount. At $1 = ₹{{ number_format($conversionRate, 2) }}, your wallet is credited in INR after automatic payment verification.</p>
                     </div>
+                        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-sky-400 to-cyan-300 px-5 py-3 font-black uppercase tracking-wider text-slate-950 shadow-lg transition hover:brightness-110">Create USD payment →</button>
+                    </form>
+                @else
+                    <div class="space-y-4">
+                        <label for="usdDepositAmount" class="block text-xs font-bold uppercase tracking-wider text-sky-300">Payment amount (USD)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-lg font-bold text-sky-400">$</span>
+                            <input type="number" id="usdDepositAmount" value="10.00" disabled class="w-full cursor-not-allowed rounded-xl border border-slate-700 bg-slate-950/70 py-3 pl-10 pr-4 font-mono text-lg font-bold text-slate-400">
+                        </div>
+                        <div class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-100">
+                            <p class="font-semibold">USD payment is not configured</p>
+                            <p class="mt-2 text-xs leading-relaxed text-amber-100/70">Add the iPaymentWallet API key to <code>.env</code> and set <code>IPAYMENT_ENABLED=true</code>. Test mode reads the legacy <code>PAYMENT_GATEWAY_API_KEY</code>; Live mode needs <code>IPAYMENT_LIVE_API_KEY</code>. Your key is never shown here.</p>
+                        </div>
+                        <button type="button" disabled class="w-full cursor-not-allowed rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 font-black uppercase tracking-wider text-slate-500">USD deposits unavailable</button>
+                    </div>
+                @endif
+            </section>
+        </div>
 
-                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-                    <script>
-                        document.getElementById('razorpayCheckoutButton')?.addEventListener('click', async function () {
-                            const button = this;
-                            const error = document.getElementById('razorpayCheckoutError');
-                            const label = document.getElementById('razorpayCheckoutLabel');
-                            const amount = Number(document.getElementById('depositAmount').value);
-                            error.classList.add('hidden');
-                            if (!Number.isFinite(amount) || amount < {{ (float) config('gateway.min_deposit', 100) }} || amount > {{ (float) config('gateway.max_deposit', 500000) }}) {
-                                error.textContent = 'Enter an amount between ₹{{ number_format(config('gateway.min_deposit', 100)) }} and ₹{{ number_format(config('gateway.max_deposit', 500000)) }}.';
-                                error.classList.remove('hidden');
-                                return;
-                            }
-                            if (!window.Razorpay) {
-                                error.textContent = 'Razorpay checkout could not load. Check the internet connection and retry.';
-                                error.classList.remove('hidden');
-                                return;
-                            }
-                            button.disabled = true;
-                            label.textContent = 'CREATING SECURE ORDER…';
-                            try {
-                                const response = await fetch('{{ route('user.deposit.razorpay.order') }}', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                    body: JSON.stringify({ amount })
-                                });
-                                const result = await response.json();
-                                const data = result.data ?? result;
-                                if (!response.ok || !data.order_id || !data.key_id) {
-                                    throw new Error(result.message || 'Could not start payment. Please try again.');
-                                }
-                                const checkout = new Razorpay({
-                                    key: data.key_id,
-                                    amount: data.amount,
-                                    currency: data.currency,
-                                    name: 'ZIVO PAY',
-                                    description: 'Fund Wallet top-up',
-                                    order_id: data.order_id,
-                                    prefill: { name: @json($user->name), email: @json($user->email), contact: @json($user->mobile ?? '') },
-                                    theme: { color: '#00c995' },
-                                    handler: async function (payment) {
-                                        label.textContent = 'VERIFYING PAYMENT…';
-                                        try {
-                                            const verifyResponse = await fetch('{{ route('user.deposit.razorpay.verify') }}', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                                body: JSON.stringify({ deposit_ref: data.deposit_ref, razorpay_payment_id: payment.razorpay_payment_id, razorpay_order_id: payment.razorpay_order_id, razorpay_signature: payment.razorpay_signature })
-                                            });
-                                            const verifyResult = await verifyResponse.json();
-                                            if (!verifyResponse.ok) {
-                                                throw new Error(verifyResult.message || 'Payment verification failed. Contact support before retrying.');
-                                            }
-                                            window.location.assign('{{ route('user.deposit.index') }}?payment=success');
-                                        } catch (exception) {
-                                            error.textContent = 'Payment was submitted but could not be confirmed right now. Please wait for verification or contact support before making another payment.';
-                                            error.classList.remove('hidden');
-                                            button.disabled = true;
-                                            label.textContent = 'PAYMENT UNDER REVIEW';
-                                        }
-                                    },
-                                    modal: { ondismiss: function () { button.disabled = false; label.textContent = 'PAY SECURELY WITH RAZORPAY'; } }
-                                });
-                                checkout.on('payment.failed', function (payment) {
-                                    error.textContent = payment.error?.description || 'Payment failed. Please try again.';
-                                    error.classList.remove('hidden');
-                                    button.disabled = false;
-                                    label.textContent = 'PAY SECURELY WITH RAZORPAY';
-                                });
-                                checkout.open();
-                            } catch (exception) {
-                                error.textContent = exception.message || 'Could not start payment. Please try again.';
-                                error.classList.remove('hidden');
-                                button.disabled = false;
-                                label.textContent = 'PAY SECURELY WITH RAZORPAY';
-                            }
-                        });
+        <div class="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 text-xs leading-relaxed text-blue-100/80">Payments are verified with their gateway before wallet credit. If a payment remains pending, keep the reference and check the deposit history again shortly.</div>
 
-                        document.getElementById('depositAmount')?.addEventListener('input', function () {
-                            const amount = Number(this.value) || 0;
-                            const formatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(amount);
-                            document.getElementById('razorpaySummaryAmount').textContent = formatted;
-                            document.getElementById('razorpaySummaryTotal').textContent = formatted;
-                        });
+        <section class="overflow-hidden rounded-2xl border border-emerald-500/25 bg-[#042718] shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-500/15 px-5 py-4">
+                <div><h2 class="font-bold text-white">Deposit history</h2><p class="mt-1 text-xs text-neutral-400">Recent gateway and manual deposit records.</p></div>
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-mono text-emerald-300">{{ $deposits->total() }} records</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[760px] text-left text-xs">
+                    <thead class="bg-[#01140c] uppercase tracking-wider text-emerald-400"><tr><th class="px-5 py-3">Reference</th><th class="px-5 py-3">Method</th><th class="px-5 py-3">Wallet credit (INR)</th><th class="px-5 py-3">Gateway amount</th><th class="px-5 py-3">UTR</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Date</th></tr></thead>
+                    <tbody class="divide-y divide-emerald-500/10 text-neutral-200">
+                        @forelse ($deposits as $deposit)
+                            <tr>
+                                <td class="whitespace-nowrap px-5 py-4 font-mono text-emerald-200">{{ $deposit->deposit_ref }}</td>
+                                <td class="px-5 py-4">{{ $deposit->payment_method }}</td>
+                                <td class="whitespace-nowrap px-5 py-4 font-mono font-bold">₹{{ number_format((float) $deposit->final_amount, 2) }}</td>
+                                <td class="whitespace-nowrap px-5 py-4 font-mono">{{ $deposit->payment_provider === 'ipaymentwallet' ? '$'.number_format((float) $deposit->amount, 2).' USD' : '₹'.number_format((float) ($deposit->amount_inr ?? $deposit->amount), 2) }}</td>
+                                <td class="max-w-40 truncate px-5 py-4 font-mono text-neutral-400">{{ $deposit->trx_hash ?? '—' }}</td>
+                                <td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 font-bold uppercase {{ $deposit->status === 'approved' ? 'bg-emerald-500/15 text-emerald-300' : ($deposit->status === 'pending' ? 'bg-amber-500/15 text-amber-200' : 'bg-rose-500/15 text-rose-300') }}">{{ $deposit->status }}</span></td>
+                                <td class="whitespace-nowrap px-5 py-4 text-neutral-400">{{ $deposit->created_at->format('d M Y, h:i A') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" class="px-5 py-10 text-center text-neutral-500">No deposits yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="border-t border-emerald-500/15 px-5 py-4">{{ $deposits->withQueryString()->links() }}</div>
+        </section>
+    </div>
 
-                    </script>
+    @if (request()->query('deposit_ref'))
+        <div id="deposit-status-check" data-url="{{ route('user.deposit.status', ['deposit_ref' => request()->query('deposit_ref')]) }}" data-return-url="{{ $depositReturnUrl ?? '' }}" class="rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-100" role="status" aria-live="polite">
+            Payment received. Checking with UPIGateway… Keep this page open.
+        </div>
+    @endif
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            const amountInput = document.getElementById('depositAmount');
+            if (amountInput) {
+                const updatePreview = () => {
+                    const amountInr = Number(amountInput.value) || 0;
+                    const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amountInr);
+                    document.getElementById('amountInr').textContent = formattedAmount;
+                    document.getElementById('upiWalletCredit').textContent = formattedAmount;
+                };
+                amountInput.addEventListener('input', updatePreview);
+                updatePreview();
+            }
+
+            const upiForm = document.getElementById('upiDepositForm');
+            const upiSubmit = document.getElementById('upiDepositSubmit');
+            if (upiForm && upiSubmit) {
+                upiForm.addEventListener('submit', () => {
+                    upiSubmit.disabled = true;
+                    upiSubmit.textContent = 'Opening secure UPI QR…';
+                    upiSubmit.classList.add('cursor-wait', 'opacity-70');
+                });
+            }
+
+            const usdAmountInput = document.getElementById('usdDepositAmount');
+            if (usdAmountInput) {
+                const exchangeRate = {{ Illuminate\Support\Js::from($conversionRate) }};
+                const updateUsdPreview = () => {
+                    const amount = Number(usdAmountInput.value) || 0;
+                    const credit = document.getElementById('usdWalletCredit');
+                    if (credit) credit.textContent = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount * exchangeRate);
+                };
+                usdAmountInput.addEventListener('input', updateUsdPreview);
+                updateUsdPreview();
+            }
+
+            const statusElement = document.getElementById('deposit-status-check');
+            if (!statusElement) return;
+            let checkingStatus = false;
+            const checkStatus = async () => {
+                if (checkingStatus) return;
+                checkingStatus = true;
+                try {
+                    const response = await fetch(statusElement.dataset.url, { headers: { 'Accept': 'application/json' } });
+                    const contentType = response.headers.get('content-type') || '';
+                    if (response.redirected || !contentType.includes('application/json')) {
+                        if (statusElement.dataset.returnUrl) {
+                            window.location.replace(statusElement.dataset.returnUrl);
+                            return;
+                        }
+                    }
+                    if (!response.ok) {
+                        statusElement.textContent = 'Payment status check is temporarily unavailable. Retrying automatically…';
+                        window.setTimeout(checkStatus, 10000);
+                        return;
+                    }
+                    const result = await response.json();
+                    if (result.status === 'approved' || result.status === 'rejected') {
+                        window.location.replace(statusElement.dataset.returnUrl);
+                        return;
+                    }
+                    statusElement.textContent = 'Payment is still being confirmed. This page will update automatically.';
+                } catch (_) {
+                    statusElement.textContent = 'Connection interrupted. Retrying payment status check…';
+                } finally {
+                    checkingStatus = false;
+                }
+                window.setTimeout(checkStatus, 5000);
+            };
+            checkStatus();
+        })();
+    </script>
+@endpush

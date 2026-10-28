@@ -39,13 +39,13 @@ class DepositService
      */
     public function approveDeposit(Deposit $deposit, ?string $adminRemark = null): bool
     {
-        if ($deposit->status !== 'pending' || $deposit->payment_provider === 'razorpay') {
+        if ($deposit->status !== 'pending' || filled($deposit->payment_provider)) {
             return false;
         }
 
         return DB::transaction(function () use ($deposit, $adminRemark): bool {
             $lockedDeposit = Deposit::query()->lockForUpdate()->find($deposit->id);
-            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || $lockedDeposit->payment_provider === 'razorpay') {
+            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || filled($lockedDeposit->payment_provider)) {
                 return false;
             }
             $lockedDeposit->update([
@@ -54,13 +54,17 @@ class DepositService
             ]);
 
             $user = $lockedDeposit->user()->lockForUpdate()->firstOrFail();
-            $user->increment('deposit_wallet', $deposit->final_amount);
+            $user->deposit_wallet = (float) $user->deposit_wallet + (float) $lockedDeposit->final_amount;
+            $user->save();
 
             Transaction::create([
                 'user_id' => $user->id,
                 'amount' => $lockedDeposit->final_amount,
                 'wallet_type' => 'deposit_wallet',
                 'type' => 'deposit',
+                'trx_type' => '+',
+                'charge' => 0,
+                'post_balance' => $user->deposit_wallet,
                 'description' => "Direct Fund Deposit via {$lockedDeposit->payment_method} (Ref: {$lockedDeposit->deposit_ref}, UTR/Hash: {$lockedDeposit->trx_hash})",
                 'trx_id' => $lockedDeposit->deposit_ref,
             ]);
@@ -74,13 +78,13 @@ class DepositService
      */
     public function rejectDeposit(Deposit $deposit, ?string $adminRemark = null): bool
     {
-        if ($deposit->status !== 'pending' || $deposit->payment_provider === 'razorpay') {
+        if ($deposit->status !== 'pending' || filled($deposit->payment_provider)) {
             return false;
         }
 
         return DB::transaction(function () use ($deposit, $adminRemark): bool {
             $lockedDeposit = Deposit::query()->lockForUpdate()->find($deposit->id);
-            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || $lockedDeposit->payment_provider === 'razorpay') {
+            if (! $lockedDeposit || $lockedDeposit->status !== 'pending' || filled($lockedDeposit->payment_provider)) {
                 return false;
             }
             $lockedDeposit->update([

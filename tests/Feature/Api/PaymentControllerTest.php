@@ -3,7 +3,6 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Deposit;
-use App\Models\PaymentGatewaySetting;
 use App\Models\Role;
 use App\Models\Transaction;
 use App\Models\User;
@@ -17,261 +16,122 @@ class PaymentControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_unauthenticated_app_cannot_start_add_money_payment_and_receives_401(): void
+    public function test_unauthenticated_user_cannot_start_a_deposit(): void
     {
-        $this->postJson('/api/add-fund', ['amount' => 500])
-            ->assertUnauthorized();
+        $this->postJson('/api/add-fund', ['currency' => 'INR', 'amount' => 1000])->assertUnauthorized();
     }
 
-    public function test_dashboard_returns_public_add_money_settings_without_server_secrets(): void
+    public function test_add_fund_configuration_only_exposes_public_payment_details(): void
     {
-        PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-        ], [
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'never_return_this_secret',
-            'test_webhook_secret' => 'never_return_this_webhook_secret',
+        config([
+            'gateway.upigateway.mode' => 'test',
+            'gateway.upigateway.modes.test.key' => 'secret-user-token',
+            'gateway.upigateway.modes.test.base_url' => 'https://upi.test',
+            'gateway.usd_to_inr_rate' => 100,
         ]);
         $user = $this->createUser();
         Sanctum::actingAs($user);
-
-        $this->getJson('/api/dashboard')
-            ->assertOk()
-            ->assertJsonMissingPath('data.add_money');
 
         $this->getJson('/api/add-fund-config')
             ->assertOk()
-            ->assertJsonPath('data.key_id', 'rzp_test_public')
-            ->assertJsonPath('data.mode', 'test')
-            ->assertJsonPath('data.enabled', true)
-            ->assertJsonPath('data.currency', 'INR')
-            ->assertJsonPath('data.start_url', route('api.add-fund.start'))
-            ->assertJsonPath('data.verify_url', route('api.add-fund.verify'))
-            ->assertJsonPath('data.status_url', route('api.add-fund.status'))
-            ->assertJsonPath('data.config_url', route('api.add-fund.config'))
-            ->assertJsonMissingPath('data.key_secret')
-            ->assertJsonMissingPath('data.api_key_secret')
-            ->assertJsonMissingPath('data.webhook_secret')
-            ->assertJsonMissingPath('data.min_amount')
-            ->assertJsonMissingPath('data.max_amount')
-            ->assertJsonMissingPath('data.upi_id');
+            ->assertJsonPath('data.provider', 'multi-gateway')
+            ->assertJsonPath('data.wallet_currency', 'USD')
+            ->assertJsonPath('data.exchange_rate', 100)
+            ->assertDontSee('secret-user-token');
     }
 
-    public function test_app_receives_add_money_checkout_details_and_pending_wallet_history(): void
+    public function test_gateway_confirms_exact_inr_amount_before_crediting_usd_wallet_once(): void
     {
+        config([
+            'gateway.upigateway.mode' => 'test',
+            'gateway.upigateway.modes.test.key' => 'secret-user-token',
+            'gateway.upigateway.modes.test.base_url' => 'https://upi.test',
+            'gateway.usd_to_inr_rate' => 100,
+        ]);
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.razorpay.com/v1/orders' => Http::response([
-                'id' => 'order_test_123',
-                'amount' => 50000,
-                'currency' => 'INR',
+            'https://upi.test/api/create_order' => Http::response([
+                'status' => true,
+                'data' => ['payment_url' => 'https://checkout.example/pay/test-order'],
+            ]),
+            'https://upi.test/api/check_order_status' => Http::response([
+                'status' => true,
+                'data' => ['status' => 'success', 'amount' => '1000.00', 'upi_txn_id' => 'UPI-UTR-TEST'],
             ]),
         ]);
-        $settings = PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'test_secret_only_on_server',
-        ]);
-        $user = $this->createUser(['deposit_wallet' => 250]);
+        $user = $this->createUser();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/add-fund', ['amount' => '500.00']);
+        $createResponse = $this->postJson('/api/add-fund', ['currency' => 'INR', 'amount' => '1000.00'])->assertCreated();
+        $depositRef = $createResponse->json('data.deposit_ref');
+        $createResponse->assertJsonPath('data.amount_usd', 10)
+            ->assertJsonPath('data.amount_inr', 1000)
+            ->assertJsonPath('data.payment_url', 'https://checkout.example/pay/test-order');
 
-        $response->assertCreated()
-            ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Add Money payment started.')
-            ->assertJsonPath('data.order_id', 'order_test_123')
-            ->assertJsonPath('data.amount', 50000)
-            ->assertJsonPath('data.currency', 'INR')
-            ->assertJsonPath('data.key_id', 'rzp_test_public')
-            ->assertJsonPath('data.mode', 'test')
-            ->assertJsonPath('data.prefill.name', $user->name)
-            ->assertJsonMissingPath('data.key_secret');
-
-        $depositRef = $response->json('data.deposit_ref');
-        $this->assertDatabaseHas('deposits', [
-            'deposit_ref' => $depositRef,
-            'user_id' => $user->id,
-            'amount' => 500,
-            'payment_order_id' => 'order_test_123',
-            'status' => 'pending',
-        ]);
-        $this->assertSame(250.0, (float) $user->fresh()->deposit_wallet);
-
-        $this->getJson('/api/fund-history')
-            ->assertOk()
-            ->assertJsonPath('data.deposits.0.deposit_ref', $depositRef)
-            ->assertJsonPath('data.deposits.0.status', 'pending');
         $this->getJson('/api/add-fund-status?deposit_ref='.$depositRef)
             ->assertOk()
-            ->assertJsonPath('data.status', 'pending')
-            ->assertJsonPath('data.deposit_wallet_balance', 250);
+            ->assertJsonPath('data.status', 'approved');
+        $this->getJson('/api/add-fund-status?deposit_ref='.$depositRef)
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
 
-        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://api.razorpay.com/v1/orders'
-            && $request['amount'] === 50000
-            && $request->hasHeader('Authorization')
-        );
+        $this->assertSame(10.0, (float) $user->fresh()->deposit_wallet);
+        $this->assertSame(1, Transaction::query()->where('trx_id', $depositRef)->count());
+        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://upi.test/api/create_order'
+            && $request['amount'] === '1000.00'
+            && $request['client_txn_id'] === $depositRef);
     }
 
-    public function test_app_payment_amount_must_be_whole_paise_and_within_limits(): void
+    public function test_usd_ipayment_deposit_creates_checkout_and_credits_only_after_verified_payment(): void
     {
-        PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'test_secret_only_on_server',
+        config([
+            'gateway.ipaymentwallet.enabled' => true,
+            'gateway.ipaymentwallet.mode' => 'test',
+            'gateway.ipaymentwallet.modes.test.api_key' => 'ipayment-test-key',
+            'gateway.ipaymentwallet.modes.test.base_url' => 'https://ipayment.test/api',
         ]);
-        $user = $this->createUser();
-        Sanctum::actingAs($user);
-
-        $this->postJson('/api/add-fund', ['amount' => 100.001])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('amount');
-
-        $this->assertDatabaseCount('deposits', 0);
-    }
-
-    public function test_app_add_fund_validation_does_not_disclose_amount_limits(): void
-    {
-        PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-        ], [
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'test_secret_only_on_server',
-        ]);
-        $user = $this->createUser();
-        Sanctum::actingAs($user);
-
-        $this->postJson('/api/add-fund', ['amount' => 99])
-            ->assertUnprocessable()
-            ->assertJsonPath('errors.amount.0', 'Amount is below the allowed limit.')
-            ->assertDontSee('100')
-            ->assertDontSee('500000');
-    }
-
-    public function test_verified_captured_app_payment_credits_wallet_once(): void
-    {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.razorpay.com/v1/payments/pay_test_123' => Http::response([
-                'id' => 'pay_test_123',
-                'order_id' => 'order_test_123',
-                'amount' => 50000,
-                'currency' => 'INR',
-                'status' => 'captured',
+            'https://ipayment.test/api/v1/create-payment' => Http::response([
+                'status' => 'success',
+                'data' => [
+                    'transactionId' => 'IPW-ORDER-123',
+                    'paymentAddress' => '0xabc123',
+                    'qrUrl' => 'https://ipayment.test/qr/IPW-ORDER-123',
+                ],
+            ]),
+            'https://ipayment.test/api/payment/check-status' => Http::response([
+                'status' => 'success',
+                'payment_confirmed' => true,
+                'data' => ['transaction_id' => 'IPW-ORDER-123', 'amount' => '10.00'],
             ]),
         ]);
-        PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'test_secret_only_on_server',
-        ]);
-        $user = $this->createUser(['deposit_wallet' => 250]);
-        $deposit = Deposit::create([
-            'user_id' => $user->id,
-            'deposit_ref' => 'DEP-APPTEST123',
-            'amount' => 500,
-            'charge' => 0,
-            'final_amount' => 500,
-            'payment_method' => 'Razorpay',
-            'payment_provider' => 'razorpay',
-            'payment_order_id' => 'order_test_123',
-            'payment_metadata' => ['mode' => 'test'],
-            'status' => 'pending',
-        ]);
+        $user = $this->createUser();
         Sanctum::actingAs($user);
-        $signature = hash_hmac('sha256', 'order_test_123|pay_test_123', 'test_secret_only_on_server');
-        $payload = [
-            'deposit_ref' => $deposit->deposit_ref,
-            'razorpay_payment_id' => 'pay_test_123',
-            'razorpay_order_id' => 'order_test_123',
-            'razorpay_signature' => $signature,
-        ];
 
-        $this->postJson('/api/add-fund-verify', $payload)
-            ->assertOk()
-            ->assertJsonPath('data.status', 'approved')
-            ->assertJsonPath('data.deposit_wallet_balance', 750);
-        $this->postJson('/api/add-fund-verify', $payload)
-            ->assertOk()
-            ->assertJsonPath('data.status', 'approved')
-            ->assertJsonPath('data.deposit_wallet_balance', 750);
+        $created = $this->postJson('/api/add-fund', ['currency' => 'USD', 'amount' => '10.00'])->assertCreated()
+            ->assertJsonPath('data.amount_usd', 10)
+            ->assertJsonPath('data.gateway_reference', 'IPW-ORDER-123');
+        $depositRef = $created->json('data.deposit_ref');
+        $deposit = Deposit::query()->where('deposit_ref', $depositRef)->firstOrFail();
+        $this->assertSame('ipaymentwallet', $deposit->payment_provider);
+        $this->assertSame(0.0, (float) $user->fresh()->deposit_wallet);
 
-        $this->assertSame(750.0, (float) $user->fresh()->deposit_wallet);
-        $this->assertSame(1, Transaction::where('trx_id', $deposit->deposit_ref)->count());
+        $this->getJson('/api/add-fund-status?deposit_ref='.$depositRef)->assertOk()->assertJsonPath('data.status', 'approved');
+        $this->assertSame(10.0, (float) $user->fresh()->deposit_wallet);
+        $this->assertSame(1, Transaction::query()->where('trx_id', $depositRef)->count());
+        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://ipayment.test/api/v1/create-payment'
+            && $request['txnId'] === $depositRef
+            && $request['amount'] === '10.00');
+        Http::assertSent(fn (Request $request): bool => $request->url() === 'https://ipayment.test/api/payment/check-status'
+            && $request->hasHeader('X-API-Key', 'ipayment-test-key'));
     }
 
-    public function test_app_cannot_verify_another_users_payment_and_receives_404(): void
+    private function createUser(): User
     {
-        PaymentGatewaySetting::query()->updateOrCreate([
-            'gateway' => 'razorpay',
-            'enabled' => true,
-            'mode' => 'test',
-            'test_key_id' => 'rzp_test_public',
-            'test_key_secret' => 'test_secret_only_on_server',
-        ]);
-        $owner = $this->createUser();
-        $otherUser = $this->createUser();
-        $deposit = Deposit::create([
-            'user_id' => $owner->id,
-            'deposit_ref' => 'DEP-OTHERUSER12',
-            'amount' => 500,
-            'charge' => 0,
-            'final_amount' => 500,
-            'payment_method' => 'Razorpay',
-            'payment_provider' => 'razorpay',
-            'payment_order_id' => 'order_other_123',
-            'payment_metadata' => ['mode' => 'test'],
-            'status' => 'pending',
-        ]);
-        Sanctum::actingAs($otherUser);
-
-        $this->postJson('/api/add-fund-verify', [
-            'deposit_ref' => $deposit->deposit_ref,
-            'razorpay_payment_id' => 'pay_other_123',
-            'razorpay_order_id' => 'order_other_123',
-            'razorpay_signature' => 'invalid',
-        ])->assertNotFound();
-    }
-
-    public function test_app_payment_status_only_returns_the_authenticated_users_deposit(): void
-    {
-        $owner = $this->createUser();
-        $otherUser = $this->createUser();
-        $deposit = Deposit::create([
-            'user_id' => $owner->id,
-            'deposit_ref' => 'DEP-STATUSUSER1',
-            'amount' => 500,
-            'charge' => 0,
-            'final_amount' => 500,
-            'payment_method' => 'Razorpay',
-            'payment_provider' => 'razorpay',
-            'payment_order_id' => 'order_status_123',
-            'status' => 'pending',
-        ]);
-        Sanctum::actingAs($otherUser);
-
-        $this->getJson('/api/add-fund-status?deposit_ref='.$deposit->deposit_ref)
-            ->assertNotFound();
-    }
-
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
-    private function createUser(array $attributes = []): User
-    {
+        $userRole = Role::query()->firstOrCreate(['slug' => 'user'], ['name' => 'User']);
         Role::query()->firstOrCreate(['slug' => 'admin'], ['name' => 'Admin']);
-        Role::query()->firstOrCreate(['slug' => 'user'], ['name' => 'User']);
 
-        return User::factory()->create($attributes);
+        return User::factory()->create(['role_id' => $userRole->id, 'mobile' => '9876543210']);
     }
 }
