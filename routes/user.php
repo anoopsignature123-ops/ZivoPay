@@ -18,6 +18,13 @@ use App\Http\Middleware\UserAuth;
 use App\Http\Middleware\UserGuest;
 use Illuminate\Support\Facades\Route;
 
+Route::get('app/deposit/upi/{deposit}', [DepositController::class, 'appUpiPayment'])
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('app.deposit.upi.webview');
+Route::get('app/deposit/upi/{deposit}/status', [DepositController::class, 'appUpiStatus'])
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('app.deposit.upi.status');
+
 /*
 |--------------------------------------------------------------------------
 | User Member Routes & Security Middlewares - ZIVO PAY

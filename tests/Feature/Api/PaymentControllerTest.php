@@ -49,24 +49,63 @@ class PaymentControllerTest extends TestCase
             'gateway.usd_to_inr_rate' => 100,
         ]);
         Http::preventStrayRequests();
+        $statusCheckCount = 0;
         Http::fake([
             'https://upi.test/api/create_order' => Http::response([
                 'status' => true,
                 'data' => ['payment_url' => 'https://checkout.example/pay/test-order'],
             ]),
-            'https://upi.test/api/check_order_status' => Http::response([
-                'status' => true,
-                'data' => ['status' => 'success', 'amount' => '1000.00', 'upi_txn_id' => 'UPI-UTR-TEST'],
-            ]),
+            'https://upi.test/api/check_order_status' => function (Request $request) use (&$statusCheckCount) {
+                $statusCheckCount++;
+                $status = $statusCheckCount === 1 ? 'scanning' : 'success';
+                $providerDepositRef = $statusCheckCount === 2 ? 'DEP-OTHER-ORDER' : $request['client_txn_id'];
+
+                return Http::response([
+                    'status' => true,
+                    'data' => [
+                        'status' => $status,
+                        'client_txn_id' => $providerDepositRef,
+                        'amount' => '1000.00',
+                        'upi_txn_id' => 'UPI-UTR-TEST',
+                    ],
+                ]);
+            },
         ]);
         $user = $this->createUser();
         Sanctum::actingAs($user);
 
         $createResponse = $this->postJson('/api/add-fund', ['currency' => 'INR', 'amount' => '1000.00'])->assertCreated();
         $depositRef = $createResponse->json('data.deposit_ref');
+        $depositId = $createResponse->json('data.deposit_id');
+        $webviewUrl = $createResponse->json('data.webview_url');
+        $webviewStatusUrl = $createResponse->json('data.webview_status_url');
         $createResponse->assertJsonPath('data.amount_usd', 10)
-            ->assertJsonPath('data.amount_inr', 1000)
-            ->assertJsonPath('data.payment_url', 'https://checkout.example/pay/test-order');
+            ->assertJsonPath('data.amount_inr', 1000);
+        $this->assertSame($webviewUrl, $createResponse->json('data.payment_url'));
+        $this->assertStringContainsString('/app/deposit/upi/'.$depositId.'?', $webviewUrl);
+        $this->assertStringContainsString('/app/deposit/upi/'.$depositId.'/status?', $webviewStatusUrl);
+
+        $otherUser = $this->createUser();
+        Sanctum::actingAs($otherUser);
+        $this->getJson('/api/add-fund-status?deposit_ref='.$depositRef)->assertNotFound();
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/webhook/upigateway', [
+            'client_txn_id' => $depositRef,
+            'amount' => '1000.00',
+            'status' => 'success',
+        ])->assertAccepted();
+        $this->assertSame(0.0, (float) $user->fresh()->deposit_wallet);
+        $this->assertDatabaseHas('deposits', ['deposit_ref' => $depositRef, 'status' => 'pending']);
+
+        $this->get('/app/deposit/upi/'.$depositId)->assertForbidden();
+        $this->get(str_replace('signature=', 'signature=invalid', $webviewUrl))->assertForbidden();
+        $this->get($webviewUrl)->assertOk()->assertSee('Complete your payment');
+        $this->assertSame(0.0, (float) $user->fresh()->deposit_wallet);
+        $this->assertDatabaseHas('deposits', ['deposit_ref' => $depositRef, 'status' => 'pending']);
+        $this->getJson($webviewStatusUrl)
+            ->assertOk()
+            ->assertJsonPath('status', 'approved');
 
         $this->getJson('/api/add-fund-status?deposit_ref='.$depositRef)
             ->assertOk()

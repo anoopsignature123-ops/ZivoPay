@@ -15,14 +15,15 @@ class Order extends Model
         'user_id', 'address_id', 'order_number', 'status', 'payment_method', 'payment_status', 'subtotal',
         'delivery_fee', 'discount', 'total', 'promo_code', 'recipient_name', 'phone', 'address_line1',
         'address_line2', 'landmark', 'city', 'state', 'postal_code', 'country', 'tracking_number', 'carrier',
-        'customer_note', 'admin_note', 'return_reason', 'return_requested_at', 'delivered_at', 'cancelled_at',
+        'customer_note', 'admin_note', 'return_reason', 'return_items', 'refunded_amount', 'return_requested_at', 'delivered_at', 'cancelled_at',
     ];
 
     protected function casts(): array
     {
         return [
             'subtotal' => 'decimal:2', 'delivery_fee' => 'decimal:2', 'discount' => 'decimal:2',
-            'total' => 'decimal:2', 'return_requested_at' => 'datetime', 'delivered_at' => 'datetime',
+            'total' => 'decimal:2', 'refunded_amount' => 'decimal:2', 'return_items' => 'array',
+            'return_requested_at' => 'datetime', 'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
         ];
     }

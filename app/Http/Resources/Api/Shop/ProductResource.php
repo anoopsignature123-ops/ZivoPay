@@ -37,6 +37,7 @@ class ProductResource extends JsonResource
             'is_featured' => (bool) $this->is_featured,
             'is_flash_deal' => (bool) $this->is_flash_deal,
             'flash_deal_ends_at' => $this->flash_deal_ends_at?->toIso8601String(),
+            'variants' => [],
         ];
     }
 }

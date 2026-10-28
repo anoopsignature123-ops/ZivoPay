@@ -57,6 +57,9 @@ Route::post('webhook/ipaymentwallet', IpaymentWalletWebhookController::class)
 Route::middleware('auth:sanctum')->group(function () {
     // E-commerce shop APIs
     Route::prefix('shop')->group(function (): void {
+        Route::get('categories', [ShopCatalogController::class, 'categories']);
+        Route::get('categories/products/{category}', [ShopCatalogController::class, 'categoryProducts']);
+        Route::get('products/search', [ShopCatalogController::class, 'search']);
         Route::get('products', [ShopCatalogController::class, 'home']);
         Route::get('products/{product}', [ShopCatalogController::class, 'show']);
         Route::post('ratings', [ShopRatingController::class, 'store'])->middleware('throttle:10,1');

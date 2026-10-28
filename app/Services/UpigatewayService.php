@@ -155,6 +155,15 @@ class UpigatewayService
             return false;
         }
 
+        $providerClientTxnId = (string) ($result['client_txn_id'] ?? $result['clientTxnId'] ?? '');
+        if ($providerClientTxnId === '' || ! hash_equals($deposit->deposit_ref, $providerClientTxnId)) {
+            Log::warning('UPIGateway status response did not match the deposit reference.', [
+                'deposit_ref' => $depositRef,
+            ]);
+
+            return false;
+        }
+
         $paidAmount = (float) ($result['amount'] ?? $result['txn_amount'] ?? 0);
         if (abs($paidAmount - (float) $deposit->amount_inr) > 0.009) {
             Log::warning('UPIGateway deposit amount mismatch.', ['deposit_ref' => $depositRef]);

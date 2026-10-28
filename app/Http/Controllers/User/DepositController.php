@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -262,6 +263,43 @@ class DepositController extends Controller
             'deposit' => $deposit,
             'checkoutUrl' => data_get($deposit->payment_metadata, 'checkout_url'),
             'qrUrl' => data_get($deposit->payment_metadata, 'qr_url'),
+        ]);
+    }
+
+    public function appUpiPayment(Deposit $deposit, UpigatewayService $upigateway): View|RedirectResponse
+    {
+        abort_unless($deposit->payment_provider === 'upigateway', 404);
+        if ($deposit->status === 'pending') {
+            $upigateway->verifyAndCredit($deposit->deposit_ref);
+            $deposit->refresh();
+        }
+
+        return view('user.deposit.app-upi', [
+            'deposit' => $deposit,
+            'checkoutUrl' => data_get($deposit->payment_metadata, 'checkout_url'),
+            'qrUrl' => data_get($deposit->payment_metadata, 'qr_url'),
+            'statusUrl' => URL::temporarySignedRoute(
+                'app.deposit.upi.status',
+                now()->addHour(),
+                ['deposit' => $deposit->id],
+            ),
+        ]);
+    }
+
+    public function appUpiStatus(Deposit $deposit, UpigatewayService $upigateway): JsonResponse
+    {
+        abort_unless($deposit->payment_provider === 'upigateway', 404);
+        if ($deposit->status === 'pending') {
+            $upigateway->verifyAndCredit($deposit->deposit_ref);
+            $deposit->refresh();
+        }
+
+        return response()->json([
+            'deposit_id' => $deposit->id,
+            'deposit_ref' => $deposit->deposit_ref,
+            'status' => $deposit->status,
+            'amount_inr' => (float) $deposit->amount_inr,
+            'wallet_credit' => (float) $deposit->final_amount,
         ]);
     }
 

@@ -8,6 +8,7 @@ use App\Models\Shop\Order;
 use App\Models\Shop\Payment;
 use App\Models\Shop\Product;
 use App\Models\Shop\PromoCode;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -19,13 +20,33 @@ class ShopOrderService
     public function placeOrder(User $customer, array $data): Order
     {
         return DB::transaction(function () use ($customer, $data): Order {
-            $cart = Cart::query()->where('user_id', $customer->id)->lockForUpdate()->first();
-            if (! $cart) {
-                throw ValidationException::withMessages(['cart' => 'Your cart is empty.']);
+            $customer = User::query()->lockForUpdate()->findOrFail($customer->id);
+            $cart = null;
+            $lineItems = [];
+            if (! empty($data['items'])) {
+                $requestedItems = collect($data['items'])->keyBy(fn (array $item): int => (int) $item['product_id']);
+                $products = Product::query()->whereIn('id', $requestedItems->keys())->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+                if ($products->count() !== $requestedItems->count()) {
+                    throw ValidationException::withMessages(['items' => 'One or more products were not found.']);
+                }
+                foreach ($requestedItems as $productId => $requestedItem) {
+                    $lineItems[] = [
+                        'product' => $products->get($productId),
+                        'quantity' => (int) $requestedItem['quantity'],
+                    ];
+                }
+            } else {
+                $cart = Cart::query()->where('user_id', $customer->id)->lockForUpdate()->first();
+                if (! $cart) {
+                    throw ValidationException::withMessages(['cart' => 'Your cart is empty.']);
+                }
+                $cartItems = $cart->items()->orderBy('product_id')->lockForUpdate()->get();
+                foreach ($cartItems as $cartItem) {
+                    $product = Product::query()->lockForUpdate()->find($cartItem->product_id);
+                    $lineItems[] = ['product' => $product, 'quantity' => (int) $cartItem->quantity];
+                }
             }
-
-            $items = $cart->items()->with('product')->lockForUpdate()->get();
-            if ($items->isEmpty()) {
+            if ($lineItems === []) {
                 throw ValidationException::withMessages(['cart' => 'Your cart is empty.']);
             }
 
@@ -35,14 +56,13 @@ class ShopOrderService
             }
 
             $subtotal = 0.0;
-            $products = [];
-            foreach ($items as $item) {
-                $product = Product::query()->lockForUpdate()->find($item->product_id);
-                if (! $product || ! $product->is_active || $product->stock < $item->quantity) {
+            foreach ($lineItems as $lineItem) {
+                $product = $lineItem['product'];
+                $quantity = $lineItem['quantity'];
+                if (! $product || ! $product->is_active || $product->stock < $quantity) {
                     throw ValidationException::withMessages(['cart' => 'One or more products are unavailable or have insufficient stock.']);
                 }
-                $subtotal += (float) $product->price * $item->quantity;
-                $products[] = [$item, $product];
+                $subtotal += (float) $product->price * $quantity;
             }
             $subtotal = round($subtotal, 2);
 
@@ -57,7 +77,12 @@ class ShopOrderService
                 ? 0.0
                 : (float) config('shop.delivery_fee');
             $total = round(max(0, $subtotal + $deliveryFee - $discount), 2);
-            $paymentMethod = $data['payment_method'];
+            $paymentMethod = $data['payment_method'] ?? 'cod';
+            if ($paymentMethod === 'fund_wallet' && (float) $customer->deposit_wallet < $total) {
+                throw ValidationException::withMessages([
+                    'payment_method' => 'Insufficient Fund Wallet balance. Available ₹'.number_format((float) $customer->deposit_wallet, 2).'; required ₹'.number_format($total, 2).'.',
+                ]);
+            }
 
             $orderNumber = 'ZIVO-ORD-'.Str::upper(Str::random(10));
             $order = Order::query()->create([
@@ -66,7 +91,7 @@ class ShopOrderService
                 'order_number' => $orderNumber,
                 'status' => 'placed',
                 'payment_method' => $paymentMethod,
-                'payment_status' => 'pending',
+                'payment_status' => $paymentMethod === 'fund_wallet' ? 'paid' : 'pending',
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'discount' => $discount,
@@ -84,16 +109,34 @@ class ShopOrderService
                 'customer_note' => $data['customer_note'] ?? null,
             ]);
 
-            foreach ($products as [$item, $product]) {
-                $product->decrement('stock', $item->quantity);
+            foreach ($lineItems as $lineItem) {
+                $product = $lineItem['product'];
+                $quantity = $lineItem['quantity'];
+                $product->decrement('stock', $quantity);
                 $order->items()->create([
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_sku' => $product->sku,
                     'product_image' => $product->image_paths[0] ?? null,
                     'unit_price' => $product->price,
-                    'quantity' => $item->quantity,
-                    'line_total' => round((float) $product->price * $item->quantity, 2),
+                    'quantity' => $quantity,
+                    'line_total' => round((float) $product->price * $quantity, 2),
+                ]);
+            }
+
+            if ($paymentMethod === 'fund_wallet') {
+                $customer->deposit_wallet = round((float) $customer->deposit_wallet - $total, 2);
+                $customer->save();
+                Transaction::query()->create([
+                    'user_id' => $customer->id,
+                    'amount' => $total,
+                    'wallet_type' => 'deposit_wallet',
+                    'type' => 'shop_order',
+                    'trx_type' => '-',
+                    'charge' => 0,
+                    'post_balance' => $customer->deposit_wallet,
+                    'description' => "Shop order payment ({$orderNumber})",
+                    'trx_id' => 'SHOP-'.$orderNumber,
                 ]);
             }
 
@@ -104,14 +147,18 @@ class ShopOrderService
                 'mode' => null,
                 'currency' => 'INR',
                 'amount' => $total,
-                'status' => 'pending',
+                'status' => $paymentMethod === 'fund_wallet' ? 'captured' : 'pending',
+                'method' => $paymentMethod,
+                'paid_at' => $paymentMethod === 'fund_wallet' ? now() : null,
             ]);
 
             if ($promo) {
                 $promo->increment('usage_count');
             }
 
-            $cart->items()->delete();
+            if ($cart) {
+                $cart->items()->delete();
+            }
 
             return $order->load('items');
         }, 3);
@@ -148,16 +195,6 @@ class ShopOrderService
             'delivered' => ['return_requested'],
             'return_requested' => ['returned', 'delivered'],
         ];
-        if (! in_array($status, $allowedTransitions[$order->status] ?? [], true)) {
-            throw ValidationException::withMessages(['status' => 'That order status change is not allowed.']);
-        }
-
-        if (in_array($status, ['cancelled', 'returned'], true) && $order->payment_status === 'paid') {
-            $payment = $order->payments()->where('status', 'captured')->latest()->first();
-            if ($payment?->provider === 'cod') {
-                $payment->update(['status' => 'refund_pending']);
-            }
-        }
 
         return DB::transaction(function () use ($order, $status, $trackingNumber, $carrier, $note, $allowedTransitions): Order {
             $lockedOrder = Order::query()->lockForUpdate()->findOrFail($order->id);
@@ -165,14 +202,14 @@ class ShopOrderService
                 throw ValidationException::withMessages(['status' => 'That order status change is not allowed.']);
             }
 
+            $lockedOrder->loadMissing(['items', 'payments']);
             if (in_array($status, ['cancelled', 'returned'], true)) {
-                foreach ($lockedOrder->items as $item) {
-                    if ($item->product_id) {
-                        Product::query()->whereKey($item->product_id)->lockForUpdate()->increment('stock', $item->quantity);
-                    }
-                }
-                if ($lockedOrder->payment_method === 'cod' && $lockedOrder->payment_status === 'paid') {
-                    $lockedOrder->payment_status = 'refund_pending';
+                $this->restoreStock($lockedOrder, $status);
+                if ($lockedOrder->payment_status === 'paid') {
+                    $this->refundToFundWallet($lockedOrder, $status === 'returned' ? $this->returnRefundAmount($lockedOrder) : (float) $lockedOrder->total);
+                } else {
+                    $lockedOrder->payment_status = 'cancelled';
+                    $lockedOrder->payments()->whereIn('status', ['pending', 'failed'])->update(['status' => 'cancelled']);
                 }
             }
 
@@ -191,14 +228,75 @@ class ShopOrderService
             }
             if ($status === 'cancelled') {
                 $lockedOrder->cancelled_at = now();
-                if ($lockedOrder->payment_status !== 'paid' && $lockedOrder->payment_status !== 'refunded') {
-                    $lockedOrder->payment_status = 'cancelled';
-                    $lockedOrder->payments()->whereIn('status', ['pending', 'failed'])->update(['status' => 'cancelled']);
-                }
             }
             $lockedOrder->save();
 
-            return $lockedOrder->load(['items', 'user']);
+            return $lockedOrder->load(['items', 'user', 'payments']);
         }, 3);
+    }
+
+    private function restoreStock(Order $order, string $status): void
+    {
+        $quantities = $status === 'returned' && is_array($order->return_items)
+            ? collect($order->return_items)->keyBy('order_item_id')->map(fn (array $item): int => (int) $item['quantity'])
+            : $order->items->keyBy('id')->map(fn ($item): int => (int) $item->quantity);
+
+        foreach ($order->items as $item) {
+            $quantity = (int) ($quantities->get($item->id) ?? 0);
+            if ($item->product_id && $quantity > 0) {
+                Product::query()->whereKey($item->product_id)->lockForUpdate()->increment('stock', $quantity);
+            }
+        }
+    }
+
+    private function returnRefundAmount(Order $order): float
+    {
+        if (! is_array($order->return_items) || $order->return_items === []) {
+            return (float) $order->total;
+        }
+
+        $refundAmount = array_sum(array_column($order->return_items, 'refund_amount'));
+        $returnedQuantities = collect($order->return_items)->keyBy('order_item_id');
+        $isFullReturn = $order->items->every(fn ($item): bool => (int) data_get($returnedQuantities->get($item->id), 'quantity', 0) >= (int) $item->quantity);
+        if ($isFullReturn) {
+            return round(max(0, (float) $order->total - (float) $order->refunded_amount), 2);
+        }
+
+        return round(min((float) $order->total - (float) $order->refunded_amount, $refundAmount), 2);
+    }
+
+    private function refundToFundWallet(Order $order, float $amount): void
+    {
+        if ($amount <= 0 || in_array($order->payment_status, ['refunded', 'partially_refunded'], true)) {
+            return;
+        }
+
+        $user = User::query()->lockForUpdate()->findOrFail($order->user_id);
+        $user->deposit_wallet = round((float) $user->deposit_wallet + $amount, 2);
+        $user->save();
+
+        Transaction::query()->create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'wallet_type' => 'deposit_wallet',
+            'type' => 'shop_order_refund',
+            'trx_type' => '+',
+            'charge' => 0,
+            'post_balance' => $user->deposit_wallet,
+            'description' => "Fund Wallet refund for shop order ({$order->order_number})",
+            'trx_id' => 'SHOP-REF-'.$order->order_number,
+        ]);
+
+        $order->refunded_amount = round((float) $order->refunded_amount + $amount, 2);
+        $order->payment_status = $order->refunded_amount >= (float) $order->total ? 'refunded' : 'partially_refunded';
+        $order->payments()->whereIn('status', ['captured', 'refund_pending'])->latest()->limit(1)->get()->each(function (Payment $payment) use ($amount, $order): void {
+            $metadata = $payment->metadata ?? [];
+            $metadata['refund_amount'] = $amount;
+            $payment->update([
+                'status' => $order->payment_status,
+                'metadata' => $metadata,
+                'refunded_at' => now(),
+            ]);
+        });
     }
 }

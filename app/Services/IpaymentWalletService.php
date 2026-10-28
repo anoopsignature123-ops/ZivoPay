@@ -182,7 +182,7 @@ class IpaymentWalletService
                 'trx_type' => '+',
                 'charge' => 0,
                 'post_balance' => $user->deposit_wallet,
-                'description' => "iPaymentWallet USD deposit ${$lockedDeposit->amount} credited as INR ₹{$lockedDeposit->final_amount} (Ref: {$lockedDeposit->deposit_ref})",
+                'description' => 'iPaymentWallet USD deposit $'.number_format((float) $lockedDeposit->amount, 2, '.', '')." credited as INR ₹{$lockedDeposit->final_amount} (Ref: {$lockedDeposit->deposit_ref})",
                 'trx_id' => $lockedDeposit->deposit_ref,
             ]);
 

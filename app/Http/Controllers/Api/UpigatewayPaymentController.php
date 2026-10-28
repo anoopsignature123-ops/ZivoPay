@@ -9,6 +9,7 @@ use App\Services\UpigatewayService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -30,6 +31,7 @@ class UpigatewayPaymentController extends Controller
             ],
             'start_url' => route('api.add-fund.start'),
             'status_url' => route('api.add-fund.status'),
+            'upigateway_webhook_url' => route('api.upigateway.webhook'),
             'ipayment_webhook_url' => route('api.ipaymentwallet.webhook'),
         ], 'Add Fund configuration retrieved.');
     }
@@ -74,7 +76,7 @@ class UpigatewayPaymentController extends Controller
         ]);
 
         try {
-            $paymentUrl = $upigateway->createOrder($deposit->load('user'));
+            $upigateway->createOrder($deposit->load('user'));
         } catch (Throwable $exception) {
             report($exception);
             $deposit->forceFill(['status' => 'rejected', 'admin_remark' => 'UPIGateway checkout creation failed.'])->save();
@@ -82,12 +84,22 @@ class UpigatewayPaymentController extends Controller
             return $this->errorResponse('Could not start UPI payment. Please try again.', 502);
         }
 
+        $expiresAt = now()->addHour();
+        $webviewUrl = URL::temporarySignedRoute('app.deposit.upi.webview', $expiresAt, ['deposit' => $deposit->id]);
+        $webviewStatusUrl = URL::temporarySignedRoute('app.deposit.upi.status', $expiresAt, ['deposit' => $deposit->id]);
+
         return $this->successResponse([
+            'deposit_id' => $deposit->id,
             'deposit_ref' => $deposit->deposit_ref,
+            'status' => $deposit->status,
             'amount_usd' => (float) $deposit->amount,
             'amount_inr' => (float) $deposit->amount_inr,
             'exchange_rate' => $rate,
-            'payment_url' => $paymentUrl,
+            'payment_url' => $webviewUrl,
+            'webview_url' => $webviewUrl,
+            'webview_status_url' => $webviewStatusUrl,
+            'api_status_url' => route('api.add-fund.status'),
+            'webhook_url' => route('api.upigateway.webhook'),
         ], 'INR UPI payment started.', 201);
     }
 

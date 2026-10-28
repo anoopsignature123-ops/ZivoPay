@@ -19,6 +19,7 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'payment_method' => $this->payment_method,
             'payment_status' => $this->payment_status,
+            'refunded_amount' => (float) ($this->refunded_amount ?? 0),
             'subtotal' => (float) $this->subtotal,
             'delivery_fee' => (float) $this->delivery_fee,
             'discount' => (float) $this->discount,
@@ -37,6 +38,8 @@ class OrderResource extends JsonResource
                 'country' => $this->country,
             ],
             'return_reason' => $this->return_reason,
+            'return_status' => $this->status === 'return_requested' ? 'pending_review' : ($this->status === 'returned' ? 'refunded' : null),
+            'return_items' => $this->return_items,
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item) => [
                 'product_id' => $item->product_id,
                 'name' => $item->product_name,
@@ -48,6 +51,8 @@ class OrderResource extends JsonResource
             ])->values()),
             'created_at' => $this->created_at?->toIso8601String(),
             'delivered_at' => $this->delivered_at?->toIso8601String(),
+            'cancelled_at' => $this->cancelled_at?->toIso8601String(),
+            'payments' => PaymentResource::collection($this->whenLoaded('payments')),
         ];
     }
 }
