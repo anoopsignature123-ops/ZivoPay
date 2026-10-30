@@ -30,14 +30,14 @@ return [
         'ca_bundle' => env('PAYMENT_GATEWAY_CA_BUNDLE', ''),
         'modes' => [
             'test' => [
-                'api_key' => env('IPAYMENT_TEST_API_KEY') ?: env('PAYMENT_GATEWAY_API_KEY', ''),
-                'base_url' => env('IPAYMENT_TEST_BASE_URL') ?: env('PAYMENT_GATEWAY_URL') ?: env('IPAYMENT_BASE_URL', 'https://ipaymentwallet.com/api'),
-                'webhook_secret' => env('IPAYMENT_TEST_WEBHOOK_SECRET', ''),
+                'api_key' => env('PAYMENT_GATEWAY_API_KEY') ?: env('PAYMENT_GATEWAY_API_KEY', ''),
+                'base_url' => env('PAYMENT_GATEWAY_URL') ?: env('PAYMENT_GATEWAY_URL') ?: env('PAYMENT_GATEWAY_URL', 'https://ipaymentwallet.com/api'),
+                // 'webhook_secret' => env('IPAYMENT_TEST_WEBHOOK_SECRET', ''),
             ],
             'live' => [
-                'api_key' => env('IPAYMENT_LIVE_API_KEY', ''),
-                'base_url' => env('IPAYMENT_LIVE_BASE_URL', ''),
-                'webhook_secret' => env('IPAYMENT_LIVE_WEBHOOK_SECRET', ''),
+                'api_key' => env('PAYMENT_GATEWAY_API_KEY', ''),
+                'base_url' => env('PAYMENT_GATEWAY_URL', 'https://ipaymentwallet.com/api'),
+                // 'webhook_secret' => env('IPAYMENT_LIVE_WEBHOOK_SECRET', ''),
             ],
         ],
     ],
