@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('app/deposit/upi/{deposit}', [DepositController::class, 'appUpiPayment'])
     ->middleware(['signed', 'throttle:60,1'])
     ->name('app.deposit.upi.webview');
+Route::get('app/deposit/upi/{deposit}/return', [DepositController::class, 'appUpiReturn'])
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('app.deposit.upi.return');
 Route::get('app/deposit/upi/{deposit}/status', [DepositController::class, 'appUpiStatus'])
     ->middleware(['signed', 'throttle:60,1'])
     ->name('app.deposit.upi.status');
@@ -41,9 +44,7 @@ Route::prefix('user')->name('user.')->group(function () {
     Route::post('register', [RegisterController::class, 'register']);
 
     // UPIGateway redirects the browser back after checkout; payment is verified server-side.
-    Route::get('deposit/return', [DepositController::class, 'returnFromPayment'])
-        ->middleware('throttle:30,1')
-        ->name('deposit.return');
+    Route::get('deposit/return', [DepositController::class, 'returnFromPayment'])->middleware('throttle:30,1')->name('deposit.return');
 
     // Guest User Routes (Redirects to User Dashboard if already logged in)
     Route::middleware(UserGuest::class)->group(function () {

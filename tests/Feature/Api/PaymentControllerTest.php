@@ -24,9 +24,8 @@ class PaymentControllerTest extends TestCase
     public function test_add_fund_configuration_only_exposes_public_payment_details(): void
     {
         config([
-            'gateway.upigateway.mode' => 'test',
-            'gateway.upigateway.modes.test.key' => 'secret-user-token',
-            'gateway.upigateway.modes.test.base_url' => 'https://upi.test',
+            'gateway.upigateway.key' => 'secret-user-token',
+            'gateway.upigateway.base_url' => 'https://upi.test',
             'gateway.usd_to_inr_rate' => 100,
         ]);
         $user = $this->createUser();
@@ -43,9 +42,8 @@ class PaymentControllerTest extends TestCase
     public function test_gateway_confirms_exact_inr_amount_before_crediting_usd_wallet_once(): void
     {
         config([
-            'gateway.upigateway.mode' => 'test',
-            'gateway.upigateway.modes.test.key' => 'secret-user-token',
-            'gateway.upigateway.modes.test.base_url' => 'https://upi.test',
+            'gateway.upigateway.key' => 'secret-user-token',
+            'gateway.upigateway.base_url' => 'https://upi.test',
             'gateway.usd_to_inr_rate' => 100,
         ]);
         Http::preventStrayRequests();
@@ -118,16 +116,17 @@ class PaymentControllerTest extends TestCase
         $this->assertSame(1, Transaction::query()->where('trx_id', $depositRef)->count());
         Http::assertSent(fn (Request $request): bool => $request->url() === 'https://upi.test/api/create_order'
             && $request['amount'] === '1000.00'
-            && $request['client_txn_id'] === $depositRef);
+            && $request['client_txn_id'] === $depositRef
+            && parse_url($request['redirect_url'], PHP_URL_PATH) === '/app/deposit/upi/'.$depositId.'/return'
+            && str_contains((string) parse_url($request['redirect_url'], PHP_URL_QUERY), 'signature='));
     }
 
     public function test_usd_ipayment_deposit_creates_checkout_and_credits_only_after_verified_payment(): void
     {
         config([
             'gateway.ipaymentwallet.enabled' => true,
-            'gateway.ipaymentwallet.mode' => 'test',
-            'gateway.ipaymentwallet.modes.test.api_key' => 'ipayment-test-key',
-            'gateway.ipaymentwallet.modes.test.base_url' => 'https://ipayment.test/api',
+            'gateway.ipaymentwallet.api_key' => 'ipayment-test-key',
+            'gateway.ipaymentwallet.url' => 'https://ipayment.test/api',
         ]);
         Http::preventStrayRequests();
         Http::fake([

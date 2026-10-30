@@ -12,9 +12,9 @@ use RuntimeException;
 
 class UpigatewayService
 {
-    public function createOrder(Deposit $deposit, ?string $customerMobile = null): string
+    public function createOrder(Deposit $deposit, ?string $customerMobile = null, ?string $redirectUrl = null): string
     {
-        $gatewayConfig = $this->gatewayConfig($deposit->provider_mode);
+        $gatewayConfig = $this->gatewayConfig();
         $token = (string) ($gatewayConfig['key'] ?? '');
         $baseUrl = (string) ($gatewayConfig['base_url'] ?? '');
         $caBundle = (string) config('gateway.upigateway.ca_bundle', '');
@@ -40,9 +40,8 @@ class UpigatewayService
                     'customer_name' => $deposit->user->name ?? 'Member',
                     'customer_email' => $deposit->user->email ?? '',
                     'customer_mobile' => $mobile,
-                    'redirect_url' => route('user.deposit.return', [
+                    'redirect_url' => $redirectUrl ?? route('user.deposit.return', [
                         'deposit_ref' => $deposit->deposit_ref,
-                        'return_token' => hash_hmac('sha256', $deposit->deposit_ref, (string) config('app.key')),
                     ]),
                     'udf1' => (string) $deposit->user_id,
                 ],
@@ -90,7 +89,7 @@ class UpigatewayService
             return true;
         }
 
-        $gatewayConfig = $this->gatewayConfig($deposit->provider_mode);
+        $gatewayConfig = $this->gatewayConfig();
         $token = (string) ($gatewayConfig['key'] ?? '');
         $baseUrl = (string) ($gatewayConfig['base_url'] ?? '');
         $caBundle = (string) config('gateway.upigateway.ca_bundle', '');
@@ -227,13 +226,11 @@ class UpigatewayService
     /**
      * @return array<string, mixed>
      */
-    private function gatewayConfig(?string $mode = null): array
+    private function gatewayConfig(): array
     {
-        $mode ??= (string) config('gateway.upigateway.mode', 'test');
-        if (! in_array($mode, ['test', 'live'], true)) {
-            return [];
-        }
-
-        return (array) config("gateway.upigateway.modes.{$mode}", []);
+        return [
+            'key' => config('gateway.upigateway.key'),
+            'base_url' => config('gateway.upigateway.base_url'),
+        ];
     }
 }

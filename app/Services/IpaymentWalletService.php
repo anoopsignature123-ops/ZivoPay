@@ -17,12 +17,12 @@ class IpaymentWalletService
      */
     public function createPayment(Deposit $deposit): array
     {
-        $config = $this->gatewayConfig($deposit->provider_mode);
+        $config = $this->gatewayConfig();
         $apiKey = (string) ($config['api_key'] ?? '');
         $baseUrl = rtrim((string) ($config['base_url'] ?? ''), '/');
         $caBundle = (string) config('gateway.ipaymentwallet.ca_bundle', '');
         if ($apiKey === '' || ! str_starts_with($baseUrl, 'https://')) {
-            throw new RuntimeException('iPaymentWallet is not configured for the selected mode.');
+            throw new RuntimeException('iPaymentWallet is not configured.');
         }
 
         try {
@@ -115,7 +115,7 @@ class IpaymentWalletService
             return true;
         }
 
-        $config = $this->gatewayConfig($deposit->provider_mode);
+        $config = $this->gatewayConfig();
         $apiKey = (string) ($config['api_key'] ?? '');
         $baseUrl = rtrim((string) ($config['base_url'] ?? ''), '/');
         $caBundle = (string) config('gateway.ipaymentwallet.ca_bundle', '');
@@ -192,24 +192,20 @@ class IpaymentWalletService
 
     public function isConfigured(): bool
     {
-        $mode = (string) config('gateway.ipaymentwallet.mode', 'test');
-        $config = $this->gatewayConfig($mode);
+        $config = $this->gatewayConfig();
 
-        return in_array($mode, ['test', 'live'], true)
-            && filled($config['api_key'] ?? null)
+        return filled($config['api_key'] ?? null)
             && str_starts_with((string) ($config['base_url'] ?? ''), 'https://');
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function gatewayConfig(?string $mode = null): array
+    private function gatewayConfig(): array
     {
-        $mode ??= (string) config('gateway.ipaymentwallet.mode', 'test');
-        if (! in_array($mode, ['test', 'live'], true)) {
-            return [];
-        }
-
-        return (array) config("gateway.ipaymentwallet.modes.{$mode}", []);
+        return [
+            'api_key' => config('gateway.ipaymentwallet.api_key'),
+            'base_url' => config('gateway.ipaymentwallet.url'),
+        ];
     }
 }

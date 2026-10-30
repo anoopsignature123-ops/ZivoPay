@@ -7,7 +7,6 @@ use App\Models\Deposit;
 use App\Services\IpaymentWalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class IpaymentWalletWebhookController extends Controller
 {
@@ -33,16 +32,6 @@ class IpaymentWalletWebhookController extends Controller
         $webhookAmount = $request->input('amount') ?? $request->input('paid_amount');
         if ($webhookAmount !== null && (! is_numeric($webhookAmount) || abs((float) $webhookAmount - (float) $deposit->amount) > 0.009)) {
             return response()->json(['status' => false, 'message' => 'Payment amount mismatch.'], 422);
-        }
-
-        $configuredSecret = (string) config("gateway.ipaymentwallet.modes.{$deposit->provider_mode}.webhook_secret", '');
-        if ($configuredSecret !== '') {
-            $providedSecret = (string) ($request->header('X-Webhook-Secret') ?? $request->input('webhook_secret', ''));
-            if (! hash_equals($configuredSecret, $providedSecret)) {
-                Log::warning('Rejected iPaymentWallet webhook with invalid signature.', ['deposit_ref' => $depositRef]);
-
-                return response()->json(['status' => false, 'message' => 'Invalid webhook authorization.'], 401);
-            }
         }
 
         $credited = $ipaymentWallet->verifyAndCredit($depositRef);

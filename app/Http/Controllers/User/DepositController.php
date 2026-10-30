@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -65,7 +66,6 @@ class DepositController extends Controller
         if ($depositRef !== '' && Deposit::query()->where('deposit_ref', $depositRef)->where('user_id', $user->id)->where('payment_provider', 'upigateway')->exists()) {
             $depositReturnUrl = route('user.deposit.return', [
                 'deposit_ref' => $depositRef,
-                'return_token' => hash_hmac('sha256', $depositRef, (string) config('app.key')),
             ]);
         }
 
@@ -110,7 +110,7 @@ class DepositController extends Controller
                 'conversion_rate' => $exchangeRate,
                 'payment_method' => 'iPaymentWallet USD',
                 'payment_provider' => 'ipaymentwallet',
-                'provider_mode' => config('gateway.ipaymentwallet.mode', 'test'),
+                'provider_mode' => 'single',
                 'status' => 'pending',
                 'admin_remark' => 'Waiting for iPaymentWallet payment confirmation.',
             ]);
@@ -164,7 +164,7 @@ class DepositController extends Controller
             'conversion_rate' => $exchangeRate,
             'payment_method' => 'UPIGateway UPI (INR)',
             'payment_provider' => 'upigateway',
-            'provider_mode' => config('gateway.upigateway.mode', 'test'),
+            'provider_mode' => 'single',
             'status' => 'pending',
             'admin_remark' => 'Waiting for UPIGateway INR payment confirmation.',
         ]);
@@ -182,43 +182,47 @@ class DepositController extends Controller
         }
     }
 
-    public function returnFromPayment(Request $request, UpigatewayService $upigateway): RedirectResponse
+    public function returnFromPayment(Request $request, UpigatewayService $upigateway): RedirectResponse|View
     {
         $depositRef = $request->input('deposit_ref', $request->input('client_txn_id'));
         validator(['deposit_ref' => $depositRef], ['deposit_ref' => ['required', 'string', 'max:255']])->validate();
-        $deposit = Deposit::query()->where('deposit_ref', $depositRef)
-            ->where('payment_provider', 'upigateway')
-            ->firstOrFail();
-        if (Auth::check()) {
-            abort_unless($deposit->user_id === Auth::id(), 403);
-        } else {
-            $returnToken = (string) $request->input('return_token', '');
-            $expectedToken = hash_hmac('sha256', $deposit->deposit_ref, (string) config('app.key'));
-            abort_unless($returnToken !== '' && hash_equals($expectedToken, $returnToken), 403);
+        $deposit = Deposit::query()->where('deposit_ref', $depositRef)->first();
+        if (! $deposit || $deposit->payment_provider !== 'upigateway') {
+            Log::warning('UPIGateway returned to an unknown deposit reference.', [
+                'deposit_ref' => $depositRef,
+                'payment_provider' => $deposit?->payment_provider,
+            ]);
+
+            $message = 'We could not match this payment return to a UPI deposit. Check your deposit history or contact support before paying again.';
+
+            return Auth::check()
+                ? redirect()->route('user.dashboard')->with('error', $message)
+                : redirect()->route('user.login')->with('error', $message);
         }
 
         $upigateway->verifyAndCredit($deposit->deposit_ref);
         $deposit->refresh();
-
-        if ($deposit->status === 'approved') {
-            $message = 'UPI payment verified. ₹'.number_format((float) $deposit->final_amount, 2).' was added to your Fund Wallet.';
-
-            return Auth::check()
-                ? redirect()->route('user.deposit.index')->with('success', $message)
-                : redirect()->route('user.login')->with('success', $message);
-        }
+        $isDepositOwner = Auth::check() && (int) Auth::id() === (int) $deposit->user_id;
 
         if ($deposit->status === 'rejected') {
             $message = 'UPI payment was not completed. No money was added to your Fund Wallet.';
 
-            return Auth::check()
+            return $isDepositOwner
                 ? redirect()->route('user.deposit.index')->with('error', $message)
                 : redirect()->route('user.login')->with('error', $message);
         }
 
-        return Auth::check()
-            ? redirect()->route('user.deposit.index', ['deposit_ref' => $deposit->deposit_ref])->with('info', 'Payment received. We are checking the final status with UPIGateway.')
-            : redirect()->route('user.login')->with('info', 'Your payment is still being confirmed. Sign in again shortly to check your wallet.');
+        return view('user.deposit.returning', [
+            'deposit' => $deposit,
+            'statusUrl' => URL::temporarySignedRoute(
+                'app.deposit.upi.status',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            ),
+            'successUrl' => $isDepositOwner
+                ? route('user.dashboard')
+                : route('user.login'),
+        ]);
     }
 
     public function payment(Deposit $deposit, IpaymentWalletService $ipaymentWallet): View|RedirectResponse
@@ -283,6 +287,26 @@ class DepositController extends Controller
                 now()->addHour(),
                 ['deposit' => $deposit->id],
             ),
+        ]);
+    }
+
+    public function appUpiReturn(Deposit $deposit, UpigatewayService $upigateway): View
+    {
+        abort_unless($deposit->payment_provider === 'upigateway', 404);
+        if ($deposit->status === 'pending') {
+            $upigateway->verifyAndCredit($deposit->deposit_ref);
+            $deposit->refresh();
+        }
+
+        return view('user.deposit.returning', [
+            'deposit' => $deposit,
+            'statusUrl' => URL::temporarySignedRoute(
+                'app.deposit.upi.status',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            ),
+            'successUrl' => null,
+            'appReturn' => true,
         ]);
     }
 

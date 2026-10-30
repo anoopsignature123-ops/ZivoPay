@@ -71,12 +71,14 @@ class UpigatewayPaymentController extends Controller
             'conversion_rate' => $rate,
             'payment_method' => 'UPIGateway UPI (INR)',
             'payment_provider' => 'upigateway',
-            'provider_mode' => config('gateway.upigateway.mode', 'test'),
+            'provider_mode' => 'single',
             'status' => 'pending',
         ]);
 
         try {
-            $upigateway->createOrder($deposit->load('user'));
+            $expiresAt = now()->addHour();
+            $appReturnUrl = URL::temporarySignedRoute('app.deposit.upi.return', $expiresAt, ['deposit' => $deposit->id]);
+            $upigateway->createOrder($deposit->load('user'), redirectUrl: $appReturnUrl);
         } catch (Throwable $exception) {
             report($exception);
             $deposit->forceFill(['status' => 'rejected', 'admin_remark' => 'UPIGateway checkout creation failed.'])->save();
@@ -84,7 +86,7 @@ class UpigatewayPaymentController extends Controller
             return $this->errorResponse('Could not start UPI payment. Please try again.', 502);
         }
 
-        $expiresAt = now()->addHour();
+        $expiresAt ??= now()->addHour();
         $webviewUrl = URL::temporarySignedRoute('app.deposit.upi.webview', $expiresAt, ['deposit' => $deposit->id]);
         $webviewStatusUrl = URL::temporarySignedRoute('app.deposit.upi.status', $expiresAt, ['deposit' => $deposit->id]);
 
@@ -97,6 +99,7 @@ class UpigatewayPaymentController extends Controller
             'exchange_rate' => $rate,
             'payment_url' => $webviewUrl,
             'webview_url' => $webviewUrl,
+            'return_url' => $appReturnUrl,
             'webview_status_url' => $webviewStatusUrl,
             'api_status_url' => route('api.add-fund.status'),
             'webhook_url' => route('api.upigateway.webhook'),
@@ -142,7 +145,7 @@ class UpigatewayPaymentController extends Controller
             'final_amount' => $amountUsd,
             'payment_method' => 'iPaymentWallet USD',
             'payment_provider' => 'ipaymentwallet',
-            'provider_mode' => config('gateway.ipaymentwallet.mode', 'test'),
+            'provider_mode' => 'single',
             'status' => 'pending',
         ]);
 
