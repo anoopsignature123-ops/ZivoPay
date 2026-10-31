@@ -77,24 +77,6 @@
             <span class="nav-text">₹3,000 Activations</span>
         </a>
 
-        <a class='nav-item {{ request()->routeIs("admin.reports.subscription-direct") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("admin.reports.subscription-direct") }}'>
-            <div
-                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="user-plus" class="w-4 h-4"></i>
-            </div>
-            <span class="nav-text">Direct Bonus Referral</span>
-        </a>
-
-        <a class='nav-item {{ request()->routeIs("admin.reports.subscription-team") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("admin.reports.subscription-team") }}'>
-            <div
-                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="users-round" class="w-4 h-4"></i>
-            </div>
-            <span class="nav-text">Team Bonus Referral</span>
-        </a>
-
         <!-- FUND WALLET 24H ROI INCOME AUDIT -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             FUND WALLET ROI INCOME
@@ -150,15 +132,6 @@
             <span class="nav-text">Daily ROI Income</span>
         </a>
 
-        <a class='nav-item {{ request()->routeIs("admin.reports.level-direct") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("admin.reports.level-direct") }}'>
-            <div
-                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="layers" class="w-4 h-4"></i>
-            </div>
-            <span class="nav-text">Business Level Income</span>
-        </a>
-
         <a class='nav-item {{ request()->routeIs("admin.reports.level-roi") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.reports.level-roi") }}'>
             <div
@@ -166,15 +139,6 @@
                 <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">ROI on ROI Level Income </span>
-        </a>
-
-        <a class='nav-item {{ request()->routeIs("admin.reports.direct-business") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-            href='{{ route("admin.reports.direct-business") }}'>
-            <div
-                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                <i data-lucide="award" class="w-4 h-4"></i>
-            </div>
-            <span class="nav-text">Direct Business Income</span>
         </a>
 
         <a class='nav-item {{ request()->routeIs("admin.reports.rewards") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'

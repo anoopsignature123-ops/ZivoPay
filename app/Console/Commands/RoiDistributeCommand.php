@@ -19,18 +19,18 @@ class RoiDistributeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Distribute ZIVO PAY daily ROI yield (0.15% - 0.30%) and 15-level ROI matching income';
+    protected $description = 'Process due 24-hour ROI cycles and 30-level ROI-on-ROI commissions (50% total)';
 
     /**
      * Execute the console command.
      */
     public function handle(RoiIncomeService $roiService): int
     {
-        $this->info('Starting ZIVO PAY Daily ROI Yield & 15-Level Distribution...');
+        $this->info('Checking due 24-hour ROI cycles and 30-level ROI-on-ROI commissions...');
 
         $count = $roiService->processDailyRoiPayouts();
 
-        $this->info("Successfully processed Daily ROI & 15-Level Income for {$count} active contracts / deposit accounts.");
+        $this->info("Processed {$count} due ROI payouts and matching commission cycles.");
 
         return Command::SUCCESS;
     }

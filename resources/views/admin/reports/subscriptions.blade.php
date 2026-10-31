@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY SUBSCRIPTIONS</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">SUBSCRIPTION ACTIVATIONS REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit trail of mandatory ₹300 User Account Subscription activations & 15-level referral payouts.</p>
+            <p class="text-xs text-neutral-300 mt-1">Audit trail of mandatory ₹3,000 account activations and Shopping Wallet credits.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">

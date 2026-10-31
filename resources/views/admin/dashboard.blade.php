@@ -158,7 +158,7 @@
                 </div>
                 <div class="text-2xl font-black text-emerald-400 font-mono">₹{{ number_format($totalCommissionsPaid, 2) }}
                 </div>
-                <p class="text-[11px] text-neutral-400">15-Level Referral & 26% ROI Matching Level Income</p>
+                <p class="text-[11px] text-neutral-400">30-Level ROI-on-ROI commission (50% total)</p>
             </div>
 
             <!-- Subscribed Members Count -->

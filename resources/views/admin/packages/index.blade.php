@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CAPITAL PLANS</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">CAPITAL PACKAGE MANAGEMENT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Configure investment tiers, daily ROI returns, direct referral bonuses, and 15-level team income settings.</p>
+            <p class="text-xs text-neutral-300 mt-1">Configure investment tiers, daily ROI returns, and plan duration. ROI-on-ROI commission follows the fixed 30-level schedule.</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
                     </div>
 
                     <h3 class="text-lg font-black text-white uppercase tracking-tight">{{ $pkg->name }}</h3>
-                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">{{ $pkg->description }}</p>
+                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">{{ number_format((float) $pkg->daily_roi_percentage, 2) }}% daily ROI; first payout after 24 hours, then every 24 hours.</p>
 
                     <div class="mt-4 p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/20 space-y-2">
                         <div class="flex justify-between items-center text-xs">
@@ -57,14 +57,6 @@
                         <div class="flex justify-between items-center text-xs">
                             <span class="text-neutral-400 font-medium">Duration</span>
                             <span class="text-white font-bold">{{ $pkg->duration_days }} Days</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-neutral-400 font-medium">Direct Level 1 Bonus</span>
-                            <span class="text-emerald-400 font-bold">{{ number_format($pkg->direct_bonus_percentage, 2) }}%</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-neutral-400 font-medium">Level 2-15 Team Bonus</span>
-                            <span class="text-emerald-400 font-bold">{{ number_format($pkg->level_income_percentage, 2) }}% / level</span>
                         </div>
                     </div>
                 </div>

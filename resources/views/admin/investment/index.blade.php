@@ -12,12 +12,12 @@
                 SYSTEM CONTROL
             </span>
             <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">USER INVESTMENTS & DAILY ROI CONTROL</h1>
-            <p class="text-xs text-neutral-400">Monitor all member active plans, total returns, and execute manual Daily ROI payouts.</p>
+            <p class="text-xs text-neutral-400">Monitor active plans and trigger only ROI cycles that have completed their 24-hour interval.</p>
         </div>
 
         <form action="{{ route('admin.trigger-daily-roi') }}" method="POST">
             @csrf
-            <button type="submit" onclick="return confirm('Are you sure you want to process Daily ROI & 15-Level Income distribution for all active investments now?');"
+            <button type="submit" onclick="return confirm('Process ROI cycles that have completed their 24-hour interval?');"
                 class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center gap-2">
                 <i data-lucide="play-circle" class="w-5 h-5"></i> Trigger Daily ROI Payout Now
             </button>

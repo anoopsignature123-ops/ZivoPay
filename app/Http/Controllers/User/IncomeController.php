@@ -18,7 +18,8 @@ class IncomeController extends Controller
     {
         $user = Auth::user();
 
-        $query = Transaction::where('user_id', $user->id);
+        $query = Transaction::where('user_id', $user->id)
+            ->whereNotIn('type', ['level_income', 'direct_bonus', 'subscription_level', 'direct_reward', 'team_reward']);
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -45,9 +46,7 @@ class IncomeController extends Controller
 
         // Income Totals Summary
         $totalRoi = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->sum('amount');
-        $totalLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_income', 'direct_bonus', 'subscription_level'])->sum('amount');
         $totalRoiLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
-        $totalSubscriptionIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['subscription_level', 'subscription'])->sum('amount');
 
         $achievedRewards = UserReward::where('user_id', $user->id)->get();
 
@@ -55,9 +54,7 @@ class IncomeController extends Controller
             'user',
             'transactions',
             'totalRoi',
-            'totalLevelIncome',
             'totalRoiLevelIncome',
-            'totalSubscriptionIncome',
             'achievedRewards'
         ));
     }
@@ -308,33 +305,6 @@ class IncomeController extends Controller
         return view('user.reports.investment_history', compact('user', 'investments', 'totalAmount'));
     }
 
-    public function subscriptionIncome(Request $request)
-    {
-        $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->whereIn('type', ['subscription_level', 'subscription']);
-
-        if ($request->filled('search')) {
-            $search = trim((string) $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
-        $totalAmount = (clone $query)->sum('amount');
-
-        return view('user.income.subscription', compact('user', 'transactions', 'totalAmount'));
-    }
-
     public function dailyRoiIncome(Request $request)
     {
         $user = Auth::user();
@@ -430,39 +400,12 @@ class IncomeController extends Controller
         return view('user.income.roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
     }
 
-    public function levelDirectIncome(Request $request)
-    {
-        $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->where('type', 'level_income');
-
-        if ($request->filled('search')) {
-            $search = trim((string) $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
-        $totalAmount = (clone $query)->sum('amount');
-
-        return view('user.income.level_direct', compact('user', 'transactions', 'totalAmount'));
-    }
-
     public function levelRoiIncome(Request $request)
     {
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
 
-        $reportTitle = 'ROI ON LEVEL INCOME (26% MATCHING)';
+        $reportTitle = 'ROI-on-ROI Matching Commission (50% across 30 levels)';
         if ($request->query('type') === 'fund') {
             $reportTitle = 'ROI ON LEVEL INCOME (SECONDARY)';
         } elseif ($request->query('type') === 'investment') {
@@ -491,85 +434,8 @@ class IncomeController extends Controller
         return view('user.income.level_roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
     }
 
-    public function subscriptionDirectIncome(Request $request)
-    {
-        return $this->directSubscriptionIncome($request);
-    }
-
-    public function subscriptionTeamIncome(Request $request)
-    {
-        return $this->teamSubscriptionIncome($request);
-    }
-
     public function roiIncome(Request $request)
     {
         return $this->dailyRoiIncome($request);
-    }
-
-    public function directSubscriptionIncome(Request $request)
-    {
-        $user = Auth::user();
-        // L1 is banded on ₹3000 activation — no direct income from subscription
-        // Show all subscription_level entries from L2 onwards (team income only)
-        $query = Transaction::where('user_id', $user->id)
-            ->where('type', 'subscription_level');
-
-        if ($request->filled('search')) {
-            $search = trim((string) $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = '₹3000 Activation Team Level Income (L2–L30)';
-
-        return view('user.income.subscription', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
-    }
-
-    public function teamSubscriptionIncome(Request $request)
-    {
-        $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)
-            ->where('type', 'subscription_level')
-            ->where(function ($q) {
-                $q->where('description', 'not like', '%Level 1%')
-                    ->where('description', 'like', '%Level%');
-            });
-
-        if ($request->filled('search')) {
-            $search = trim((string) $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Team Bonus Referral Income';
-
-        return view('user.income.subscription', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
-    }
-
-    public function directBusinessIncome(Request $request)
-    {
-        return redirect()->route('user.income.level-direct');
     }
 }

@@ -88,25 +88,13 @@ class DashboardController extends Controller
         $todayRoi = $todayFundRoi + $todayInvestmentRoi;
         $totalRoiIncome = $totalFundRoi + $totalInvestmentRoi;
 
-        $todayDirect = $user->transactions()->whereIn('type', ['level_income', 'subscription_level'])->whereDate('created_at', now())->sum('amount');
-        $totalDirectIncome = $user->transactions()->whereIn('type', ['level_income', 'subscription_level'])->sum('amount');
-
-        $todaySubLevel = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
-        $totalSubLevelIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
-
         $todayLevelRoi = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
         $totalLevelRoiIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
-
-        $todayDirectReward = $user->transactions()->where('type', 'direct_reward')->whereDate('created_at', now())->sum('amount');
-        $totalDirectReward = $user->transactions()->where('type', 'direct_reward')->sum('amount');
-
-        $todayTeamReward = $user->transactions()->where('type', 'team_reward')->whereDate('created_at', now())->sum('amount');
-        $totalTeamReward = $user->transactions()->where('type', 'team_reward')->sum('amount');
 
         $todayTransfer = $user->transactions()->where('type', 'wallet_transfer')->whereDate('created_at', now())->sum('amount');
         $totalTransfer = $user->transactions()->where('type', 'wallet_transfer')->sum('amount');
 
-        $totalIncomeEarned = $totalRoiIncome + $totalDirectIncome + $totalSubLevelIncome + $totalLevelRoiIncome + $totalDirectReward + $totalTeamReward;
+        $totalIncomeEarned = $totalRoiIncome + $totalLevelRoiIncome;
 
         // Sponsor Info
         $sponsor = User::where('referral_code', $user->sponsor_code)->first();
@@ -139,16 +127,8 @@ class DashboardController extends Controller
             'totalFundRoi',
             'todayInvestmentRoi',
             'totalInvestmentRoi',
-            'todayDirect',
-            'totalDirectIncome',
-            'todaySubLevel',
-            'totalSubLevelIncome',
             'todayLevelRoi',
             'totalLevelRoiIncome',
-            'todayDirectReward',
-            'totalDirectReward',
-            'todayTeamReward',
-            'totalTeamReward',
             'todayTransfer',
             'totalTransfer',
             'totalIncomeEarned'

@@ -145,8 +145,7 @@
 
                 <p class="text-[11px] text-neutral-400">
                     <i data-lucide="info" class="w-3.5 h-3.5 inline text-emerald-400"></i>
-                    Activating your ₹3,000 Zivo Family Kit package unlocks 15-Level Direct & Team Referral Bonuses (5% L1,
-                    0.5% L2-L15) and enables 24-hour Fund Wallet Compound Profit!
+                    Activating the ₹3,000 Zivo Family Kit credits ₹3,000 to your Shopping Wallet. ROI eligibility begins after each full 24-hour cycle.
                     </p>
 
                 @if (!$user->is_subscription_active)

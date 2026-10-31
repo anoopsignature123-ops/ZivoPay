@@ -442,10 +442,6 @@
                 <span id="mobileModalDailyRoi" class="font-mono text-emerald-400 font-bold">$0.00</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
-                <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-400">🎁</span> 30-Level Business Income:</span>
-                <span id="mobileModalDirectIncome" class="font-mono text-emerald-400 font-bold">$0.00</span>
-            </div>
-            <div class="flex justify-between items-center py-1 border-b border-emerald-500/10">
                 <span class="text-slate-300 font-semibold flex items-center gap-1.5"><span class="text-emerald-300">👥</span> Downline Count:</span>
                 <span id="mobileModalDirects" class="font-bold text-emerald-300 font-mono">0 Members</span>
             </div>
@@ -564,17 +560,17 @@
         });
     }
 
-    function handleCardClick(event, navUrl, name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directIncome, directs, joined) {
+    function handleCardClick(event, navUrl, name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directs, joined) {
         if (window.innerWidth < 768) {
             event.preventDefault();
             event.stopPropagation();
-            openMobileModal(name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directIncome, directs, joined, navUrl);
+            openMobileModal(name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directs, joined, navUrl);
         } else {
             window.location.href = navUrl;
         }
     }
 
-    function openMobileModal(name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directIncome, directs, joined, navUrl = '#') {
+    function openMobileModal(name, code, sponsor, status, activeInvest, earningWallet, dailyRoi, directs, joined, navUrl = '#') {
         document.getElementById('mobileModalName').textContent = name;
         document.getElementById('mobileModalCode').textContent = code;
         document.getElementById('mobileModalSponsor').textContent = sponsor;
@@ -592,7 +588,6 @@
         document.getElementById('mobileModalActiveInvest').textContent = activeInvest;
         document.getElementById('mobileModalEarningWallet').textContent = earningWallet;
         document.getElementById('mobileModalDailyRoi').textContent = dailyRoi;
-        document.getElementById('mobileModalDirectIncome').textContent = directIncome;
         document.getElementById('mobileModalDirects').textContent = directs;
         document.getElementById('mobileModalJoined').textContent = joined;
 

@@ -163,22 +163,11 @@
             <!-- Level Income -->
             <div class="p-5 rounded-2xl bg-[#01140c] border border-emerald-500/30 hover:border-emerald-500/60 transition shadow-lg flex items-center justify-between">
                 <div>
-                    <span class="text-neutral-400 text-[11px] font-bold uppercase tracking-wider block">Level Income Earned</span>
+                    <span class="text-neutral-400 text-[11px] font-bold uppercase tracking-wider block">ROI-on-ROI Commission Earned</span>
                     <strong class="text-teal-300 font-black text-xl font-mono block mt-1">${{ number_format((float)$totalLevelIncome, 2) }}</strong>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center shrink-0">
                     <i data-lucide="layers" class="w-5 h-5"></i>
-                </div>
-            </div>
-
-            <!-- Direct Income -->
-            <div class="p-5 rounded-2xl bg-[#01140c] border border-emerald-500/30 hover:border-emerald-500/60 transition shadow-lg flex items-center justify-between">
-                <div>
-                    <span class="text-neutral-400 text-[11px] font-bold uppercase tracking-wider block">30-Level Business Income</span>
-                    <strong class="text-emerald-400 font-black text-xl font-mono block mt-1">${{ number_format((float)$totalDirectIncome, 2) }}</strong>
-                </div>
-                <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
-                    <i data-lucide="trending-up" class="w-5 h-5"></i>
                 </div>
             </div>
 

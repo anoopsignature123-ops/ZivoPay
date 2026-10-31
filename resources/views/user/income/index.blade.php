@@ -15,8 +15,7 @@
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">INCOME
                         LEDGER & SUMMARY</h1>
-                    <p class="text-xs text-neutral-300 mt-1">Audit log of all daily ROI returns, direct level commissions,
-                        ROI level matching incomes, and wallet transfers.</p>
+                    <p class="text-xs text-neutral-300 mt-1">Ledger of daily ROI returns, 30-level ROI-on-ROI commissions, and wallet activity.</p>
                     </div>
                 <a href="{{ route('user.withdrawal.index') }}"
                     class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center gap-2 shrink-0">
@@ -33,19 +32,9 @@
                     <span class="text-[10px] text-neutral-400">0.15% to 0.30% Daily Return</span>
                     </div>
 
-                <!-- 2. Direct Level Income -->
+                <!-- ROI-on-ROI commission -->
                 <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level Business
-                        Income</span>
-                    <span
-                        class="text-2xl font-black text-emerald-300 font-mono mt-1 block">₹{{ number_format($totalLevelIncome, 2) }}</span>
-                    <span class="text-[10px] text-neutral-400">L1=8%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%</span>
-                    </div>
-
-                <!-- 3. ROI Level Income -->
-                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level ROI
-                        Matching</span>
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level ROI-on-ROI Commission</span>
                     <span
                         class="text-2xl font-black text-teal-300 font-mono mt-1 block">₹{{ number_format($totalRoiLevelIncome, 2) }}</span>
                     <span class="text-[10px] text-neutral-400">L1=15%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%</span>
@@ -89,10 +78,6 @@
                         <option value="">All Income Types</option>
                         <option value="daily_roi" {{ request('type') === 'daily_roi' ? 'selected' : '' }}>Daily ROI Income
                         </option>
-                        <option value="level_income" {{ request('type') === 'level_income' ? 'selected' : '' }}>30-Level Business Income</option>
-                        <option value="subscription_level" {{ request('type') === 'subscription_level' ? 'selected' : '' }}>30-Level Subscription Income</option>
-                        <option value="level_roi" {{ request('type') === 'level_roi' ? 'selected' : '' }}>ROI
-                            Level Matching</option>
                         <option value="roi_level_income" {{ request('type') === 'roi_level_income' ? 'selected' : '' }}>ROI
                             on ROI Level Matching</option>
                         </select>

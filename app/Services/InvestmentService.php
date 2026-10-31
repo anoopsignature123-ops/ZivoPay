@@ -68,67 +68,7 @@ class InvestmentService
                 'description' => 'Capital Investment of ₹'.number_format($amount, 2).' at '.number_format($roiRate, 2).'% Daily ROI',
             ]);
 
-            // Distribute 30-Level Direct Business Bonus (L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%)
-            $this->distributeDirectBusinessBonus($user, $amount);
-
             return $investment;
         });
-    }
-
-    private function distributeDirectBusinessBonus(User $user, float $investmentAmount): void
-    {
-        $currentSponsorCode = $user->sponsor_code;
-        $level = 1;
-
-        while (! empty($currentSponsorCode) && $level <= 30) {
-            $sponsor = User::where('referral_code', $currentSponsorCode)->first();
-            if (! $sponsor) {
-                break;
-            }
-
-            // Only distribute direct business bonus if sponsor account is active
-            if (! $sponsor->isActiveForIncome()) {
-                $currentSponsorCode = $sponsor->sponsor_code;
-                $level++;
-
-                continue;
-            }
-
-            // L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
-            if ($level === 1) {
-                $percentage = 8.00;
-            } elseif ($level === 2) {
-                $percentage = 8.00;
-            } elseif ($level <= 8) {
-                $percentage = 2.00;
-            } elseif ($level <= 16) {
-                $percentage = 1.00;
-            } else {
-                $percentage = 0.50;
-            }
-
-            $commission = ($investmentAmount * $percentage) / 100;
-
-            if ($commission > 0) {
-                $sponsor->earning_wallet += $commission;
-                $sponsor->save();
-
-                Transaction::create([
-                    'user_id' => $sponsor->id,
-                    'from_user_id' => $user->id,
-                    'trx_id' => 'INC-L'.$level.'-'.strtoupper(Str::random(8)),
-                    'type' => 'level_income',
-                    'wallet_type' => 'earning',
-                    'trx_type' => '+',
-                    'amount' => $commission,
-                    'charge' => 0.00,
-                    'post_balance' => $sponsor->earning_wallet,
-                    'description' => "Level {$level} Direct Business Bonus ({$percentage}%) from member {$user->name}'s investment of ₹".number_format($investmentAmount, 2),
-                ]);
-            }
-
-            $currentSponsorCode = $sponsor->sponsor_code;
-            $level++;
-        }
     }
 }

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', '26% 15-Level ROI Matching Audit Log - Admin ZIVO PAY')
+@section('title', '50% 30-Level ROI Matching Audit Log - Admin ZIVO PAY')
 
 @section('content')
 <div class="w-full space-y-6 font-sans">
@@ -11,8 +11,8 @@
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">AUDIT LOG</span>
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY SECONDARY ROI MATCHING</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">26% ROI-ON-ROI MATCHING LEVEL REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit log of 26% total 15-level ROI matching bonus (Level 1: 10%, Level 2: 3%, Levels 3-15: 1% each) paid for 24 months.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">50% ROI-ON-ROI MATCHING LEVEL REPORT</h1>
+            <p class="text-xs text-neutral-300 mt-1">Audit log of ROI-on-ROI commission across 30 levels: L1 15%, L2 8%, L3–L8 2% each, L9–L16 1% each, L17–L30 0.5% each.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
@@ -91,7 +91,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                No 26% ROI-on-ROI matching level income records found.
+                No 30-level ROI-on-ROI commission records found.
                             </td>
                         </tr>
                     @endforelse

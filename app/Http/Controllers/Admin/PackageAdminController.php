@@ -28,8 +28,6 @@ class PackageAdminController extends Controller
             'max_amount' => 'required|numeric|gte:min_amount',
             'daily_roi_percentage' => 'required|numeric|min:0.01|max:100',
             'duration_days' => 'required|integer|min:1',
-            'direct_bonus_percentage' => 'required|numeric|min:0|max:100',
-            'level_income_percentage' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:active,inactive',
             'description' => 'nullable|string',
         ]);
@@ -53,8 +51,6 @@ class PackageAdminController extends Controller
             'max_amount' => 'required|numeric|gte:min_amount',
             'daily_roi_percentage' => 'required|numeric|min:0.01|max:100',
             'duration_days' => 'required|integer|min:1',
-            'direct_bonus_percentage' => 'required|numeric|min:0|max:100',
-            'level_income_percentage' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:active,inactive',
             'description' => 'nullable|string',
         ]);

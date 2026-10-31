@@ -14,8 +14,7 @@
                 </span>
                 <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">BUY PACKAGE ₹3,000 (ZIVO
                     FAMILY KIT)</h1>
-                <p class="text-xs text-neutral-300 mt-1">Activate your account with mandatory ₹3,000 Zivo Family Kit package
-                    to unlock 15-level referral bonuses and 24H Fund Wallet profits.</p>
+                <p class="text-xs text-neutral-300 mt-1">Activate your account with the mandatory ₹3,000 Zivo Family Kit. Activation also credits ₹3,000 to your Shopping Wallet.</p>
                 </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full sm:w-auto">
@@ -84,8 +83,8 @@
                         <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-white">15-Level Referral Income</span>
-                        <p class="text-[10px] text-neutral-400">5% Level 1 (₹150) + 0.50% Level 2-15 (₹15 / level)</p>
+                    <span class="font-bold text-white">ROI eligibility</span>
+                        <p class="text-[10px] text-neutral-400">ROI starts after each eligible investment completes its first 24 hours.</p>
                     </div>
                     </div>
 

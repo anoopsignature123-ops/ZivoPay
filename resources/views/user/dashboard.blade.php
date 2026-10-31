@@ -180,18 +180,18 @@
                                     class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                             </span>
-                            ₹3,000 PACKAGE ACTIVE (TEAM INCOMES UNLOCKED)
+                            ₹3,000 PACKAGE ACTIVE (ROI ELIGIBLE)
                         </span>
                     @else
                         <span
                             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.35)]"
-                            title="₹3,000 Activation Mandatory to Unlock Team & Level Incomes">
+                            title="₹3,000 activation required for ROI eligibility">
                             <span class="relative flex h-2 w-2">
                                 <span
                                     class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
                             </span>
-                            SELF ROI ACTIVE &bull; TEAM INCOMES LOCKED (₹3,000 ACTIVATION MANDATORY)
+                            ROI LOCKED (₹3,000 ACTIVATION REQUIRED)
                         </span>
                     @endif
                     <span class="text-neutral-400">• ZIVO PAY FINANCIAL PORTAL</span>
@@ -360,8 +360,8 @@
                                 ⚡ ₹3,000 PACKAGE ACTIVE & WORKING
                             </h4>
                             <p class="text-[11px] text-neutral-300 truncate">
-                                Activated on {{ $user->created_at ? $user->created_at->format('M d, Y H:i') : 'N/A' }}.
-                                15-Level Referral & ROI Active.
+                                Activated on {{ $user->subscription_activated_at ? $user->subscription_activated_at->format('M d, Y H:i') : 'N/A' }}.
+                                ROI eligibility follows each full 24-hour cycle.
                             </p>
                         @else
                             <h4
@@ -369,7 +369,7 @@
                                 ⚠️ NO PACKAGE ACTIVATED YET
                             </h4>
                             <p class="text-[11px] text-neutral-300 truncate">
-                                Activate ₹3,000 package to unlock 15-Level Referral & Team Incomes.
+                                Activate the ₹3,000 package to become eligible for ROI after 24 hours.
                             </p>
                         @endif
                     </div>
@@ -639,29 +639,7 @@
                                         ₹{{ number_format($totalInvestmentRoi, 2) }}</td>
                                 </tr>
 
-                                <!-- 4. 15-Level Subscription Income -->
-                                <tr class="hover:bg-emerald-500/5 transition">
-                                    <td class="py-2.5 px-3">
-                                        <div class="flex items-center gap-2.5">
-                                            <div
-                                                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                                                <i data-lucide="git-merge" class="w-3.5 h-3.5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-white block text-xs">15-Level Subscription
-                                                    Income</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">5% L1 + 0.50% L2-L15
-                                                    (Downline referral levels)</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">
-                                        ₹{{ number_format($todaySubLevel, 2) }}</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">
-                                        ₹{{ number_format($totalSubLevelIncome, 2) }}</td>
-                                </tr>
-
-                                <!-- 5. ROI Level Matching Income -->
+                                <!-- ROI-on-ROI Matching Income -->
                                 <tr class="hover:bg-emerald-500/5 transition">
                                     <td class="py-2.5 px-3">
                                         <div class="flex items-center gap-2.5">
@@ -672,8 +650,7 @@
                                             <div>
                                                 <span class="font-bold text-white block text-xs">ROI Level Matching
                                                     Income</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">26% Total ROI Matching
-                                                    (15 Levels ROI Matching)</span>
+                                                <span class="text-[9.5px] text-neutral-400 block">50% total commission across 30 levels</span>
                                             </div>
                                         </div>
                                     </td>
@@ -681,49 +658,6 @@
                                         ₹{{ number_format($todayLevelRoi, 2) }}</td>
                                     <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">
                                         ₹{{ number_format($totalLevelRoiIncome, 2) }}</td>
-                                </tr>
-
-                                <!-- 6. Direct Business Reward -->
-                                <tr class="hover:bg-emerald-500/5 transition">
-                                    <td class="py-2.5 px-3">
-                                        <div class="flex items-center gap-2.5">
-                                            <div
-                                                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                                                <i data-lucide="gift" class="w-3.5 h-3.5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-white block text-xs">Direct Business
-                                                    Reward</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">Direct turnover milestone
-                                                    rewards</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">
-                                        ₹{{ number_format($todayDirectReward, 2) }}</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">
-                                        ₹{{ number_format($totalDirectReward, 2) }}</td>
-                                </tr>
-
-                                <!-- 7. Team Bonus Reward -->
-                                <tr class="hover:bg-emerald-500/5 transition">
-                                    <td class="py-2.5 px-3">
-                                        <div class="flex items-center gap-2.5">
-                                            <div
-                                                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                                                <i data-lucide="crown" class="w-3.5 h-3.5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-white block text-xs">Team Bonus Reward</span>
-                                                <span class="text-[9.5px] text-neutral-400 block">Team volume leadership
-                                                    rewards</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">
-                                        ₹{{ number_format($todayTeamReward, 2) }}</td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs">
-                                        ₹{{ number_format($totalTeamReward, 2) }}</td>
                                 </tr>
 
                                 <!-- 8. Internal Wallet Transfer -->

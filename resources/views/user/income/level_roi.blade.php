@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', '26% 15-Level ROI-on-ROI Income Report - ZIVO PAY')
+@section('title', '50% 30-Level ROI-on-ROI Income Report - ZIVO PAY')
 
 @section('content')
     <div class="space-y-6 font-sans">
@@ -10,14 +10,12 @@
             <div>
                 <span
                     class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
-                    SECONDARY ROI MATCHING INCOME (26% TOTAL)
+                    SECONDARY ROI-ON-ROI COMMISSION (50% TOTAL)
                 </span>
                 <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">
                     {{ $reportTitle ?? 'ROI ON LEVEL INCOME' }}
                 </h1>
-                <p class="text-xs text-neutral-300 mt-1">Earn daily matching returns on your downline team's daily ROI yields
-                    (Level 1:
-                    10%, Level 2: 3%, Levels 3-15: 1%).</p>
+                <p class="text-xs text-neutral-300 mt-1">Commission is calculated on downline ROI: L1 15%, L2 8%, L3–L8 2% each, L9–L16 1% each, and L17–L30 0.5% each.</p>
                 </div>
 
             <div class="px-5 py-3 rounded-2xl bg-[#02180f] border border-emerald-500/40 text-right">

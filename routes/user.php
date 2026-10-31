@@ -104,13 +104,9 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('reports/deposit-p2p', [IncomeController::class, 'depositP2pHistory'])->name('reports.deposit-p2p');
         Route::get('reports/package-history', [IncomeController::class, 'packageHistory'])->name('reports.package-history');
         Route::get('reports/investments', [IncomeController::class, 'investmentHistory'])->name('reports.investments');
-        Route::get('income/subscription-direct', [IncomeController::class, 'subscriptionDirectIncome'])->name('income.subscription-direct');
-        Route::get('income/subscription-team', [IncomeController::class, 'subscriptionTeamIncome'])->name('income.subscription-team');
         Route::get('income/roi', [IncomeController::class, 'roiIncome'])->name('income.roi');
         Route::get('income/fund-wallet-roi', [IncomeController::class, 'fundWalletRoiIncome'])->name('income.fund-roi');
         Route::get('income/capital-investment-roi', [IncomeController::class, 'capitalInvestmentRoiIncome'])->name('income.investment-roi');
-        Route::get('income/level-direct', [IncomeController::class, 'levelDirectIncome'])->name('income.level-direct');
-        Route::get('income/direct-business', [IncomeController::class, 'directBusinessIncome'])->name('income.direct-business');
         Route::get('income/level-roi', [IncomeController::class, 'levelRoiIncome'])->name('income.level-roi');
         Route::get('rewards', [RewardController::class, 'index'])->name('rewards.index');
 

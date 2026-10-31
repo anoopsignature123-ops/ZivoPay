@@ -3,6 +3,13 @@
 @section('title', 'Edit Capital Package - ZIVO PAY Admin')
 
 @section('content')
+@php
+    $storedDescription = (string) $package->description;
+    $hasLegacyIncomeRules = str_contains(strtolower($storedDescription), 'direct') || str_contains(strtolower($storedDescription), 'level 2-15');
+    $defaultDescription = $hasLegacyIncomeRules
+        ? number_format((float) $package->daily_roi_percentage, 2).'% daily ROI; first payout after 24 hours, then every 24 hours.'
+        : $storedDescription;
+@endphp
 <div class="w-full space-y-6 font-sans max-w-4xl mx-auto">
     <!-- Header Banner -->
     <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/95 border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.3)] flex items-center justify-between gap-4">
@@ -12,7 +19,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CONFIGURATION</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">EDIT CAPITAL PACKAGE: {{ strtoupper($package->name) }}</h1>
-            <p class="text-xs text-neutral-300 mt-1">Update package plan name, min/max limits, daily ROI percentage return, and referral rules.</p>
+            <p class="text-xs text-neutral-300 mt-1">Update package limits, daily ROI percentage and duration. ROI matching uses the fixed 30-level schedule.</p>
         </div>
 
         <a href="{{ route('admin.packages.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 border border-emerald-500/30 text-neutral-300 text-xs font-bold hover:text-white transition">
@@ -62,20 +69,6 @@
                     @error('duration_days') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Direct Level 1 Bonus Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 1 Direct Bonus (%)</label>
-                    <input type="number" step="0.01" name="direct_bonus_percentage" value="{{ old('direct_bonus_percentage', $package->direct_bonus_percentage) }}" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('direct_bonus_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Team Level 2-15 Bonus Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 2-15 Team Bonus (%)</label>
-                    <input type="number" step="0.01" name="level_income_percentage" value="{{ old('level_income_percentage', $package->level_income_percentage) }}" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('level_income_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
                 <!-- Status -->
                 <div>
                     <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Status</label>
@@ -89,7 +82,7 @@
                 <!-- Description -->
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Plan Description & Conditions</label>
-                    <textarea name="description" rows="3" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400">{{ old('description', $package->description) }}</textarea>
+                    <textarea name="description" rows="3" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400">{{ old('description', $defaultDescription) }}</textarea>
                     @error('description') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>

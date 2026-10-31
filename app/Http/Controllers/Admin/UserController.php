@@ -144,12 +144,8 @@ class UserController extends Controller
         $totalTeamCount = max(0, count($totalTeamIds) - 1);
 
         // Income breakdown sums
-        $totalDirectIncome = Transaction::where('user_id', $user->id)
-            ->whereIn('type', ['level_income', 'subscription_level'])
-            ->sum('amount');
-
         $totalLevelIncome = Transaction::where('user_id', $user->id)
-            ->whereIn('type', ['level_income', 'subscription_level', 'level_roi', 'roi_level_income'])
+            ->whereIn('type', ['level_roi', 'roi_level_income'])
             ->sum('amount');
 
         $totalRoiIncome = Transaction::where('user_id', $user->id)
@@ -186,7 +182,6 @@ class UserController extends Controller
             'user',
             'directCount',
             'totalTeamCount',
-            'totalDirectIncome',
             'totalLevelIncome',
             'totalRoiIncome',
             'totalRewardIncome',

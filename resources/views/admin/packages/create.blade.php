@@ -62,20 +62,6 @@
                     @error('duration_days') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Direct Level 1 Bonus Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 1 Direct Bonus (%)</label>
-                    <input type="number" step="0.01" name="direct_bonus_percentage" value="{{ old('direct_bonus_percentage', 5.00) }}" placeholder="5.00" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('direct_bonus_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Team Level 2-15 Bonus Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Level 2-15 Team Bonus (%)</label>
-                    <input type="number" step="0.01" name="level_income_percentage" value="{{ old('level_income_percentage', 0.50) }}" placeholder="0.50" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('level_income_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
                 <!-- Status -->
                 <div>
                     <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Status</label>

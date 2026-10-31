@@ -23,58 +23,6 @@ class MLMIncomeService
     }
 
     /**
-     * Distribute 15-level referral income on ₹300 subscription fee.
-     */
-    public function distributeSubscriptionLevelIncome(User $user, float $amount): void
-    {
-        $currentSponsorCode = $user->sponsor_code;
-        $levelPercentages = [
-            1 => 5.00,
-            2 => 0.50, 3 => 0.50, 4 => 0.50, 5 => 0.50, 6 => 0.50,
-            7 => 0.50, 8 => 0.50, 9 => 0.50, 10 => 0.50, 11 => 0.50,
-            12 => 0.50, 13 => 0.50, 14 => 0.50, 15 => 0.50,
-        ];
-
-        for ($level = 1; $level <= 15; $level++) {
-            if (! $currentSponsorCode) {
-                break;
-            }
-
-            $sponsor = User::where('referral_code', $currentSponsorCode)->first();
-            if (! $sponsor) {
-                break;
-            }
-
-            // Only distribute subscription level income if sponsor account is active
-            if (! $sponsor->isActiveForIncome()) {
-                $currentSponsorCode = $sponsor->sponsor_code;
-
-                continue;
-            }
-
-            $percentage = $levelPercentages[$level];
-            $incomeAmount = round($amount * ($percentage / 100), 2);
-
-            if ($incomeAmount > 0) {
-                $sponsor->increment('earning_wallet', $incomeAmount);
-
-                Transaction::create([
-                    'user_id' => $sponsor->id,
-                    'from_user_id' => $user->id,
-                    'amount' => $incomeAmount,
-                    'wallet_type' => 'earning_wallet',
-                    'type' => 'level_income',
-                    'level' => $level,
-                    'description' => "Level {$level} Subscription Income ({$percentage}%) from {$user->name} ({$user->referral_code})",
-                    'trx_id' => 'SUB-L'.$level.'-'.strtoupper(Str::random(8)),
-                ]);
-            }
-
-            $currentSponsorCode = $sponsor->sponsor_code;
-        }
-    }
-
-    /**
      * Transfer funds from Earning Wallet -> Fund Wallet (deposit_wallet).
      */
     public function transferEarningToFundWallet(User $user, float $amount): WalletTransfer
@@ -185,80 +133,11 @@ class MLMIncomeService
                 'trx_id' => 'INV-'.strtoupper(Str::random(10)),
             ]);
 
-            // Distribute 15-Level Direct Income (12% Total)
-            $this->distributeDirectLevelIncome($investment);
-
             // Check rewards up the upline tree
             $this->evaluateRewardsUpward($user);
 
             return $investment;
         });
-    }
-
-    /**
-     * Distribute 30-Level Direct Income on investment activation.
-     * Rules:
-     * Level 1: 8.00%
-     * Level 2: 8.00%
-     * Level 3-8: 2.00% per level
-     * Level 9-16: 1.00% per level
-     * Level 17-30: 0.50% per level
-     */
-    public function distributeDirectLevelIncome(UserInvestment $investment): void
-    {
-        $investor = $investment->user;
-        $currentSponsorCode = $investor->sponsor_code;
-        $amount = $investment->amount;
-
-        for ($level = 1; $level <= 30; $level++) {
-            if (! $currentSponsorCode) {
-                break;
-            }
-
-            $sponsor = User::where('referral_code', $currentSponsorCode)->first();
-            if (! $sponsor) {
-                break;
-            }
-
-            // Only distribute direct level income if sponsor account is active
-            if (! $sponsor->isActiveForIncome()) {
-                $currentSponsorCode = $sponsor->sponsor_code;
-
-                continue;
-            }
-
-            // L1: 8%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
-            if ($level === 1) {
-                $percentage = 8.00;
-            } elseif ($level === 2) {
-                $percentage = 8.00;
-            } elseif ($level <= 8) {
-                $percentage = 2.00;
-            } elseif ($level <= 16) {
-                $percentage = 1.00;
-            } else {
-                $percentage = 0.50;
-            }
-
-            $incomeAmount = round($amount * ($percentage / 100), 2);
-
-            if ($incomeAmount > 0) {
-                $sponsor->increment('earning_wallet', $incomeAmount);
-
-                Transaction::create([
-                    'user_id' => $sponsor->id,
-                    'from_user_id' => $investor->id,
-                    'amount' => $incomeAmount,
-                    'wallet_type' => 'earning_wallet',
-                    'type' => 'level_income',
-                    'level' => $level,
-                    'description' => "Level {$level} Direct Income ({$percentage}%) from {$investor->name} ({$investor->referral_code})",
-                    'trx_id' => 'INC-L'.$level.'-'.strtoupper(Str::random(8)),
-                ]);
-            }
-
-            $currentSponsorCode = $sponsor->sponsor_code;
-        }
     }
 
     /**
@@ -273,87 +152,7 @@ class MLMIncomeService
      */
     public function distributeDailyROI(UserInvestment $investment): void
     {
-        if ($investment->status !== 'active' || $investment->days_completed >= $investment->total_days) {
-            return;
-        }
-
-        DB::transaction(function () use ($investment) {
-            $investor = $investment->user;
-            $dailyRoiAmount = $investment->daily_amount;
-
-            // 1. Credit Investor's Earning Wallet
-            $investor->increment('earning_wallet', $dailyRoiAmount);
-            $investment->increment('total_returned', $dailyRoiAmount);
-            $investment->increment('days_completed');
-            $investment->update(['last_payout_at' => now()]);
-
-            Transaction::create([
-                'user_id' => $investor->id,
-                'amount' => $dailyRoiAmount,
-                'wallet_type' => 'earning_wallet',
-                'type' => 'daily_roi',
-                'description' => "Daily ROI ({$investment->daily_percentage}%) for {$investment->plan_name}",
-                'trx_id' => 'ROI-'.strtoupper(Str::random(10)),
-            ]);
-
-            // Check completion
-            if ($investment->days_completed >= $investment->total_days) {
-                $investment->update(['status' => 'completed']);
-            }
-
-            // 2. Distribute 30-Level Secondary ROI Level Income
-            // L1: 15%, L2: 8%, L3-L8: 2%, L9-L16: 1%, L17-L30: 0.5%
-            $currentSponsorCode = $investor->sponsor_code;
-
-            for ($level = 1; $level <= 30; $level++) {
-                if (! $currentSponsorCode) {
-                    break;
-                }
-
-                $sponsor = User::where('referral_code', $currentSponsorCode)->first();
-                if (! $sponsor) {
-                    break;
-                }
-
-                // Only distribute ROI matching level income if sponsor account is active
-                if (! $sponsor->isActiveForIncome()) {
-                    $currentSponsorCode = $sponsor->sponsor_code;
-
-                    continue;
-                }
-
-                if ($level === 1) {
-                    $percentage = 15.00;
-                } elseif ($level === 2) {
-                    $percentage = 8.00;
-                } elseif ($level <= 8) {
-                    $percentage = 2.00;
-                } elseif ($level <= 16) {
-                    $percentage = 1.00;
-                } else {
-                    $percentage = 0.50;
-                }
-
-                $roiMatchingIncome = round($dailyRoiAmount * ($percentage / 100), 2);
-
-                if ($roiMatchingIncome > 0) {
-                    $sponsor->increment('earning_wallet', $roiMatchingIncome);
-
-                    Transaction::create([
-                        'user_id' => $sponsor->id,
-                        'from_user_id' => $investor->id,
-                        'amount' => $roiMatchingIncome,
-                        'wallet_type' => 'earning_wallet',
-                        'type' => 'roi_level_income',
-                        'level' => $level,
-                        'description' => "Level {$level} ROI Matching Income ({$percentage}%) from {$investor->name}'s Daily ROI",
-                        'trx_id' => 'ROIL-L'.$level.'-'.strtoupper(Str::random(8)),
-                    ]);
-                }
-
-                $currentSponsorCode = $sponsor->sponsor_code;
-            }
-        });
+        app(RoiIncomeService::class)->processDailyRoiPayouts();
     }
 
     /**

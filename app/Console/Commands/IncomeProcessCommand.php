@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Models\UserInvestment;
 use App\Services\MLMIncomeService;
 use Illuminate\Console\Command;
 
@@ -21,7 +20,7 @@ class IncomeProcessCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Process and calculate ZIVO PAY incomes, level matching, and milestone rewards';
+    protected $description = 'Evaluate ZIVO PAY milestone rewards for active users';
 
     /**
      * Execute the console command.
@@ -53,31 +52,19 @@ class IncomeProcessCommand extends Command
             // Evaluate milestone rewards
             $incomeService->checkUserRewardAchievements($user);
 
-            // Process daily ROI for user's active investments
-            $userInvestments = UserInvestment::where('user_id', $user->id)
-                ->where('status', 'active')
-                ->get();
-
-            $roiProcessed = 0;
-            foreach ($userInvestments as $investment) {
-                $incomeService->distributeDailyROI($investment);
-                $roiProcessed++;
-            }
-
             $rows[] = [
                 'user' => $user->name.' ('.$user->referral_code.')',
-                'active_investments' => $userInvestments->count(),
-                'roi_processed' => $roiProcessed,
+                'reward_check' => 'Completed',
                 'earning_wallet' => '₹'.number_format((float) $user->fresh()->earning_wallet, 2),
             ];
         }
 
         $this->table(
-            ['User / Referral', 'Active Contracts', 'ROI Cycles Processed', 'Earning Wallet'],
+            ['User / Referral', 'Reward Check', 'Earning Wallet'],
             $rows
         );
 
-        $this->info('ZIVO PAY Income & Reward Distribution Completed Successfully!');
+        $this->info('ZIVO PAY reward evaluation completed successfully. ROI payouts are processed by roi:distribute only.');
 
         return Command::SUCCESS;
     }

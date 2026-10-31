@@ -242,7 +242,7 @@ class ReportController extends Controller
     public function subscriptionHistory(Request $request)
     {
         $query = Transaction::with(['user', 'fromUser'])
-            ->whereIn('type', ['subscription', 'subscription_level']);
+            ->where('type', 'subscription');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -336,36 +336,6 @@ class ReportController extends Controller
         return view('admin.reports.daily_roi', compact('rois', 'totalAmount'));
     }
 
-    public function levelDirectHistory(Request $request)
-    {
-        $query = Transaction::with(['user', 'fromUser'])
-            ->whereIn('type', ['direct_bonus', 'level_income']);
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('referral_code', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $directs = $query->orderBy('id', 'desc')->paginate(20);
-        $totalAmount = (clone $query)->sum('amount');
-
-        return view('admin.reports.level_direct', compact('directs', 'totalAmount'));
-    }
-
     public function levelRoiHistory(Request $request)
     {
         $query = Transaction::with(['user', 'fromUser'])
@@ -415,102 +385,5 @@ class ReportController extends Controller
         $rewards = $query->orderBy('id', 'desc')->paginate(20);
 
         return view('admin.reports.rewards', compact('rewards'));
-    }
-
-    public function directSubscriptionHistory(Request $request)
-    {
-        $query = Transaction::with(['user', 'fromUser'])
-            ->where('type', 'subscription_level');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('referral_code', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $subscriptions = $query->orderBy('id', 'desc')->paginate(20);
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = '₹3000 Activation Income Audit (L2–L30)';
-
-        return view('admin.reports.subscriptions', compact('subscriptions', 'totalAmount', 'reportTitle'));
-    }
-
-    public function teamSubscriptionHistory(Request $request)
-    {
-        $query = Transaction::with(['user', 'fromUser'])
-            ->where('type', 'subscription_level')
-            ->where(function ($q) {
-                $q->where('description', 'not like', '%Level 1%')
-                    ->where('description', 'like', '%Level%');
-            });
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('referral_code', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $subscriptions = $query->orderBy('id', 'desc')->paginate(20);
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Team Bonus Referral Income Audit';
-
-        return view('admin.reports.subscriptions', compact('subscriptions', 'totalAmount', 'reportTitle'));
-    }
-
-    public function directBusinessHistory(Request $request)
-    {
-        $query = Transaction::with(['user', 'fromUser'])
-            ->where('type', 'direct_bonus');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('trx_id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('referral_code', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $directs = $query->orderBy('id', 'desc')->paginate(20);
-        $totalAmount = (clone $query)->sum('amount');
-        $reportTitle = 'Direct Business Income Audit';
-
-        return view('admin.reports.level_direct', compact('directs', 'totalAmount', 'reportTitle'));
     }
 }

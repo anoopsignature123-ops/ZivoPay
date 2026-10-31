@@ -30,7 +30,7 @@ class InvestmentAdminController extends Controller
         Artisan::call('zivo:process-daily-roi');
         $output = Artisan::output();
 
-        return back()->with('success', 'Daily ROI & 15-Level ROI Level Income processing triggered successfully! '.$output);
+        return back()->with('success', 'Due 24-hour ROI and 30-level ROI-on-ROI cycles processed. '.$output);
     }
 
     public function withdrawals(Request $request)

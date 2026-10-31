@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY SYSTEM LOGS</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">TRANSACTION HISTORY</h1>
-            <p class="text-xs text-neutral-300 mt-1">Complete ledger of all subscriptions, ROI bonuses, level commissions, transfers & withdrawals.</p>
+            <p class="text-xs text-neutral-300 mt-1">Complete ledger of subscriptions, daily ROI, ROI-on-ROI matching, transfers and withdrawals.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
@@ -44,8 +44,7 @@
                     <option value="">All Types</option>
                     <option value="subscription" {{ request('type') == 'subscription' ? 'selected' : '' }}>Subscription Activation</option>
                     <option value="daily_roi" {{ request('type') == 'daily_roi' ? 'selected' : '' }}>Daily ROI Bonus</option>
-                    <option value="level_income" {{ request('type') == 'level_income' ? 'selected' : '' }}>30-Level Business Income</option>
-                    <option value="level_roi" {{ request('type') == 'level_roi' ? 'selected' : '' }}>Level ROI Bonus</option>
+                    <option value="roi_level_income" {{ request('type') == 'roi_level_income' ? 'selected' : '' }}>ROI-on-ROI Commission</option>
                     <option value="admin_credit" {{ request('type') == 'admin_credit' ? 'selected' : '' }}>Admin Credit</option>
                     <option value="admin_deduct" {{ request('type') == 'admin_deduct' ? 'selected' : '' }}>Admin Deduct</option>
                     <option value="withdrawal" {{ request('type') == 'withdrawal' ? 'selected' : '' }}>Withdrawal</option>

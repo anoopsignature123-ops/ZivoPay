@@ -19,7 +19,7 @@ class ProcessDailyROI extends Command
      *
      * @var string
      */
-    protected $description = 'Process daily ROI distributions and 15-level ROI matching income for active investments & deposit balances';
+    protected $description = 'Process due 24-hour ROI cycles and 30-level ROI-on-ROI commissions (50% total)';
 
     /**
      * Execute the console command.
@@ -30,7 +30,7 @@ class ProcessDailyROI extends Command
 
         $count = $roiService->processDailyRoiPayouts();
 
-        $this->info("Successfully processed Daily ROI & 15-Level ROI Level Income for {$count} active contracts / deposit accounts.");
+        $this->info("Processed {$count} due ROI payouts and matching commission cycles.");
 
         return Command::SUCCESS;
     }

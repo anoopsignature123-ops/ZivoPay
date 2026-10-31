@@ -47,7 +47,6 @@ class WithdrawalController extends Controller
             'user' => $user,
             'withdrawals' => $withdrawals,
             'stats' => $stats,
-            'exchangeRate' => (float) config('gateway.usd_to_inr_rate', 100),
             'payoutEnabled' => false,
         ]);
     }
