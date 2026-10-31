@@ -51,7 +51,7 @@
                     <span class="badge" id="paymentStatus">{{ $deposit->status }}</span>
                 </div>
                 <div class="amount">₹{{ number_format((float) $deposit->amount_inr, 2) }} <span class="subtle" style="font-size:14px;font-weight:600">INR</span></div>
-                <div class="qr-wrap">
+                <div class="qr-wrap" id="paymentCheckout" @if ($deposit->status === 'approved') style="display:none" @endif>
                     @if ($qrUrl && filter_var($qrUrl, FILTER_VALIDATE_URL) && parse_url($qrUrl, PHP_URL_SCHEME) === 'https')
                         <img id="gatewayQr" class="qr-image" src="{{ $qrUrl }}" alt="UPIGateway payment QR">
                     @elseif ($checkoutUrl)
@@ -60,10 +60,14 @@
                         <p style="padding:20px;color:#64748b;text-align:center">Payment QR is unavailable. Please contact support.</p>
                     @endif
                 </div>
+                <div id="paymentSuccess" class="status-box" role="status" aria-live="polite" @if ($deposit->status !== 'approved') style="display:none" @endif>
+                    <strong style="color:#a7f3d0">Payment confirmed</strong>
+                    <p>Your payment has been verified and added to your Fund Wallet. You can return to the app.</p>
+                </div>
                 @if ($checkoutUrl)
-                    <a class="open-link" href="{{ $checkoutUrl }}" target="_blank" rel="noopener noreferrer">Open secure UPI checkout ↗</a>
+                    <a id="openCheckout" class="open-link" href="{{ $checkoutUrl }}" target="_blank" rel="noopener noreferrer" @if ($deposit->status === 'approved') style="display:none" @endif>Open secure UPI checkout ↗</a>
                 @endif
-                <p class="note" id="paymentMessage" role="status" aria-live="polite">Waiting for gateway confirmation. This page checks automatically.</p>
+                <p class="note" id="paymentMessage" role="status" aria-live="polite">{{ $deposit->status === 'approved' ? 'Payment confirmed. You can return to the app now.' : 'Waiting for gateway confirmation. This page checks automatically.' }}</p>
             </section>
 
             <aside class="card">
@@ -84,7 +88,41 @@
             const statusUrl = {{ Illuminate\Support\Js::from($statusUrl) }};
             const status = document.getElementById('paymentStatus');
             const message = document.getElementById('paymentMessage');
+            const checkout = document.getElementById('paymentCheckout');
+            const success = document.getElementById('paymentSuccess');
+            const openCheckout = document.getElementById('openCheckout');
             let busy = false;
+            let completionNotified = false;
+
+            const showSuccess = (result) => {
+                status.textContent = 'APPROVED';
+                status.style.color = '#a7f3d0';
+                checkout.style.display = 'none';
+                success.style.display = 'block';
+                if (openCheckout) openCheckout.style.display = 'none';
+                message.textContent = 'Payment confirmed. You can return to the app now.';
+                if (completionNotified) return;
+                completionNotified = true;
+                const payload = JSON.stringify({ type: 'payment_success', deposit_id: result.deposit_id, deposit_ref: result.deposit_ref, status: result.status });
+                if (window.ReactNativeWebView?.postMessage) window.ReactNativeWebView.postMessage(payload);
+                if (window.webkit?.messageHandlers?.paymentStatus) window.webkit.messageHandlers.paymentStatus.postMessage(payload);
+            };
+
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin
+                    || event.source !== document.querySelector('.checkout')?.contentWindow
+                    || event.data?.type !== 'upi_returned'
+                    || event.data?.deposit_id !== {{ Illuminate\Support\Js::from($deposit->id) }}) {
+                    return;
+                }
+
+                poll();
+            });
+
+            if (status.textContent.trim().toLowerCase() === 'approved') {
+                showSuccess({ deposit_id: {{ Illuminate\Support\Js::from($deposit->id) }}, deposit_ref: {{ Illuminate\Support\Js::from($deposit->deposit_ref) }}, status: 'approved' });
+            }
+
             const poll = async () => {
                 if (busy) return;
                 busy = true;
@@ -94,11 +132,7 @@
                     const result = await response.json();
                     status.textContent = result.status;
                     if (result.status === 'approved') {
-                        status.style.color = '#a7f3d0';
-                        message.textContent = 'Payment confirmed. You can return to the app now.';
-                        const payload = JSON.stringify({ type: 'payment_success', deposit_id: result.deposit_id, deposit_ref: result.deposit_ref, status: result.status });
-                        if (window.ReactNativeWebView?.postMessage) window.ReactNativeWebView.postMessage(payload);
-                        if (window.webkit?.messageHandlers?.paymentStatus) window.webkit.messageHandlers.paymentStatus.postMessage(payload);
+                        showSuccess(result);
                         return;
                     }
                     if (result.status === 'rejected') {

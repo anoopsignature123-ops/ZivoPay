@@ -66,7 +66,7 @@ class UpigatewayPaymentController extends Controller
             'deposit_ref' => 'DEP-'.Str::upper(Str::random(12)),
             'amount' => $amountUsd,
             'charge' => 0,
-            'final_amount' => $amountUsd,
+            'final_amount' => $amountInr,
             'amount_inr' => $amountInr,
             'conversion_rate' => $rate,
             'payment_method' => 'UPIGateway UPI (INR)',
@@ -96,6 +96,7 @@ class UpigatewayPaymentController extends Controller
             'status' => $deposit->status,
             'amount_usd' => (float) $deposit->amount,
             'amount_inr' => (float) $deposit->amount_inr,
+            'wallet_credit_inr' => (float) $deposit->final_amount,
             'exchange_rate' => $rate,
             'payment_url' => $webviewUrl,
             'webview_url' => $webviewUrl,
@@ -127,6 +128,7 @@ class UpigatewayPaymentController extends Controller
             'status' => $deposit->status,
             'amount_usd' => (float) $deposit->amount,
             'amount_inr' => (float) $deposit->amount_inr,
+            'wallet_credit_inr' => (float) $deposit->final_amount,
         ], 'Payment status retrieved.');
     }
 

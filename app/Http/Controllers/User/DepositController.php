@@ -290,8 +290,15 @@ class DepositController extends Controller
         ]);
     }
 
-    public function appUpiReturn(Deposit $deposit, UpigatewayService $upigateway): View
+    public function appUpiReturn(Request $request, Deposit $deposit, UpigatewayService $upigateway): View
     {
+        $hasValidSignature = URL::hasValidSignature(
+            $request,
+            true,
+            static fn (string $parameter): bool => $parameter !== 'expires',
+        );
+
+        abort_unless($hasValidSignature, 403);
         abort_unless($deposit->payment_provider === 'upigateway', 404);
         if ($deposit->status === 'pending') {
             $upigateway->verifyAndCredit($deposit->deposit_ref);

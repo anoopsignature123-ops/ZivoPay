@@ -36,6 +36,13 @@
             const message = document.getElementById('paymentMessage');
             let checking = false;
 
+            if (appReturn && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'upi_returned',
+                    deposit_id: {{ Illuminate\Support\Js::from($deposit->id) }},
+                }, window.location.origin);
+            }
+
             const checkStatus = async () => {
                 if (checking) return;
                 checking = true;
