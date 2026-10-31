@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Operator;
 use App\Models\Recharge;
 use App\Models\Transaction;
 use App\Models\User;
@@ -282,34 +283,13 @@ class RechargeService
      */
     protected function detectServiceType(string $operatorCode): string
     {
-        $dthCodes = ['TTV', 'ATV', 'DTV', 'VTV', 'STV'];
-        $fastagCodes = ['AXF', 'ICF', 'SBF', 'PTF', 'HDF', 'KMF', 'APB', 'IFF', 'BBF', 'INDF'];
-        $electricityCodes = ['UPPCLU', 'UPPCLR', 'BSES', 'BSESY', 'TPD', 'MSEDC', 'NBE', 'SBE', 'WBSEDCL', 'BESCOM', 'TNEB'];
+        $category = Operator::query()
+            ->whereRaw('UPPER(code) = ?', [strtoupper($operatorCode)])
+            ->value('category');
 
-        if (in_array($operatorCode, $dthCodes, true)) {
-            return 'dth';
-        }
-
-        if (in_array($operatorCode, $fastagCodes, true)) {
-            return 'fastag';
-        }
-
-        if (in_array($operatorCode, $electricityCodes, true)) {
-            return 'electricity';
-        }
-
-        foreach (config('a1topup.operators', []) as $category => $operators) {
-            foreach ($operators as $operator) {
-                if (strtoupper((string) ($operator['code'] ?? '')) === strtoupper($operatorCode)) {
-                    return match ($category) {
-                        'mobile', 'dth', 'postpaid', 'electricity', 'gas', 'fastag', 'insurance' => $category,
-                        default => 'mobile',
-                    };
-                }
-            }
-        }
-
-        return 'mobile';
+        return in_array($category, ['mobile', 'dth', 'postpaid', 'electricity', 'gas', 'fastag', 'insurance'], true)
+            ? $category
+            : 'mobile';
     }
 
     /**
@@ -317,16 +297,8 @@ class RechargeService
      */
     protected function lookupOperatorName(string $operatorCode): string
     {
-        $operators = config('a1topup.operators', []);
-
-        foreach ($operators as $category => $items) {
-            foreach ($items as $item) {
-                if ($item['code'] === $operatorCode) {
-                    return $item['name'];
-                }
-            }
-        }
-
-        return $operatorCode;
+        return (string) (Operator::query()
+            ->whereRaw('UPPER(code) = ?', [strtoupper($operatorCode)])
+            ->value('name') ?? $operatorCode);
     }
 }

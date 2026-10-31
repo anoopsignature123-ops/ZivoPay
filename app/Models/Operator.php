@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Operator extends Model
 {
@@ -21,9 +20,4 @@ class Operator extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    public function plans(): HasMany
-    {
-        return $this->hasMany(RechargePlan::class, 'operator_code', 'code');
-    }
 }

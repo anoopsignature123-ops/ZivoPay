@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\RechargeRequest;
 use App\Http\Resources\Api\RechargeResource;
+use App\Models\A1PlanCatalog;
 use App\Models\Operator;
 use App\Models\Recharge;
-use App\Models\RechargePlan;
-use App\Services\OperatorLookupService;
+use App\Services\A1PlanService;
 use App\Services\RechargeService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +28,22 @@ class RechargeController extends Controller
         $filter = strtolower((string) ($request->get('type') ?? $request->get('category') ?? $request->get('service_type') ?? ''));
         $search = strtolower((string) $request->get('search', ''));
 
+        $a1PlanCategories = ['mobile', 'dth', 'postpaid', 'electricity', 'fastag'];
+
+        if (in_array($filter, $a1PlanCategories, true)) {
+            $dbOperators = A1PlanCatalog::query()
+                ->where('catalog_type', 'operator')
+                ->where('category', $filter)
+                ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                ->orderBy('name')
+                ->get(['operator_code as code', 'name']);
+
+            return $this->successResponse([
+                'category' => $filter,
+                'operators' => $dbOperators,
+            ], ucfirst($filter).' operators retrieved successfully.');
+        }
+
         $query = Operator::where('is_active', true);
 
         if (! empty($filter)) {
@@ -41,33 +57,35 @@ class RechargeController extends Controller
         $dbOperators = $query->get();
 
         if (! empty($filter)) {
-            if ($dbOperators->isEmpty()) {
-                $allConfig = config('a1topup.operators', []);
-                $dbOperators = collect($allConfig[$filter] ?? []);
-            }
-
             return $this->successResponse([
                 'category' => $filter,
                 'operators' => $dbOperators->values(),
             ], ucfirst($filter).' operators retrieved successfully.');
         }
 
-        if ($dbOperators->isNotEmpty()) {
-            $operators = [
-                'mobile' => $dbOperators->where('category', 'mobile')->values(),
-                'dth' => $dbOperators->where('category', 'dth')->values(),
-                'fastag' => $dbOperators->where('category', 'fastag')->values(),
-                'postpaid' => $dbOperators->where('category', 'postpaid')->values(),
-                'electricity' => $dbOperators->where('category', 'electricity')->values(),
-                'gas' => $dbOperators->where('category', 'gas')->values(),
-                'insurance' => $dbOperators->where('category', 'insurance')->values(),
-                'voucher' => $dbOperators->whereIn('category', ['voucher', 'google_play'])->values(),
-            ];
-        } else {
-            $operators = config('a1topup.operators', []);
-        }
+        $operators = [
+            'mobile' => $dbOperators->where('category', 'mobile')->values(),
+            'dth' => $dbOperators->where('category', 'dth')->values(),
+            'fastag' => $dbOperators->where('category', 'fastag')->values(),
+            'postpaid' => $dbOperators->where('category', 'postpaid')->values(),
+            'electricity' => $dbOperators->where('category', 'electricity')->values(),
+            'gas' => $dbOperators->where('category', 'gas')->values(),
+            'insurance' => $dbOperators->where('category', 'insurance')->values(),
+            'voucher' => $dbOperators->whereIn('category', ['voucher', 'google_play'])->values(),
+        ];
 
-        $circles = config('a1topup.circles', []);
+        foreach ($a1PlanCategories as $category) {
+            $operators[$category] = A1PlanCatalog::query()
+                ->where('catalog_type', 'operator')
+                ->where('category', $category)
+                ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                ->orderBy('name')
+                ->get(['operator_code as code', 'name']);
+        }
+        $circles = A1PlanCatalog::query()
+            ->where('catalog_type', 'circle')
+            ->orderByRaw('CAST(circle_code AS UNSIGNED)')
+            ->get(['circle_code as code', 'name']);
 
         return $this->successResponse([
             'operators' => $operators,
@@ -80,7 +98,10 @@ class RechargeController extends Controller
      */
     public function circles(): JsonResponse
     {
-        $circles = config('a1topup.circles', []);
+        $circles = A1PlanCatalog::query()
+            ->where('catalog_type', 'circle')
+            ->orderByRaw('CAST(circle_code AS UNSIGNED)')
+            ->get(['circle_code as code', 'name']);
 
         return $this->successResponse([
             'circles' => $circles,
@@ -90,7 +111,7 @@ class RechargeController extends Controller
     /**
      * Auto-Detect / Fetch Operator & Telecom Circle by Mobile Number API (Google Pay Style).
      */
-    public function fetchOperator(Request $request): JsonResponse
+    public function fetchOperator(Request $request, A1PlanService $a1PlanService): JsonResponse
     {
         $number = preg_replace('/\D/', '', (string) ($request->get('number') ?? $request->get('mobile')));
 
@@ -101,9 +122,62 @@ class RechargeController extends Controller
         $inputOperatorCode = $request->get('operator_code') ?? $request->get('operator');
         $inputCircleCode = $request->get('circle_code') ?? $request->get('circle');
 
-        $detected = OperatorLookupService::detect($number, $inputOperatorCode, $inputCircleCode);
+        if (! empty($inputOperatorCode)) {
+            $operatorCode = strtoupper(trim((string) $inputOperatorCode));
+            $operatorName = A1PlanCatalog::query()
+                ->where('catalog_type', 'operator')
+                ->where('category', 'mobile')
+                ->where('operator_code', $operatorCode)
+                ->value('name');
+            if (! $operatorName) {
+                return $this->errorResponse('Select a valid A1Plan mobile operator code.', 422);
+            }
 
-        return $this->successResponse($detected, 'Operator and circle detected successfully.');
+            $circleCode = $inputCircleCode !== null ? trim((string) $inputCircleCode) : null;
+            $circleName = $circleCode !== null
+                ? A1PlanCatalog::query()->where('catalog_type', 'circle')->where('circle_code', $circleCode)->value('name')
+                : null;
+            if ($circleCode !== null && ! $circleName) {
+                return $this->errorResponse('Select a valid A1Plan circle code.', 422);
+            }
+
+            $detected = [
+                'number' => $number,
+                'operator_code' => $operatorCode,
+                'operator_name' => $operatorName,
+                'circle_code' => $circleCode,
+                'circle_name' => $circleName,
+                'is_explicit_param' => true,
+            ];
+
+            return $this->successResponse($detected, 'Operator and circle selected successfully.');
+        }
+
+        try {
+            $providerResponse = $a1PlanService->operatorCircleFetch($number);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception->getMessage(), 503);
+        }
+
+        if ((string) ($providerResponse['ERROR'] ?? $providerResponse['error'] ?? '') !== '0'
+            || (string) ($providerResponse['STATUS'] ?? $providerResponse['status'] ?? '') !== '1') {
+            $message = (string) ($providerResponse['Message'] ?? $providerResponse['MESSAGE'] ?? 'A1Plan could not detect this operator and circle.');
+
+            return $this->errorResponse(mb_substr($message, 0, 200), 422, ['provider_response' => $providerResponse]);
+        }
+
+        $operatorCode = (string) ($providerResponse['OpCode'] ?? '');
+        $circleCode = (string) ($providerResponse['CircleCode'] ?? '');
+        $detected = [
+            'number' => $number,
+            'operator_code' => $operatorCode,
+            'operator_name' => (string) ($providerResponse['Operator'] ?? $operatorCode),
+            'circle_code' => $circleCode,
+            'circle_name' => (string) ($providerResponse['Circle'] ?? $circleCode),
+            'is_live_a1plan' => true,
+        ];
+
+        return $this->successResponse($detected, 'Operator and circle detected through A1Plan.');
     }
 
     /**
@@ -111,53 +185,44 @@ class RechargeController extends Controller
      */
     public function plans(Request $request): JsonResponse
     {
-        $operatorCode = (string) $request->get('operator_code', 'RC');
-        $dthQuickAmounts = config('a1topup.dth_quick_amounts', [150, 250, 500, 1000]);
+        $operatorCode = strtoupper(trim((string) ($request->get('operator_code') ?? $request->get('operatorcode') ?? 'RC')));
+        $a1PlanOperator = A1PlanCatalog::query()
+            ->where('catalog_type', 'operator')
+            ->whereIn('category', ['mobile', 'dth'])
+            ->where('operator_code', $operatorCode)
+            ->first();
 
-        $dbPlans = RechargePlan::where('operator_code', $operatorCode)
-            ->where('is_active', true)
-            ->get()
-            ->map(function ($plan) {
-                return [
-                    'id' => $plan->id,
-                    'amount' => (float) $plan->amount,
-                    'validity' => $plan->validity,
-                    'description' => $plan->description,
-                    'category' => $plan->category,
-                ];
-            });
-
-        if ($dbPlans->isNotEmpty()) {
-            $plans = $dbPlans->toArray();
-        } else {
-            $allPlans = config('a1topup.plans', []);
-
-            if (isset($allPlans[$operatorCode])) {
-                $plans = $allPlans[$operatorCode];
-            } else {
-                $operator = Operator::where('code', $operatorCode)->first();
-                $category = $operator ? strtolower((string) $operator->category) : null;
-
-                if (! $category) {
-                    $configOperators = config('a1topup.operators', []);
-                    foreach ($configOperators as $cat => $opList) {
-                        foreach ($opList as $op) {
-                            if (strtoupper((string) ($op['code'] ?? '')) === strtoupper($operatorCode)) {
-                                $category = strtolower((string) $cat);
-                                break 2;
-                            }
-                        }
-                    }
-                }
-
-                $plans = match ($category) {
-                    'fastag' => $allPlans['FASTAG_DEFAULT'] ?? [],
-                    'dth' => $allPlans['DTH_DEFAULT'] ?? [],
-                    'electricity', 'gas', 'postpaid', 'insurance' => $allPlans['BILL_DEFAULT'] ?? [],
-                    default => $allPlans['RC'] ?? [],
-                };
+        if ($a1PlanOperator) {
+            $circleCode = trim((string) ($request->get('circle_code') ?? $request->get('circle') ?? ''));
+            if ($a1PlanOperator->category === 'mobile' && $circleCode === '') {
+                return $this->errorResponse('Select a circle to get the correct mobile plans.', 422, [
+                    'circle_code' => ['The circle_code parameter is required for mobile plan lookup.'],
+                ]);
             }
+
+            if ($a1PlanOperator->category === 'mobile' && ! A1PlanCatalog::query()
+                ->where('catalog_type', 'circle')
+                ->where('circle_code', $circleCode)
+                ->exists()) {
+                return $this->errorResponse('The selected A1Plan circle code is invalid.', 422, [
+                    'circle_code' => ['Select a circle returned by the recharge circles API.'],
+                ]);
+            }
+
+            $catalog = A1PlanCatalog::query()
+                ->where('catalog_type', $a1PlanOperator->category)
+                ->where('operator_code', $operatorCode)
+                ->where('circle_code', $a1PlanOperator->category === 'mobile' ? $circleCode : '')
+                ->first();
+
+            if (! $catalog) {
+                return $this->errorResponse('The live plan catalog has not been synced for this operator and circle yet.', 404);
+            }
+
+            return $this->a1PlanCatalogResponse($catalog->payload ?? [], $operatorCode, $circleCode, $a1PlanOperator->category);
         }
+
+        $plans = [];
 
         // Group plans by category for Google Pay / PhonePe style category tabs
         $categorizedPlans = [];
@@ -177,8 +242,24 @@ class RechargeController extends Controller
             'categorized_plans' => $categorizedPlans,
             'recommended_plans' => $categorizedPlans['Recommended Plans'] ?? $plans,
             'all_plans' => $plans,
-            'dth_quick_amounts' => $dthQuickAmounts,
+            'dth_quick_amounts' => [],
         ], 'Recharge plans retrieved successfully.');
+    }
+
+    /**
+     * A1Plan catalog alias for mobile clients and Postman integrations.
+     */
+    public function a1PlanMobileCatalog(Request $request): JsonResponse
+    {
+        return $this->a1PlanCatalog($request, 'mobile');
+    }
+
+    /**
+     * A1Plan catalog alias for mobile clients and Postman integrations.
+     */
+    public function a1PlanDthCatalog(Request $request): JsonResponse
+    {
+        return $this->a1PlanCatalog($request, 'dth');
     }
 
     /**
@@ -220,19 +301,103 @@ class RechargeController extends Controller
     public function operatorsByCategory(string $category): JsonResponse
     {
         $cat = strtolower(trim($category));
+        if (in_array($cat, ['mobile', 'dth', 'postpaid', 'electricity', 'fastag'], true)) {
+            $dbOperators = A1PlanCatalog::query()
+                ->where('catalog_type', 'operator')
+                ->where('category', $cat)
+                ->orderBy('name')
+                ->get(['operator_code as code', 'name']);
+
+            return $this->successResponse([
+                'category' => $cat,
+                'operators' => $dbOperators,
+            ], ucfirst($cat).' operators retrieved successfully.');
+        }
+
         $dbOperators = Operator::where('is_active', true)
             ->where('category', $cat)
             ->get();
-
-        if ($dbOperators->isEmpty()) {
-            $allConfig = config('a1topup.operators', []);
-            $dbOperators = collect($allConfig[$cat] ?? []);
-        }
 
         return $this->successResponse([
             'category' => $cat,
             'operators' => $dbOperators->values(),
         ], ucfirst($cat).' operators retrieved successfully.');
+    }
+
+    /** @param array<string, mixed> $providerResponse */
+    private function a1PlanCatalogResponse(array $providerResponse, string $operatorCode, string $circleCode, string $category): JsonResponse
+    {
+        $plansByCategory = [];
+        $providerPlanCategories = $providerResponse['RDATA'] ?? [];
+        if (! is_array($providerPlanCategories)) {
+            $providerPlanCategories = [];
+        }
+
+        foreach ($providerPlanCategories as $planCategory => $providerPlans) {
+            if (! is_array($providerPlans)) {
+                continue;
+            }
+
+            foreach ($providerPlans as $providerPlan) {
+                $plan = is_array($providerPlan) ? $providerPlan : ['description' => (string) $providerPlan];
+                $plan['amount'] = $plan['rs'] ?? $plan['amount'] ?? null;
+                $plan['validity'] = $plan['validity'] ?? null;
+                $plan['description'] = $plan['desc'] ?? $plan['description'] ?? '';
+                $plan['category'] = (string) $planCategory;
+                if ($category === 'mobile') {
+                    $plan['circle_code'] = $circleCode;
+                }
+                $plansByCategory[(string) $planCategory][] = $plan;
+            }
+        }
+
+        $plans = array_merge(...array_values($plansByCategory ?: [[]]));
+        $recommendedCategory = collect(array_keys($plansByCategory))
+            ->first(fn (string $name): bool => str_contains(mb_strtolower($name), 'recommended'));
+
+        return $this->successResponse([
+            'operator_code' => $operatorCode,
+            'circle_code' => $category === 'mobile' ? $circleCode : null,
+            'categories' => array_keys($plansByCategory),
+            'categorized_plans' => $plansByCategory,
+            'recommended_plans' => $recommendedCategory ? $plansByCategory[$recommendedCategory] : $plans,
+            'all_plans' => $plans,
+            'dth_quick_amounts' => [],
+            'synced_at' => A1PlanCatalog::query()
+                ->where('catalog_type', $category)
+                ->where('operator_code', $operatorCode)
+                ->where('circle_code', $category === 'mobile' ? $circleCode : '')
+                ->value('synced_at'),
+            'provider_response' => $providerResponse,
+        ], 'Recharge plans retrieved from the synced A1Plan database catalog.');
+    }
+
+    private function a1PlanCatalog(Request $request, string $category): JsonResponse
+    {
+        $operatorCode = strtoupper(trim((string) ($request->get('operator_code') ?? $request->get('operatorcode') ?? '')));
+        if ($operatorCode === '') {
+            return $this->errorResponse('The operatorcode parameter is required.', 422, [
+                'operatorcode' => ['Select an operator from the recharge operators API.'],
+            ]);
+        }
+
+        $operatorExists = A1PlanCatalog::query()
+            ->where('catalog_type', 'operator')
+            ->where('category', $category)
+            ->where('operator_code', $operatorCode)
+            ->exists();
+        if (! $operatorExists) {
+            return $this->errorResponse('The selected operator code is not available for this catalog.', 422, [
+                'operatorcode' => ['Select an operator from the matching category.'],
+            ]);
+        }
+
+        $request->merge([
+            'operator_code' => $operatorCode,
+            'circle_code' => $request->get('circle_code') ?? $request->get('circle'),
+        ]);
+
+        return $this->plans($request);
     }
 
     /**

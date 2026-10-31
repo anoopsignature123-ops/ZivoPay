@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\A1PlanController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
@@ -114,6 +115,32 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('api.add-fund.status');
 
     // Master & Unified Recharge Endpoints
+    Route::prefix('recharge/a1plan')->name('api.recharge.a1plan.')->group(function (): void {
+        // Catalog aliases for integrations that use the A1Plan-specific paths.
+        // The established /recharge/* endpoints below remain available as well.
+        Route::get('operators', [RechargeController::class, 'operators'])->name('catalog.operators');
+        Route::get('circles', [RechargeController::class, 'circles'])->name('catalog.circles');
+        Route::get('catalog/mobile', [RechargeController::class, 'a1PlanMobileCatalog'])->name('catalog.mobile');
+        Route::get('catalog/dth', [RechargeController::class, 'a1PlanDthCatalog'])->name('catalog.dth');
+        Route::post('dth/basic-info', [A1PlanController::class, 'dthBasicInfo'])->middleware('throttle:10,1')->name('dth.basic-info');
+        Route::post('dth/info-check', [A1PlanController::class, 'dthInfoCheck'])->middleware('throttle:10,1')->name('dth.info-check');
+        Route::post('dth/info-with-last-recharge', [A1PlanController::class, 'dthInfoWithLastRecharge'])->middleware('throttle:10,1')->name('dth.info-with-last-recharge');
+        Route::post('dth/operator-check', [A1PlanController::class, 'dthOperatorCheck'])->middleware('throttle:10,1')
+            ->name('dth.operator-check');
+        Route::post('bills/electricity', [A1PlanController::class, 'electricityBillFetch'])->middleware('throttle:10,1')
+            ->name('bills.electricity');
+        Route::post('bills/postpaid', [A1PlanController::class, 'postpaidBillFetch'])->middleware('throttle:10,1')
+            ->name('bills.postpaid');
+        Route::post('bills/fastag', [A1PlanController::class, 'fastagBillFetch'])->middleware('throttle:10,1')->name('bills.fastag');
+
+        Route::post('operator-circle', [A1PlanController::class, 'operatorCircleFetch'])->middleware('throttle:20,1')
+            ->name('operator-circle');
+
+        Route::post('plans', [A1PlanController::class, 'planFetch'])
+            ->middleware('throttle:5,1')->name('plans');
+        Route::post('roffer-check', [A1PlanController::class, 'rofferCheck'])->middleware('throttle:20,1')->name('roffer-check');
+    });
+
     Route::get('recharge/operators', [RechargeController::class, 'operators']);
     Route::get('recharge/circles', [RechargeController::class, 'circles']);
     Route::get('recharge/fetch-operator', [RechargeController::class, 'fetchOperator']);
@@ -121,23 +148,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('recharge/history', [RechargeController::class, 'history']);
     Route::get('recharge/status/{orderId?}', [RechargeController::class, 'status']);
 
-    // Dedicated Category Operator Listing GET Endpoints
-    Route::get('recharge/operators/mobile', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'mobile');
-    Route::get('recharge/operators/dth', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'dth');
-    Route::get('recharge/operators/postpaid', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'postpaid');
-    Route::get('recharge/operators/electricity', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'electricity');
-    Route::get('recharge/operators/gas', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'gas');
-    Route::get('recharge/operators/fastag', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'fastag');
-    Route::get('recharge/operators/insurance', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'insurance');
-    Route::get('recharge/operators/voucher', [RechargeController::class, 'operatorsByCategory'])
-        ->defaults('category', 'voucher');
+    // Category paths (for example, /recharge/operators/mobile) use this route.
     Route::get('recharge/operators/{category}', [RechargeController::class, 'operatorsByCategory']);
 
     // Dedicated Recharge POST Action Endpoints
