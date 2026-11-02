@@ -102,6 +102,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Admin Withdrawal Approvals Routes
         Route::get('withdrawals', [InvestmentAdminController::class, 'withdrawals'])->name('withdrawals');
         Route::post('withdrawals/{withdrawal}/status', [InvestmentAdminController::class, 'updateWithdrawalStatus'])->name('withdrawals.update');
+        Route::post('withdrawals/bulk-approve', [InvestmentAdminController::class, 'bulkApproveWithdrawals'])->name('withdrawals.bulk-approve');
+        Route::post('withdrawals/bulk-complete', [InvestmentAdminController::class, 'bulkCompleteWithdrawals'])->name('withdrawals.bulk-complete');
 
         // Admin KYC Management Routes
         Route::get('kyc', [KycAdminController::class, 'index'])->name('kyc.index');

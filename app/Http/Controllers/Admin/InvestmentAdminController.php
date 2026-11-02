@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\UserInvestment;
 use App\Models\Withdrawal;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class InvestmentAdminController extends Controller
 {
@@ -50,7 +54,7 @@ class InvestmentAdminController extends Controller
             });
         }
 
-        if ($request->filled('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
+        if ($request->filled('status') && in_array($request->status, ['pending', 'approved', 'completed', 'rejected'], true)) {
             $query->where('status', $request->status);
         }
 
@@ -61,49 +65,250 @@ class InvestmentAdminController extends Controller
             'pending_count' => Withdrawal::where('status', 'pending')->count(),
             'pending_amount' => (float) Withdrawal::where('status', 'pending')->sum('amount'),
             'approved_amount' => (float) Withdrawal::where('status', 'approved')->sum('final_amount'),
+            'completed_amount' => (float) Withdrawal::where('status', 'completed')->sum('final_amount'),
             'rejected_count' => Withdrawal::where('status', 'rejected')->count(),
         ];
 
-        return view('admin.withdrawal.index', compact('withdrawals', 'stats'));
+        $contractAddress = (string) config('services.usdt.payout_contract_address', '');
+
+        return view('admin.withdrawal.index', compact('withdrawals', 'stats', 'contractAddress'));
     }
 
-    public function updateWithdrawalStatus(Request $request, Withdrawal $withdrawal)
+    public function updateWithdrawalStatus(Request $request, Withdrawal $withdrawal): RedirectResponse
     {
-        $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'admin_remarks' => 'nullable|string|max:500',
+        $validated = $request->validate([
+            'status' => ['required', 'in:rejected'],
+            'admin_remarks' => ['nullable', 'string', 'max:500'],
         ]);
 
-        if ($withdrawal->status !== 'pending') {
-            return back()->withErrors(['status' => 'This withdrawal request has already been processed and cannot be modified.']);
-        }
+        DB::transaction(function () use ($withdrawal, $validated): void {
+            $lockedWithdrawal = Withdrawal::query()->lockForUpdate()->findOrFail($withdrawal->id);
 
-        DB::transaction(function () use ($withdrawal, $request) {
-            $withdrawal->update([
-                'status' => $request->status,
-                'admin_remarks' => $request->admin_remarks,
+            if (! in_array($lockedWithdrawal->status, ['pending', 'approved'], true)) {
+                throw ValidationException::withMessages(['status' => 'Only pending or approved withdrawals can be rejected.']);
+            }
+
+            $lockedWithdrawal->update([
+                'status' => 'rejected',
+                'admin_remarks' => $validated['admin_remarks'] ?? null,
+                'provider_reference' => null,
                 'processed_at' => now(),
             ]);
 
-            // If rejected, refund full amount back to user's earning wallet
-            if ($request->status === 'rejected') {
-                $withdrawal->user->increment('earning_wallet', $withdrawal->amount);
+            $user = $lockedWithdrawal->user()->lockForUpdate()->firstOrFail();
+            $sourceWallet = in_array($lockedWithdrawal->source_wallet, ['deposit_wallet', 'earning_wallet'], true)
+                ? $lockedWithdrawal->source_wallet
+                : 'earning_wallet';
+            $user->increment($sourceWallet, $lockedWithdrawal->amount);
+            $user->refresh();
 
-                $reasonNote = $request->admin_remarks ? " Reason: {$request->admin_remarks}" : '';
-
-                Transaction::create([
-                    'user_id' => $withdrawal->user_id,
-                    'amount' => $withdrawal->amount,
-                    'wallet_type' => 'earning_wallet',
-                    'type' => 'admin_credit',
-                    'description' => "Withdrawal Request #{$withdrawal->trx_id} Rejected - Balance Refunded.{$reasonNote}",
-                    'trx_id' => 'REF-'.strtoupper(Str::random(8)),
-                ]);
-            }
+            Transaction::query()->create([
+                'user_id' => $lockedWithdrawal->user_id,
+                'amount' => $lockedWithdrawal->amount,
+                'wallet_type' => $sourceWallet === 'deposit_wallet' ? 'fund' : 'earning',
+                'type' => 'withdrawal_refund',
+                'trx_type' => '+',
+                'post_balance' => $user->{$sourceWallet},
+                'description' => 'Rejected USDT BEP20 withdrawal #'.$lockedWithdrawal->trx_id.' refunded to original wallet.',
+                'trx_id' => 'REF-'.strtoupper(Str::random(10)),
+            ]);
         });
 
-        $statusLabel = strtoupper($request->status);
+        return back()->with('success', "Withdrawal request #{$withdrawal->trx_id} rejected and refunded to its original wallet.");
+    }
 
-        return back()->with('success', "Withdrawal request #{$withdrawal->trx_id} marked as {$statusLabel} successfully.");
+    public function bulkApproveWithdrawals(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'withdrawal_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'withdrawal_ids.*' => ['required', 'integer', 'distinct', 'exists:withdrawals,id'],
+        ]);
+
+        $updated = DB::transaction(function () use ($validated): int {
+            $withdrawals = Withdrawal::query()
+                ->whereIn('id', $validated['withdrawal_ids'])
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            if ($withdrawals->count() !== count($validated['withdrawal_ids']) || $withdrawals->contains(fn (Withdrawal $item): bool => $item->status !== 'pending' || $item->usdt_amount === null || ! preg_match('/^0x[a-fA-F0-9]{40}$/', (string) $item->account_details))) {
+                throw ValidationException::withMessages(['withdrawal_ids' => 'Every selected request must be pending, have a saved USDT conversion, and contain a valid BEP20 address.']);
+            }
+
+            return Withdrawal::query()->whereIn('id', $validated['withdrawal_ids'])->where('status', 'pending')->update([
+                'status' => 'approved',
+                'processed_at' => null,
+            ]);
+        });
+
+        return response()->json(['success' => true, 'message' => "{$updated} withdrawal request(s) approved.", 'updated' => $updated]);
+    }
+
+    public function bulkCompleteWithdrawals(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'withdrawal_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'withdrawal_ids.*' => ['required', 'integer', 'distinct', 'exists:withdrawals,id'],
+            'transaction_hash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+        ]);
+
+        if (Withdrawal::query()->where('provider_reference', $validated['transaction_hash'])->whereNotIn('id', $validated['withdrawal_ids'])->exists()) {
+            throw ValidationException::withMessages(['transaction_hash' => 'This BSC transaction is already attached to another withdrawal batch.']);
+        }
+
+        $contractAddress = strtolower((string) config('services.usdt.payout_contract_address', ''));
+        $rpcUrl = (string) config('services.usdt.rpc_url', '');
+        if (! preg_match('/^0x[a-f0-9]{40}$/', $contractAddress) || ! filter_var($rpcUrl, FILTER_VALIDATE_URL)) {
+            throw ValidationException::withMessages(['transaction_hash' => 'Configure a valid USDT_PAYOUT_CONTRACT_ADDRESS and BSC_RPC_URL before completing payouts.']);
+        }
+
+        $selectedWithdrawals = Withdrawal::query()->whereIn('id', $validated['withdrawal_ids'])->get();
+        if ($selectedWithdrawals->count() !== count($validated['withdrawal_ids']) || $selectedWithdrawals->contains(fn (Withdrawal $item): bool => $item->status !== 'approved' || $item->usdt_amount === null || ! preg_match('/^0x[a-fA-F0-9]{40}$/', (string) $item->account_details))) {
+            throw ValidationException::withMessages(['withdrawal_ids' => 'Every selected request must still be approved with a saved USDT amount and valid BEP20 address.']);
+        }
+
+        $this->verifyBscTransaction($rpcUrl, $validated['transaction_hash'], $contractAddress, $selectedWithdrawals->all());
+
+        $updated = DB::transaction(function () use ($validated): int {
+            $withdrawals = Withdrawal::query()
+                ->whereIn('id', $validated['withdrawal_ids'])
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            if ($withdrawals->count() !== count($validated['withdrawal_ids']) || $withdrawals->contains(fn (Withdrawal $item): bool => $item->status !== 'approved' || $item->usdt_amount === null)) {
+                throw ValidationException::withMessages(['withdrawal_ids' => 'Every selected request must still be approved with a saved USDT amount.']);
+            }
+
+            return Withdrawal::query()->whereIn('id', $validated['withdrawal_ids'])->where('status', 'approved')->update([
+                'status' => 'completed',
+                'provider_reference' => $validated['transaction_hash'],
+                'processed_at' => now(),
+            ]);
+        });
+
+        return response()->json(['success' => true, 'message' => "{$updated} withdrawal request(s) marked completed.", 'updated' => $updated]);
+    }
+
+    /**
+     * @param  list<Withdrawal>  $withdrawals
+     */
+    private function verifyBscTransaction(string $rpcUrl, string $transactionHash, string $contractAddress, array $withdrawals): void
+    {
+        try {
+            $rpc = fn (string $method, array $params) => Http::timeout(12)->post($rpcUrl, [
+                'jsonrpc' => '2.0',
+                'id' => 1,
+                'method' => $method,
+                'params' => $params,
+            ]);
+            $chainResponse = $rpc('eth_chainId', []);
+            $transactionResponse = $rpc('eth_getTransactionByHash', [$transactionHash]);
+            $receiptResponse = $rpc('eth_getTransactionReceipt', [$transactionHash]);
+            $ownerResponse = $rpc('eth_call', [['to' => $contractAddress, 'data' => '0x8da5cb5b'], 'latest']);
+            $transaction = $transactionResponse->json('result');
+            $receipt = $receiptResponse->json('result');
+            $owner = strtolower('0x'.substr((string) $ownerResponse->json('result'), -40));
+        } catch (\Throwable $exception) {
+            report($exception);
+            throw ValidationException::withMessages(['transaction_hash' => 'Could not verify this transaction on BNB Smart Chain. Try again after it is confirmed.']);
+        }
+
+        if (! $chainResponse->successful() || strtolower((string) $chainResponse->json('result')) !== '0x38'
+            || ! $transactionResponse->successful() || ! is_array($transaction)
+            || ! $receiptResponse->successful() || ! is_array($receipt)
+            || strtolower((string) ($transaction['to'] ?? '')) !== $contractAddress
+            || strtolower((string) ($transaction['from'] ?? '')) !== $owner
+            || strtolower((string) ($transaction['input'] ?? '')) === ''
+            || strtolower((string) ($receipt['transactionHash'] ?? '')) !== strtolower($transactionHash)
+            || strtolower((string) ($receipt['to'] ?? '')) !== $contractAddress
+            || strtolower((string) ($receipt['status'] ?? '')) !== '0x1'
+        ) {
+            throw ValidationException::withMessages(['transaction_hash' => 'Transaction is not confirmed successfully from the payout contract owner on BNB Smart Chain.']);
+        }
+
+        $input = strtolower(ltrim((string) $transaction['input'], '0x'));
+        if (substr($input, 0, 8) !== 'bd13a803' || strlen($input) < 136) {
+            throw ValidationException::withMessages(['transaction_hash' => 'The transaction does not call the payout contract bulk withdrawal function.']);
+        }
+
+        $arguments = substr($input, 8);
+        $recipientsOffset = hexdec(substr($arguments, 0, 64)) * 2;
+        $amountsOffset = hexdec(substr($arguments, 64, 64)) * 2;
+        if ($recipientsOffset > strlen($arguments) - 64 || $amountsOffset > strlen($arguments) - 64) {
+            throw ValidationException::withMessages(['transaction_hash' => 'The transaction data is malformed.']);
+        }
+
+        $recipientCount = hexdec(substr($arguments, $recipientsOffset, 64));
+        $amountCount = hexdec(substr($arguments, $amountsOffset, 64));
+        if ($recipientCount !== count($withdrawals) || $amountCount !== count($withdrawals)) {
+            throw ValidationException::withMessages(['transaction_hash' => 'The on-chain recipient list does not match the selected withdrawal requests.']);
+        }
+
+        $actualRecipients = [];
+        $actualAmounts = [];
+        for ($index = 0; $index < $recipientCount; $index++) {
+            $recipientWord = substr($arguments, $recipientsOffset + 64 + ($index * 64), 64);
+            $amountWord = substr($arguments, $amountsOffset + 64 + ($index * 64), 64);
+            if (strlen($recipientWord) !== 64 || strlen($amountWord) !== 64) {
+                throw ValidationException::withMessages(['transaction_hash' => 'The transaction data is incomplete.']);
+            }
+
+            $actualRecipients[] = '0x'.substr($recipientWord, -40);
+            $actualAmounts[] = $amountWord;
+        }
+
+        $matchingTokenPrecision = false;
+        for ($decimals = 0; $decimals <= 18; $decimals++) {
+            $expected = [];
+            foreach ($withdrawals as $withdrawal) {
+                $expectedAmount = $this->decimalTokenUnitsHex((string) $withdrawal->usdt_amount, $decimals);
+                if ($expectedAmount === null) {
+                    $expected = [];
+                    break;
+                }
+                $expected[] = [strtolower((string) $withdrawal->account_details), $expectedAmount];
+            }
+
+            $actual = [];
+            foreach ($actualRecipients as $index => $recipient) {
+                $actual[] = [$recipient, $actualAmounts[$index]];
+            }
+            sort($expected);
+            sort($actual);
+
+            if ($expected === $actual) {
+                $matchingTokenPrecision = true;
+                break;
+            }
+        }
+
+        if (! $matchingTokenPrecision) {
+            throw ValidationException::withMessages(['transaction_hash' => 'The on-chain recipients or USDT amounts do not match these selected requests.']);
+        }
+    }
+
+    private function decimalTokenUnitsHex(string $amount, int $decimals): ?string
+    {
+        [$whole, $fraction] = array_pad(explode('.', $amount, 2), 2, '');
+        if (strlen($fraction) > $decimals) {
+            return null;
+        }
+
+        $decimal = ltrim(($whole ?: '0').str_pad($fraction, $decimals, '0'), '0') ?: '0';
+        $hex = '';
+        while ($decimal !== '0') {
+            $quotient = '';
+            $remainder = 0;
+            foreach (str_split($decimal) as $digit) {
+                $current = ($remainder * 10) + (int) $digit;
+                $quotient .= (string) intdiv($current, 16);
+                $remainder = $current % 16;
+            }
+            $hex = dechex($remainder).$hex;
+            $decimal = ltrim($quotient, '0') ?: '0';
+        }
+
+        return str_pad($hex, 64, '0', STR_PAD_LEFT);
     }
 }

@@ -12,10 +12,12 @@ class Withdrawal extends Model
 
     protected $fillable = [
         'user_id',
+        'source_wallet',
         'amount',
         'charge',
         'final_amount',
         'amount_inr',
+        'usdt_amount',
         'conversion_rate',
         'provider_reference',
         'payment_method',
@@ -31,6 +33,7 @@ class Withdrawal extends Model
         'charge' => 'decimal:2',
         'final_amount' => 'decimal:2',
         'amount_inr' => 'decimal:2',
+        'usdt_amount' => 'decimal:6',
         'conversion_rate' => 'decimal:4',
         'processed_at' => 'datetime',
     ];

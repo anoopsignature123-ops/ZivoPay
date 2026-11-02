@@ -253,6 +253,13 @@
                 const form = btn.closest('form');
                 const card = btn.closest('.bg-panel, .poster-clean-table, .gold-card-animated');
 
+                // Native browser validation runs after the click event. Do not
+                // leave the global loader covering the form when validation fails.
+                if (form && !form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
                 if (form) {
                     form.classList.add('form-blur-loading');
                 } else if (card) {

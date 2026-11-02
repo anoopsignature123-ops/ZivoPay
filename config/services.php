@@ -45,6 +45,8 @@ return [
 
     'usdt' => [
         'wallet_address' => env('USDT_WALLET_ADDRESS', ''),
+        'payout_contract_address' => env('USDT_PAYOUT_CONTRACT_ADDRESS', ''),
+        'rpc_url' => env('BSC_RPC_URL', 'https://bsc-dataseed.binance.org/'),
     ],
 
 ];

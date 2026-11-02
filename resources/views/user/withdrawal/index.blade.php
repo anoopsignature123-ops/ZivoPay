@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'ZIVO PAY - 24x7 Withdrawal Portal')
+@section('title', 'ZIVO PAY - USDT Withdrawal')
 
 @section('content')
     <div class="max-w-6xl mx-auto space-y-5 font-sans">
@@ -12,23 +12,23 @@
                 <div class="flex items-center gap-2 mb-1">
                     <span
                         class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
-                        24X7 WITHDRAWAL PORTAL
+                        USDT BEP20 PAYOUT
                     </span>
-                    <span class="text-xs text-emerald-400 font-black tracking-[2px] uppercase">ZIVO PAY PAYOUTS</span>
+                    <span class="text-xs text-emerald-400 font-black tracking-[2px] uppercase">MANUAL ADMIN REVIEW</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">24x7
-                    INSTANT WITHDRAWALS</h1>
-                <p class="text-xs text-neutral-300 mt-1">Withdraw your daily ROI earnings and ROI-on-ROI matching commissions
-                    income anytime 24 hours a day.</p>
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">USDT WITHDRAWAL</h1>
+                <p class="text-xs text-neutral-300 mt-1">Request an INR amount. After the 5% fee, the net is converted to USDT and sent to your BEP20 address after admin review.</p>
             </div>
 
-            <div
-                class="p-4 rounded-2xl bg-[#02180f] border-2 border-emerald-400 text-center shrink-0 min-w-[220px] shadow-lg">
-                <span class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Available Earning
-                    Wallet</span>
-                <span
-                    class="text-3xl font-black text-white font-mono mt-0.5 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
-                <span class="text-[10px] text-emerald-400 font-semibold mt-1 block">Ready for 24x7 Payout</span>
+            <div class="grid grid-cols-2 gap-3 shrink-0">
+                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-400/60 text-right min-w-[150px] shadow-lg">
+                    <span class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Earning Wallet</span>
+                    <span class="text-xl font-black text-white font-mono mt-0.5 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
+                </div>
+                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-400/60 text-right min-w-[150px] shadow-lg">
+                    <span class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Fund Wallet</span>
+                    <span class="text-xl font-black text-white font-mono mt-0.5 block">₹{{ number_format($user->deposit_wallet, 2) }}</span>
+                </div>
             </div>
         </div>
 
@@ -52,12 +52,6 @@
             </div>
         @endif
 
-        @if (!$payoutEnabled)
-            <div class="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
-                Bank payouts are paused until iPaymentWallet’s official IMPS API endpoint, authentication, and status callback are confirmed. Your wallet will not be debited while payouts are unavailable.
-            </div>
-        @endif
-
         <!-- KYC Enforcement Alert Banner -->
         @if (!$user->isKycApproved())
             <div
@@ -73,14 +67,13 @@
                                 Verification Required for Payouts</h3>
                             <p class="text-xs text-amber-200/90 mt-0.5">
                                 @if ($user->kyc_status === 'pending')
-                                    Your KYC submission is currently <strong>Under Admin Review</strong>. Withdrawals will
-                                    unlock automatically once approved.
+                                    Your KYC submission is currently <strong>Under Admin Review</strong>. Withdrawal requests unlock after approval.
                                 @elseif($user->kyc_status === 'rejected')
                                     Your KYC submission was <strong>Rejected</strong>. Please review the reason, update your
                                     details, and resubmit.
                                 @else
                                     You have not completed your KYC document & banking verification yet. Please submit your
-                                    documents to unlock 24x7 withdrawals.
+                                    documents before submitting a withdrawal request.
                                 @endif
                             </p>
                         </div>
@@ -148,7 +141,7 @@
                     <div class="flex items-center justify-between border-b border-emerald-500/20 pb-4 mb-4">
                         <h2
                             class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
-                            <i data-lucide="send" class="w-5 h-5 text-emerald-400"></i> Submit 24x7 Payout Request
+                            <i data-lucide="send" class="w-5 h-5 text-emerald-400"></i> Submit USDT Payout Request
                         </h2>
                         <span
                             class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Fast
@@ -176,10 +169,8 @@
                         <!-- Amount Field -->
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-bold text-emerald-400 uppercase">Withdrawal Amount (INR)
-                                    *</label>
-                                <span class="text-[11px] text-neutral-400">Min: <strong
-                                        class="text-white">₹5</strong></span>
+                                <label class="block text-xs font-bold text-emerald-400 uppercase">Withdrawal Amount (INR) *</label>
+                            <span class="text-[11px] text-neutral-400">Min: <strong class="text-white">₹5</strong></span>
                             </div>
                             <div class="relative">
                                 <span
@@ -198,24 +189,16 @@
                                     id="availBalDisplay">₹{{ number_format($user->earning_wallet, 2) }}</strong></p>
                         </div>
 
-                        <!-- Payment Method Field -->
+                        <!-- BEP20 Destination -->
                         <div>
-                            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Select Payment Method
-                                *</label>
-                            <select id="paymentMethod" name="payment_method" required
-                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
-                                <option value="Bank Transfer"
-                                    {{ old('payment_method') === 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer (IMPS /
-                                    NEFT / RTGS)</option>
-                            </select>
-                        </div>
-
-                        <!-- Bank Details Field -->
-                        <div>
-                            <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Bank account, holder name & IFSC *</label>
-                            <textarea id="accountDetails" name="account_details" rows="3" required
-                                placeholder="Enter complete payment details e.g.&#10;Bank Name: HDFC Bank&#10;Account No: 1234567890&#10;IFSC Code: HDFC0001234&#10;Holder Name: John Doe"
-                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition">{{ old('account_details') }}</textarea>
+                            <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">USDT wallet address (BEP20) *</label>
+                            <input type="text" name="usdt_address" required value="{{ old('usdt_address') }}"
+                                placeholder="0x… (BNB Smart Chain / BEP20 address)" autocomplete="off" spellcheck="false"
+                                minlength="42" maxlength="42" pattern="0x[a-fA-F0-9]{40}"
+                                title="Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters."
+                                aria-describedby="usdt-address-help"
+                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400 transition">
+                            <p id="usdt-address-help" class="mt-1 text-[11px] text-neutral-400">Required format: <span class="font-mono text-emerald-300">0x</span> plus exactly 40 hexadecimal characters (0–9, a–f). Check the network carefully; only USDT on BEP20 will be sent.</p>
                         </div>
 
                         <!-- Live Net Amount Payout Breakdown Box -->
@@ -229,11 +212,12 @@
                                 <strong id="displayFee" class="text-rose-400 font-mono font-bold">-₹0.00</strong>
                             </div>
                             <div class="border-t border-emerald-500/20 pt-2 flex justify-between text-sm">
-                                <span class="font-bold text-emerald-400">Net after fee (INR):</span>
+                                <span class="font-bold text-emerald-400">Net amount (INR):</span>
                                 <strong id="displayNet"
                                     class="text-emerald-400 font-mono font-black text-base">₹0.00</strong>
                             </div>
-                            <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-neutral-300"><span>Estimated bank transfer (INR):</span><strong id="displayPayoutInr" class="font-mono text-white">₹0.00</strong></div>
+                            <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-neutral-300"><span>Estimated payout (USDT):</span><strong id="displayPayoutUsdt" class="font-mono text-white">0.000000 USDT</strong></div>
+                            <p class="text-[10px] text-neutral-400">Rate: ₹1 = {{ number_format(1 / max($conversionRate, 0.0001), 6) }} USDT. Final amount is fixed in your request for admin review.</p>
                         </div>
 
                         @if (!$user->isKycApproved())
@@ -245,7 +229,7 @@
                         @else
                             <button type="submit" @disabled(!$payoutEnabled)
                                 class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> Submit 24x7 Payout Request
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Submit USDT Payout Request
                             </button>
                         @endif
                     </form>
@@ -262,9 +246,8 @@
                             <i data-lucide="shield-check" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <h3 class="text-sm font-black text-white uppercase tracking-wider font-heading">24x7 Payout
-                                Rules</h3>
-                            <p class="text-[11px] text-neutral-400">ZIVO PAY Instant Processing Policy</p>
+                            <h3 class="text-sm font-black text-white uppercase tracking-wider font-heading">USDT Payout Rules</h3>
+                            <p class="text-[11px] text-neutral-400">Admin reviewed on BNB Smart Chain</p>
                         </div>
                     </div>
 
@@ -274,8 +257,7 @@
                                 class="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             </div>
-                            <span><strong>24x7 Availability:</strong> You can submit withdrawal requests 24 hours a day, 7
-                                days a week.</span>
+                            <span><strong>Admin review:</strong> A request is paid after review and the blockchain transaction hash is recorded.</span>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <div
@@ -290,15 +272,14 @@
                                 class="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             </div>
-                            <span><strong>Service Charge:</strong> Flat <strong>5% admin fee</strong> deducted to cover
-                                gateway & banking transaction costs.</span>
+                            <span><strong>Service fee:</strong> A <strong>5% fee</strong> is deducted before the INR-to-USDT conversion.</span>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <div
                                 class="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             </div>
-                            <span><strong>Bank payout:</strong> The net INR amount is paid in INR. No USD conversion is applied to wallet balances.</span>
+                            <span><strong>USDT BEP20 payout:</strong> Your INR wallet amount is reserved when requested. After the 5% fee, the net INR is converted to USDT using the displayed rate. Admin reviews and sends it to your address.</span>
                         </li>
                     </ul>
                 </div>
@@ -383,11 +364,12 @@
                             class="bg-[#02180f] text-emerald-400 uppercase text-[10px] font-bold border-b border-emerald-500/30">
                             <tr>
                                 <th class="p-3.5">Trx ID</th>
-                                <th class="p-3.5">Payment Method</th>
-                                <th class="p-3.5">Account / Wallet Details</th>
+                                <th class="p-3.5">Network</th>
+                                <th class="p-3.5">USDT address</th>
                                 <th class="p-3.5">Gross (INR)</th>
                                 <th class="p-3.5">Fee (INR)</th>
-                                <th class="p-3.5">Net payout (INR)</th>
+                                <th class="p-3.5">Net (INR)</th>
+                                <th class="p-3.5">Payout (USDT)</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Admin Remarks / UTR</th>
                                 <th class="p-3.5 text-right">Date & Time</th>
@@ -405,8 +387,8 @@
                                     <td class="p-3.5 font-mono font-bold text-white">₹{{ number_format($wth->amount, 2) }}
                                     </td>
                                     <td class="p-3.5 font-mono text-rose-400">-₹{{ number_format($wth->charge, 2) }}</td>
-                                    <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
-                                        {{ $wth->amount_inr !== null ? '₹'.number_format((float) $wth->amount_inr, 2) : '—' }}</td>
+                                    <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">₹{{ number_format((float) $wth->final_amount, 2) }}</td>
+                                    <td class="p-3.5 font-mono font-bold text-white">{{ $wth->usdt_amount !== null ? number_format((float) $wth->usdt_amount, 6).' USDT' : '—' }}</td>
                                     <td class="p-3.5">
                                         <span
                                             class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase
@@ -417,8 +399,12 @@
                                         </span>
                                     </td>
                                     <td class="p-3.5 text-neutral-300 max-w-xs truncate font-mono text-[11px]"
-                                        title="{{ $wth->admin_remarks ?? 'N/A' }}">
-                                        {{ $wth->admin_remarks ?? '-' }}
+                                        title="{{ $wth->provider_reference ?? $wth->admin_remarks ?? 'N/A' }}">
+                                        @if ($wth->provider_reference)
+                                            <a class="text-emerald-300 hover:underline" target="_blank" rel="noopener noreferrer" href="https://bscscan.com/tx/{{ urlencode($wth->provider_reference) }}">View tx</a>
+                                        @else
+                                            {{ $wth->admin_remarks ?? '-' }}
+                                        @endif
                                     </td>
                                     <td class="p-3.5 text-right text-neutral-400">
                                         {{ $wth->created_at ? $wth->created_at->format('d M Y, h:i A') : 'N/A' }}</td>
@@ -445,15 +431,18 @@
                 deposit_wallet: {{ (float) $user->deposit_wallet }}
             };
 
+            var conversionRate = {{ (float) $conversionRate }};
+
             function calculateFee(val) {
                 var amount = parseFloat(val) || 0;
                 var fee = Math.round((amount * 0.05) * 100) / 100;
                 var net = Math.round((amount - fee) * 100) / 100;
+                var usdt = conversionRate > 0 ? net / conversionRate : 0;
 
                 document.getElementById('displayGross').innerText = '₹' + amount.toFixed(2);
                 document.getElementById('displayFee').innerText = '-₹' + fee.toFixed(2);
                 document.getElementById('displayNet').innerText = '₹' + net.toFixed(2);
-                document.getElementById('displayPayoutInr').innerText = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(net);
+                document.getElementById('displayPayoutUsdt').innerText = usdt.toFixed(6) + ' USDT';
             }
 
             function updateWalletBalance(walletType) {
@@ -469,8 +458,7 @@
                 calculateFee(maxVal);
             }
 
-            function autofillDetails(details) {
-                document.getElementById('accountDetails').value = details;
-            }
+            updateWalletBalance(document.getElementById('fromWallet').value);
+            calculateFee(document.getElementById('wthAmount').value);
         </script>
     @endsection

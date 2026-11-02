@@ -3,17 +3,21 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Withdrawal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class WithdrawalController extends Controller
 {
     public function index(Request $request): View
     {
-        $user = Auth::user();
+        $user = $request->user();
         $query = Withdrawal::query()->where('user_id', $user->id);
 
         if ($request->filled('search')) {
@@ -47,14 +51,88 @@ class WithdrawalController extends Controller
             'user' => $user,
             'withdrawals' => $withdrawals,
             'stats' => $stats,
-            'payoutEnabled' => false,
+            'payoutEnabled' => true,
+            'conversionRate' => (float) config('gateway.usd_to_inr_rate', 100),
+            'contractAddress' => (string) config('services.usdt.contract_address', ''),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        return back()->withErrors([
-            'payout' => 'Automated bank payouts are paused until the official iPaymentWallet IMPS API contract is confirmed and configured.',
-        ])->withInput();
+        $request->merge([
+            'usdt_address' => trim((string) $request->input('usdt_address')),
+        ]);
+
+        $validated = $request->validate([
+            'from_wallet' => ['required', 'string', 'in:earning_wallet,deposit_wallet'],
+            'amount' => ['required', 'numeric', 'min:5', 'decimal:0,2'],
+            'usdt_address' => ['bail', 'required', 'string', 'regex:/\A0x[a-fA-F0-9]{40}\z/'],
+        ], [
+            'amount.min' => 'Minimum withdrawal request is ₹5.00.',
+            'usdt_address.regex' => 'Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters.',
+        ]);
+
+        if (! $request->user()->isKycApproved()) {
+            throw ValidationException::withMessages(['payout' => 'Complete KYC verification before requesting a withdrawal.']);
+        }
+
+        $rate = (float) config('gateway.usd_to_inr_rate', 100);
+        if ($rate <= 0) {
+            throw ValidationException::withMessages(['amount' => 'USDT conversion rate is not configured correctly.']);
+        }
+
+        $grossInr = round((float) $validated['amount'], 2);
+        $feeInr = round($grossInr * 0.05, 2);
+        $netInr = round($grossInr - $feeInr, 2);
+        $usdtAmount = round($netInr / $rate, 6);
+        $sourceWallet = $validated['from_wallet'];
+
+        if ($usdtAmount <= 0) {
+            throw ValidationException::withMessages(['amount' => 'The requested amount is too small to convert to USDT.']);
+        }
+
+        DB::transaction(function () use ($request, $grossInr, $feeInr, $netInr, $usdtAmount, $rate, $sourceWallet, $validated): void {
+            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+            $balance = (float) $user->{$sourceWallet};
+
+            if ($balance < $grossInr) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Insufficient wallet balance. Available: ₹'.number_format($balance, 2).'.',
+                ]);
+            }
+
+            $user->decrement($sourceWallet, $grossInr);
+            $user->refresh();
+
+            $trxId = 'WTH-'.strtoupper(Str::random(10));
+            Withdrawal::query()->create([
+                'user_id' => $user->id,
+                'source_wallet' => $sourceWallet,
+                'amount' => $grossInr,
+                'charge' => $feeInr,
+                'final_amount' => $netInr,
+                'amount_inr' => $netInr,
+                'conversion_rate' => $rate,
+                'usdt_amount' => $usdtAmount,
+                'payment_method' => 'USDT BEP20',
+                'account_details' => $validated['usdt_address'],
+                'trx_id' => $trxId,
+                'status' => 'pending',
+            ]);
+
+            Transaction::query()->create([
+                'user_id' => $user->id,
+                'trx_id' => $trxId,
+                'type' => 'withdrawal_request',
+                'wallet_type' => $sourceWallet === 'deposit_wallet' ? 'fund' : 'earning',
+                'trx_type' => '-',
+                'amount' => $grossInr,
+                'charge' => $feeInr,
+                'post_balance' => $user->{$sourceWallet},
+                'description' => 'USDT BEP20 withdrawal request reserved. Net payout: '.number_format($usdtAmount, 6).' USDT.',
+            ]);
+        });
+
+        return back()->with('success', 'Withdrawal request submitted. INR has been reserved and the USDT payout is awaiting admin review.');
     }
 }
