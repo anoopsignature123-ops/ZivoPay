@@ -113,7 +113,7 @@
                 </div>
                 <div class="text-2xl font-black text-emerald-300 font-mono">₹{{ number_format($totalInvestmentsSum, 2) }}
                 </div>
-                <p class="text-[11px] text-neutral-400">Capital packages earning 0.15% to 0.30% daily ROI</p>
+                <p class="text-[11px] text-neutral-400">Fund Wallet daily ROI and Fixed Package monthly ROI investments</p>
             </div>
         </div>
 
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <div class="text-2xl font-black text-teal-300 font-mono">₹{{ number_format($totalRoiDistributed, 2) }}</div>
-                <p class="text-[11px] text-neutral-400">Cumulative daily ROI returns credited to members</p>
+                <p class="text-[11px] text-neutral-400">Cumulative Fund Wallet daily and Fixed Package monthly ROI credited to members</p>
             </div>
 
             <!-- Total Commissions Paid -->

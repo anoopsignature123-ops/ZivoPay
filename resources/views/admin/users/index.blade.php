@@ -161,6 +161,8 @@
                                 <div>
                                     <span class="text-[10px] text-neutral-400 uppercase block">Earning Wallet</span>
                                     <strong class="text-sm font-mono font-bold text-emerald-400">₹{{ number_format($user->earning_wallet, 2) }}</strong>
+                                    <span class="mt-1 block text-[10px] text-neutral-400 uppercase">Shopping Wallet</span>
+                                    <strong class="text-sm font-mono font-bold text-sky-300">₹{{ number_format($user->shopping_wallet, 2) }}</strong>
                                 </div>
                             </td>
 
@@ -265,6 +267,7 @@
                 <select name="wallet_type" required class="w-full px-4 py-2.5 rounded-xl border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" style="background-color: #01140c !important;">
                     <option value="deposit_wallet" class="bg-[#042718] text-white">Fund Wallet</option>
                     <option value="earning_wallet" class="bg-[#042718] text-white">Earning Wallet</option>
+                    <option value="shopping_wallet" class="bg-[#042718] text-white">Shopping Wallet</option>
                 </select>
             </div>
 

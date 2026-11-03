@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY INVESTMENT ROI</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">DAILY ROI INCOME REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit log of daily ROI income distributed to members from active investment packages (DROI / ROI prefix).</p>
+            <p class="text-xs text-neutral-300 mt-1">Audit log of daily Fund Wallet ROI payouts. Fixed Package monthly ROI is recorded separately in the income ledger.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">

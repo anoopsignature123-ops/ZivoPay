@@ -92,7 +92,7 @@
                             <th class="px-5 py-4">ID</th>
                             <th class="px-5 py-4">Package</th>
                             <th class="px-5 py-4">Capital Invested</th>
-                            <th class="px-5 py-4">Daily Return Rate</th>
+                            <th class="px-5 py-4">ROI Schedule</th>
                             <th class="px-5 py-4">Status</th>
                             <th class="px-5 py-4">Activated At</th>
                         </tr>
@@ -108,8 +108,11 @@
                                 <td class="px-5 py-4 font-bold text-emerald-400 text-sm">
                                     ₹{{ number_format($inv->amount, 2) }}</td>
                                 <td class="px-5 py-4 text-emerald-300 font-bold">
-                                    {{ $inv->daily_percentage ?? number_format(($inv->daily_roi_rate ?? 0.0015) * 100, 2) }}%
-                                    / day
+                                    @if (($inv->roi_frequency ?? 'daily') === 'monthly')
+                                        8% monthly · ₹{{ number_format((float) ($inv->monthly_amount ?? $inv->daily_amount), 2) }}/cycle
+                                    @else
+                                        {{ $inv->daily_percentage ?? number_format(($inv->daily_roi_rate ?? 0.0015) * 100, 2) }}% / day
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4">
                                     <span

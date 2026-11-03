@@ -7,7 +7,7 @@
     $storedDescription = (string) $package->description;
     $hasLegacyIncomeRules = str_contains(strtolower($storedDescription), 'direct') || str_contains(strtolower($storedDescription), 'level 2-15');
     $defaultDescription = $hasLegacyIncomeRules
-        ? number_format((float) $package->daily_roi_percentage, 2).'% daily ROI; first payout after 24 hours, then every 24 hours.'
+        ? 'Fixed Package ROI: 8% monthly for 25 cycles. ROI-on-ROI eligibility requires an activated account for at least 24 hours.'
         : $storedDescription;
 @endphp
 <div class="w-full space-y-6 font-sans max-w-4xl mx-auto">
@@ -19,7 +19,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CONFIGURATION</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">EDIT CAPITAL PACKAGE: {{ strtoupper($package->name) }}</h1>
-            <p class="text-xs text-neutral-300 mt-1">Update package limits, daily ROI percentage and duration. ROI matching uses the fixed 30-level schedule.</p>
+            <p class="text-xs text-neutral-300 mt-1">Update package amount limits. Fixed Package ROI is locked at 8% monthly for 25 cycles.</p>
         </div>
 
         <a href="{{ route('admin.packages.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 border border-emerald-500/30 text-neutral-300 text-xs font-bold hover:text-white transition">
@@ -55,18 +55,8 @@
                     @error('max_amount') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Daily ROI Return Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Daily ROI Return Rate (%)</label>
-                    <input type="number" step="0.01" name="daily_roi_percentage" value="{{ old('daily_roi_percentage', $package->daily_roi_percentage) }}" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('daily_roi_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Duration in Days -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Duration (Days)</label>
-                    <input type="number" name="duration_days" value="{{ old('duration_days', $package->duration_days) }}" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('duration_days') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                <div class="md:col-span-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm text-emerald-200">
+                    Fixed Package ROI: <strong>8% monthly × 25 cycles</strong>. This system rule is fixed and is not edited per tier.
                 </div>
 
                 <!-- Status -->

@@ -100,8 +100,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('packages/{package}', [PackageAdminController::class, 'destroy'])->name('packages.destroy');
 
         // Admin Withdrawal Approvals Routes
+        Route::get('withdrawals/inr', [InvestmentAdminController::class, 'inrWithdrawals'])->name('withdrawals.inr');
+        Route::get('withdrawals/usd', [InvestmentAdminController::class, 'usdWithdrawals'])->name('withdrawals.usd');
+        Route::get('withdrawals/pending-counts', [InvestmentAdminController::class, 'pendingWithdrawalCounts'])->name('withdrawals.pending-counts');
         Route::get('withdrawals', [InvestmentAdminController::class, 'withdrawals'])->name('withdrawals');
         Route::post('withdrawals/{withdrawal}/status', [InvestmentAdminController::class, 'updateWithdrawalStatus'])->name('withdrawals.update');
+        Route::post('withdrawals/{withdrawal}/complete-manual', [InvestmentAdminController::class, 'completeManualWithdrawal'])->name('withdrawals.complete-manual');
         Route::post('withdrawals/bulk-approve', [InvestmentAdminController::class, 'bulkApproveWithdrawals'])->name('withdrawals.bulk-approve');
         Route::post('withdrawals/bulk-complete', [InvestmentAdminController::class, 'bulkCompleteWithdrawals'])->name('withdrawals.bulk-complete');
 

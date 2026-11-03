@@ -102,7 +102,7 @@
 
         <!-- INVESTMENT SECTION (5 REPORTS AUDIT) -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-            INVESTMENT INCOME SECTION
+            FIXED PACKAGE ROI INCOME
         </div>
 
         <a class='nav-item {{ request()->routeIs("admin.packages*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -155,13 +155,38 @@
             WITHDRAWAL MANAGEMENT
         </div>
 
-        <a class='nav-item {{ request()->routeIs("admin.withdrawals*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+        {{-- <a
+            class='nav-item {{ request()->routeIs("admin.withdrawals") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.withdrawals") }}'>
             <div
                 class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
                 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
-            <span class="nav-text">Withdrawal Requests</span>
+            <span class="nav-text flex-1">All Withdrawal Requests</span>
+            </a> --}}
+            
+            <a class='nav-item {{ request()->routeIs("admin.withdrawals.inr") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+                href='{{ route("admin.withdrawals.inr") }}'>
+                <div
+                    class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                    <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+                </div>
+                <span class="nav-text flex-1">INR Withdrawals</span>
+                <span id="pendingInrWithdrawalBadge" data-count="{{ $pendingInrWithdrawalCount }}"
+                    class="{{ $pendingInrWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
+                    aria-label="Pending INR withdrawals">{{ $pendingInrWithdrawalCount }}</span>
+            </a>
+            
+            <a class='nav-item {{ request()->routeIs("admin.withdrawals.usd") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+                href='{{ route("admin.withdrawals.usd") }}'>
+                <div
+                    class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                    <i data-lucide="coins" class="w-4 h-4"></i>
+                </div>
+                <span class="nav-text flex-1">USD Contract Payouts</span>
+                <span id="pendingUsdWithdrawalBadge" data-count="{{ $pendingUsdWithdrawalCount }}"
+                    class="{{ $pendingUsdWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
+                    aria-label="Pending USD withdrawals">{{ $pendingUsdWithdrawalCount }}</span>
         </a>
         <!-- REPORTS & AUDITS -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
@@ -330,3 +355,55 @@
 <!-- ======================================
      End Admin Sidebar Area
      ====================================== -->
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inrBadge = document.getElementById('pendingInrWithdrawalBadge');
+            const usdBadge = document.getElementById('pendingUsdWithdrawalBadge');
+            const endpoint = @json(route('admin.withdrawals.pending-counts'));
+            if (!inrBadge || !usdBadge) return;
+
+            let previousInr = Number(inrBadge.dataset.count || 0);
+            let previousUsd = Number(usdBadge.dataset.count || 0);
+
+            const updateWithdrawalBadges = async () => {
+                if (document.hidden) return;
+
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: { Accept: 'application/json' },
+                        credentials: 'same-origin',
+                    });
+                    if (!response.ok) return;
+
+                    const counts = await response.json();
+                    const currentInr = Number(counts.inr || 0);
+                    const currentUsd = Number(counts.usd || 0);
+                    const newInr = Math.max(0, currentInr - previousInr);
+                    const newUsd = Math.max(0, currentUsd - previousUsd);
+
+                    [[inrBadge, currentInr], [usdBadge, currentUsd]].forEach(([badge, count]) => {
+                        badge.textContent = count;
+                        badge.dataset.count = count;
+                        badge.classList.toggle('hidden', count < 1);
+                    });
+
+                    if (newInr + newUsd > 0 && typeof window.showToast === 'function') {
+                        const messages = [];
+                        if (newInr > 0) messages.push(`${newInr} new INR withdrawal${newInr === 1 ? '' : 's'}`);
+                        if (newUsd > 0) messages.push(`${newUsd} new USD withdrawal${newUsd === 1 ? '' : 's'}`);
+                        window.showToast('New withdrawal request', messages.join(' · '), 'info');
+                    }
+
+                    previousInr = currentInr;
+                    previousUsd = currentUsd;
+                } catch (_) {
+                    // Keep the last known badge counts if the admin session is temporarily offline.
+                }
+            };
+
+            window.setInterval(updateWithdrawalBadges, 30000);
+        });
+    </script>
+@endpush

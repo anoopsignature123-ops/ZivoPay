@@ -53,7 +53,56 @@ class SubscriptionService
                 'description' => '₹3,000 Shopping Wallet credit from Zivo Family Kit activation',
             ]);
 
+            $this->distributeFamilyKitCommission($user);
+
             return true;
         });
+    }
+
+    private function distributeFamilyKitCommission(User $activatedUser): void
+    {
+        $sponsorCode = $activatedUser->sponsor_code;
+
+        for ($level = 1; $level <= 30 && $sponsorCode; $level++) {
+            $sponsor = User::query()
+                ->where('referral_code', $sponsorCode)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $sponsor) {
+                break;
+            }
+
+            if ($sponsor->isActiveForIncome()) {
+                $percentage = match (true) {
+                    $level === 1 => 15.0,
+                    $level === 2 => 8.0,
+                    $level <= 8 => 2.0,
+                    $level <= 16 => 1.0,
+                    default => 0.5,
+                };
+                $commission = round(self::ACTIVATION_FEE * $percentage / 100, 2);
+                if ($commission > 0) {
+                    $sponsor->earning_wallet = round((float) $sponsor->earning_wallet + $commission, 2);
+                    $sponsor->save();
+
+                    Transaction::create([
+                        'user_id' => $sponsor->id,
+                        'from_user_id' => $activatedUser->id,
+                        'trx_id' => 'KIT-L'.$level.'-'.strtoupper(Str::random(8)),
+                        'type' => 'family_kit_level_income',
+                        'wallet_type' => 'earning',
+                        'trx_type' => '+',
+                        'level' => $level,
+                        'amount' => $commission,
+                        'charge' => 0,
+                        'post_balance' => $sponsor->earning_wallet,
+                        'description' => "Family Kit one-time L{$level} commission ({$percentage}%) from {$activatedUser->name}'s activation",
+                    ]);
+                }
+            }
+
+            $sponsorCode = $sponsor->sponsor_code;
+        }
     }
 }

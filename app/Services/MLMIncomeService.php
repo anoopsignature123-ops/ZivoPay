@@ -9,6 +9,7 @@ use App\Models\UserReward;
 use App\Models\WalletTransfer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MLMIncomeService
 {
@@ -92,48 +93,48 @@ class MLMIncomeService
      */
     public function createInvestment(User $user, float $amount, string $walletType = 'deposit_wallet'): UserInvestment
     {
-        return DB::transaction(function () use ($user, $amount, $walletType) {
-            $tierInfo = self::getTierInfo($amount);
+        return DB::transaction(function () use ($user, $amount, $walletType): UserInvestment {
+            $user = User::query()->lockForUpdate()->findOrFail($user->id);
+            if (! in_array($walletType, ['deposit_wallet', 'earning_wallet'], true)) {
+                throw new \InvalidArgumentException('Unsupported investment wallet.');
+            }
+            if ((float) $user->{$walletType} < $amount) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Insufficient Fund Wallet balance. Available ₹'.number_format((float) $user->{$walletType}, 2).'.',
+                ]);
+            }
 
-            // Create investment record
+            $monthlyAmount = round($amount * 0.08, 2);
+
             $investment = UserInvestment::create([
                 'user_id' => $user->id,
-                'plan_name' => $tierInfo['tier_name'],
+                'plan_name' => 'Fixed Package ROI',
                 'amount' => $amount,
-                'daily_percentage' => $tierInfo['daily_percentage'],
-                'daily_amount' => $tierInfo['daily_amount'],
-                'monthly_amount' => $tierInfo['monthly_amount'],
+                'daily_percentage' => 8.00,
+                'roi_frequency' => 'monthly',
+                'daily_amount' => $monthlyAmount,
+                'monthly_amount' => $monthlyAmount,
                 'total_returned' => 0.00,
                 'days_completed' => 0,
-                'total_days' => 750, // 25 Months
+                'total_days' => 25,
                 'status' => 'active',
                 'activated_at' => now(),
             ]);
 
-            // Deduct wallet if paid via deposit wallet
-            if ($walletType === 'deposit_wallet') {
-                $user->decrement('deposit_wallet', $amount);
-            }
+            $user->decrement($walletType, $amount);
+            $user->refresh();
 
-            // Set user active if inactive
-            if ($user->status !== 'active') {
-                $user->update([
-                    'status' => 'active',
-                    'activated_at' => now(),
-                ]);
-            }
-
-            // Log investment transaction
             Transaction::create([
                 'user_id' => $user->id,
                 'amount' => $amount,
                 'wallet_type' => $walletType,
+                'trx_type' => '-',
+                'post_balance' => $user->{$walletType},
                 'type' => 'investment',
-                'description' => "Activated {$tierInfo['tier_name']} for ₹".number_format($amount, 2),
+                'description' => 'Fixed Package investment: 8% monthly ROI for 25 months on ₹'.number_format($amount, 2),
                 'trx_id' => 'INV-'.strtoupper(Str::random(10)),
             ]);
 
-            // Check rewards up the upline tree
             $this->evaluateRewardsUpward($user);
 
             return $investment;

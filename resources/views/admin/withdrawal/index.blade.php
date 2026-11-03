@@ -16,10 +16,12 @@
                     </span>
                     <span class="text-xs text-emerald-400 font-black tracking-[2px] uppercase">ZIVO PAY AUDIT</span>
                     </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">24X7
-                    WITHDRAWAL APPROVALS QUEUE</h1>
-                <p class="text-xs text-neutral-300 mt-1">Approve INR withdrawal requests, send the saved net USDT amount
-                    through the payout contract, then record its confirmed BSC transaction.</p>
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">
+                    {{ $withdrawalType === 'inr' ? 'INR Withdrawal Report' : ($withdrawalType === 'usd' ? 'USD Contract Payouts' : 'All Withdrawal Requests') }}
+                </h1>
+                <p class="text-xs text-neutral-300 mt-1">
+                    {{ $withdrawalType === 'inr' ? 'Review INR UPI and bank withdrawal requests and record the UTR after payment.' : ($withdrawalType === 'usd' ? 'Review USDT withdrawal requests and process approved payouts through the BSC contract.' : 'Review INR requests and USDT contract payouts in one combined report.') }}
+                </p>
                 </div>
 
             <div class="flex flex-wrap items-center gap-3">
@@ -37,13 +39,13 @@
             </div>
         @endif
 
-        @if ($contractAddress !== '')
+        @if ($withdrawalType !== 'inr' && $contractAddress !== '')
             <div class="rounded-2xl border border-sky-500/30 bg-sky-500/10 p-4 text-xs text-sky-100">
                 USDT payout contract: <a class="font-mono text-sky-300 hover:underline"
                     href="https://bscscan.com/address/{{ urlencode($contractAddress) }}" target="_blank"
                     rel="noopener noreferrer">{{ $contractAddress }}</a>
             </div>
-        @else
+        @elseif ($withdrawalType !== 'inr')
             <div class="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-100">
                 Payout contract is not configured. Set <code>USDT_PAYOUT_CONTRACT_ADDRESS</code> and
                 <code>BSC_RPC_URL</code> in the server environment before processing payouts.
@@ -63,70 +65,78 @@
         @endif
 
         <!-- Stat Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <!-- 1. Pending Queue Amount -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
-                <div class="flex items-center justify-between text-teal-400 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Pending Approvals</span>
+            <div class="p-4 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+                <div class="flex items-center justify-between text-teal-400 mb-1.5 gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Pending Approvals</span>
                     <span
                         class="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-mono font-bold text-[10px]">{{ $stats['pending_count'] }}
                         Requests</span>
                     </div>
-                <h3 class="text-2xl font-black text-teal-300 font-mono">₹{{ number_format($stats['pending_amount'], 2) }}
+                <h3 class="text-xl font-black text-teal-300 font-mono">₹{{ number_format($stats['pending_amount'], 2) }}
                 </h3>
                 <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">Needs Action</span>
                 </div>
 
             <!-- 2. Approved Payouts Total -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
-                <div class="flex items-center justify-between text-emerald-400 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Approved · Awaiting
+            <div class="p-4 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+                <div class="flex items-center justify-between text-emerald-400 mb-1.5 gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Approved · Awaiting
                         Payout</span>
                     <i data-lucide="check-circle-2" class="w-5 h-5"></i>
                     </div>
-                <h3 class="text-2xl font-black text-emerald-400 font-mono">
+                <h3 class="text-xl font-black text-emerald-400 font-mono">
                     ₹{{ number_format($stats['approved_amount'], 2) }}</h3>
                 <span class="text-[10px] text-emerald-400 font-semibold mt-1 block">Net INR reserved for payout</span>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
-                    <div class="flex items-center justify-between text-emerald-400 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Completed Payouts</span>
+                <div class="p-4 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+                    <div class="flex items-center justify-between text-emerald-400 mb-1.5 gap-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Completed Payouts</span>
                         <i data-lucide="badge-check" class="w-5 h-5"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-emerald-300 font-mono">
+                    <h3 class="text-xl font-black text-emerald-300 font-mono">
                         ₹{{ number_format($stats['completed_amount'], 2) }}</h3>
                     <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">BSC transaction confirmed</span>
                 </div>
 
             <!-- 3. Rejected Count -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
-                <div class="flex items-center justify-between text-rose-400 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Rejected Requests</span>
+            <div class="p-4 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+                <div class="flex items-center justify-between text-rose-400 mb-1.5 gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Rejected Requests</span>
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
                 </div>
-                <h3 class="text-2xl font-black text-rose-300 font-mono">{{ $stats['rejected_count'] }}</h3>
+                <h3 class="text-xl font-black text-rose-300 font-mono">{{ $stats['rejected_count'] }}</h3>
                 <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">Refunded to User Wallet</span>
             </div>
 
             <!-- 4. Total Requests -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
-                <div class="flex items-center justify-between text-emerald-400 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">All Payout Requests</span>
+            <div class="p-4 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+                <div class="flex items-center justify-between text-emerald-400 mb-1.5 gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">All Payout Requests</span>
                     <i data-lucide="layers" class="w-5 h-5"></i>
                 </div>
-                <h3 class="text-2xl font-black text-white font-mono">{{ $stats['total_requests'] }}</h3>
+                <h3 class="text-xl font-black text-white font-mono">{{ $stats['total_requests'] }}</h3>
                 <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">Lifetime Requests</span>
             </div>
             </div>
 
         <!-- Filter & Table Container -->
         <div class="p-6 rounded-3xl bg-[#042718] border border-emerald-500/30 shadow-2xl space-y-6">
+            <div class="flex flex-wrap gap-2 border-b border-emerald-500/20 pb-4">
+                @foreach ([['admin.withdrawals', 'All requests', 'all'], ['admin.withdrawals.inr', 'INR report', 'inr'], ['admin.withdrawals.usd', 'USD contract', 'usd']] as [$routeName, $label, $type])
+                    <a href="{{ route($routeName) }}"
+                        class="rounded-lg border px-3 py-2 text-xs font-bold transition {{ $withdrawalType === $type ? 'border-emerald-400 bg-emerald-500 text-black' : 'border-emerald-500/30 bg-[#01140c] text-neutral-300 hover:text-emerald-300' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
             <!-- Search & Status Filter Section -->
             <div class="space-y-4 border-b border-emerald-500/20 pb-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <!-- Search Form -->
-                    <form action="{{ route('admin.withdrawals') }}" method="GET" class="flex items-center gap-2 w-full sm:w-80">
+                    <form action="{{ route($withdrawalRoute) }}" method="GET" class="flex items-center gap-2 w-full sm:w-80">
                         @if (request('status'))
                             <input type="hidden" name="status" value="{{ request('status') }}">
                         @endif
@@ -143,23 +153,23 @@
 
                     <!-- Status Filter Pills Container -->
                     <div class="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 shrink-0">
-                        <a href="{{ route('admin.withdrawals', array_merge(request()->except('status'), ['status' => ''])) }}"
+                        <a href="{{ route($withdrawalRoute, array_merge(request()->except('status'), ['status' => ''])) }}"
                             class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-emerald-500 text-black font-black shadow-md' : 'bg-[#01140c] border border-emerald-500/30 text-neutral-300 hover:text-emerald-400' }}">
                             All Requests
                         </a>
-                        <a href="{{ route('admin.withdrawals', array_merge(request()->except('status'), ['status' => 'pending'])) }}"
+                        <a href="{{ route($withdrawalRoute, array_merge(request()->except('status'), ['status' => 'pending'])) }}"
                             class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition {{ request('status') === 'pending' ? 'bg-teal-500 text-black font-black shadow-md' : 'bg-[#01140c] border border-emerald-500/30 text-neutral-300 hover:text-teal-300' }}">
                             Pending Queue ({{ $stats['pending_count'] }})
                         </a>
-                        <a href="{{ route('admin.withdrawals', array_merge(request()->except('status'), ['status' => 'approved'])) }}"
+                        <a href="{{ route($withdrawalRoute, array_merge(request()->except('status'), ['status' => 'approved'])) }}"
                             class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition {{ request('status') === 'approved' ? 'bg-emerald-500 text-black font-black shadow-md' : 'bg-[#01140c] border border-emerald-500/30 text-neutral-300 hover:text-emerald-400' }}">
                             Approved · Awaiting Payout
                             </a>
-                            <a href="{{ route('admin.withdrawals', array_merge(request()->except('status'), ['status' => 'completed'])) }}"
+                            <a href="{{ route($withdrawalRoute, array_merge(request()->except('status'), ['status' => 'completed'])) }}"
                                 class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition {{ request('status') === 'completed' ? 'bg-emerald-500 text-black font-black shadow-md' : 'bg-[#01140c] border border-emerald-500/30 text-neutral-300 hover:text-emerald-400' }}">
                                 Completed
                             </a>
-                            <a href="{{ route('admin.withdrawals', array_merge(request()->except('status'), ['status' => 'rejected'])) }}"
+                            <a href="{{ route($withdrawalRoute, array_merge(request()->except('status'), ['status' => 'rejected'])) }}"
                                 class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition {{ request('status') === 'rejected' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 font-black shadow-md' : 'bg-[#01140c] border border-emerald-500/30 text-neutral-300 hover:text-rose-400' }}">
                                 Rejected Requests
                             </a>
@@ -167,7 +177,7 @@
                             </div>
                             </div>
 
-            @if (in_array(request('status'), ['pending', 'approved'], true))
+            @if ($withdrawalType === 'usd' && in_array(request('status'), ['pending', 'approved'], true))
                 <div id="bulkActionsBar"
                     class="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-500/25 bg-[#01140c] p-4">
                     <label class="flex items-center gap-2 text-xs text-neutral-300">
@@ -195,7 +205,7 @@
                         <thead
                             class="bg-[#02180f] text-emerald-400 uppercase text-[10px] font-bold border-b border-emerald-500/30">
                             <tr>
-                                @if (in_array(request('status'), ['pending', 'approved'], true))
+                                @if ($withdrawalType === 'usd' && in_array(request('status'), ['pending', 'approved'], true))
                                     <th class="p-3.5"><input type="checkbox" id="tableSelectAll"
                                             onchange="toggleAll(this)" class="accent-emerald-500"
                                             aria-label="Select all requests"></th>
@@ -203,20 +213,26 @@
                                 <th class="p-3.5">Trx ID & Date</th>
                                 <th class="p-3.5">Member Details</th>
                                 <th class="p-3.5">Method</th>
-                                <th class="p-3.5">Source Wallet / USDT address</th>
+                                <th class="p-3.5">{{ $withdrawalType === 'inr' ? 'INR Payment Details' : 'Source Wallet / USDT Address' }}</th>
                                 <th class="p-3.5">Requested (INR)</th>
                                 <th class="p-3.5">Fee (5%)</th>
                                 <th class="p-3.5">Net INR</th>
-                                <th class="p-3.5">Send (USDT)</th>
+                                @if ($withdrawalType !== 'inr')
+                                    <th class="p-3.5">Send (USDT)</th>
+                                @endif
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Admin Remark / Tx Hash</th>
                                 <th class="p-3.5 text-center">Actions Menu</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-emerald-500/10">
-                            @foreach ($withdrawals as $wth)
+                                            @foreach ($withdrawals as $wth)
+                                                @php
+                                                    $payoutDetails = json_decode((string) $wth->account_details, true);
+                                                    $payoutDetails = is_array($payoutDetails) ? $payoutDetails : ['address' => $wth->account_details];
+                                                @endphp
                                 <tr class="hover:bg-emerald-500/5 transition">
-                                    @if (in_array(request('status'), ['pending', 'approved'], true))
+                                    @if ($withdrawalType === 'usd' && in_array(request('status'), ['pending', 'approved'], true))
                                         <td class="p-3.5"><input type="checkbox"
                                                 class="withdrawal-check accent-emerald-500" value="{{ $wth->id }}"
                                                 data-address="{{ $wth->account_details }}"
@@ -251,14 +267,21 @@
                                         </td>
                                         <td class="p-3.5 font-semibold text-emerald-300">{{ $wth->payment_method }}</td>
                                         <td class="p-3.5 max-w-xs">
-                                        <div class="space-y-1 max-w-xs">
-                                            <span
-                                                class="block text-[10px] uppercase text-emerald-300">{{ $wth->source_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}</span>
-                                            <span class="truncate font-medium text-neutral-200 block text-xs"
-                                                title="{{ $wth->account_details }}">
-                                                {{ $wth->account_details }}
-                                            </span>
-                                            <button type="button" onclick="copyToClipboard(@js($wth->account_details), 'USDT address')" title="Copy Account Details"
+                                        <div class="max-w-xs rounded-lg border border-emerald-500/15 bg-[#02180f]/80 p-2.5">
+                                            @if ($withdrawalType !== 'inr')
+                                                <span class="mb-1 block text-[10px] uppercase text-emerald-300">{{ $wth->source_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}</span>
+                                            @endif
+                                            @if (isset($payoutDetails['upi_id']))
+                                                <span class="mb-0.5 block text-[10px] uppercase tracking-wide text-neutral-500">UPI ID</span>
+                                                <span class="block break-all font-semibold text-white">{{ $payoutDetails['upi_id'] }}</span>
+                                            @elseif (isset($payoutDetails['account_number']))
+                                                <span class="block font-semibold text-white">{{ $payoutDetails['account_holder'] ?? 'Account holder' }}</span>
+                                                <span class="mt-0.5 block font-mono text-neutral-200">A/C {{ $payoutDetails['account_number'] }}</span>
+                                                <span class="block font-mono text-neutral-400">IFSC {{ $payoutDetails['ifsc'] ?? '' }}</span>
+                                            @else
+                                                <span class="truncate font-medium text-neutral-200 block text-xs" title="{{ $wth->account_details }}">{{ $wth->account_details }}</span>
+                                            @endif
+                                            <button type="button" onclick="copyToClipboard(@js($wth->account_details), 'Payout details')" title="Copy payout details"
                                                 class="p-1 rounded bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition shrink-0">
                                                 <i data-lucide="copy" class="w-3 h-3"></i>
                                             </button>
@@ -269,9 +292,11 @@
                                     <td class="p-3.5 font-mono text-rose-400">-₹{{ number_format($wth->charge, 2) }}</td>
                                     <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
                                         ₹{{ number_format($wth->final_amount, 2) }}</td>
-                                    <td class="p-3.5 font-mono font-black text-white">
-                                        {{ $wth->usdt_amount !== null ? number_format((float) $wth->usdt_amount, 6) . ' USDT' : '—' }}
-                                    </td>
+                                    @if ($withdrawalType !== 'inr')
+                                        <td class="p-3.5 font-mono font-black text-white">
+                                            {{ $wth->usdt_amount !== null ? number_format((float) $wth->usdt_amount, 6) . ' USDT' : 'INR' }}
+                                        </td>
+                                    @endif
                                     <td class="p-3.5">
                                         <span
                                             class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase
@@ -284,8 +309,12 @@
                                     <td class="p-3.5 font-mono text-[11px] text-neutral-300 max-w-xs truncate"
                                         title="{{ $wth->provider_reference ?? ($wth->admin_remarks ?? '-') }}">
                                         @if ($wth->provider_reference)
-                                            <a href="https://bscscan.com/tx/{{ urlencode($wth->provider_reference) }}" target="_blank" rel="noopener noreferrer"
-                                                class="text-emerald-300 hover:underline">View transaction</a>
+                                            @if ($withdrawalType === 'inr')
+                                                <span class="text-white">UTR: {{ $wth->provider_reference }}</span>
+                                            @else
+                                                <a href="https://bscscan.com/tx/{{ urlencode($wth->provider_reference) }}" target="_blank" rel="noopener noreferrer"
+                                                    class="text-emerald-300 hover:underline">View transaction</a>
+                                            @endif
                                         @else
                                             {{ $wth->admin_remarks ?? '-' }}
                                         @endif
@@ -293,6 +322,15 @@
                                     <td class="p-3.5 text-center">
                                         @if (in_array($wth->status, ['pending', 'approved'], true))
                                             <div class="flex items-center justify-center gap-2">
+                                                    @if (in_array($wth->payment_method, ['INR UPI', 'INR Bank Transfer'], true))
+                                                        <form action="{{ route('admin.withdrawals.complete-manual', $wth) }}" method="POST" class="flex min-w-56 flex-col gap-2 rounded-xl border border-emerald-500/20 bg-[#02180f] p-2.5 text-left">
+                                                            @csrf
+                                                            <label class="text-[10px] font-bold uppercase tracking-wide text-emerald-300" for="utr-{{ $wth->id }}">Payment reference / UTR</label>
+                                                            <input id="utr-{{ $wth->id }}" name="provider_reference" required maxlength="160" placeholder="Enter bank UTR" class="w-full rounded-lg border border-emerald-500/30 bg-[#01140c] px-2.5 py-2 text-xs text-white placeholder:text-neutral-500 focus:border-emerald-400 focus:outline-none">
+                                                            <input name="admin_remarks" maxlength="500" placeholder="Note (optional)" class="w-full rounded-lg border border-emerald-500/30 bg-[#01140c] px-2.5 py-2 text-xs text-white placeholder:text-neutral-500 focus:border-emerald-400 focus:outline-none">
+                                                            <button type="submit" class="rounded-lg bg-emerald-500 px-3 py-2 text-xs font-black text-black transition hover:bg-emerald-400">Confirm INR payment</button>
+                                                        </form>
+                                                    @endif
                                                     <button type="button"
                                                         onclick="openRejectModal({{ $wth->id }}, @js($wth->trx_id), @js($wth->user ? $wth->user->name : 'Member'), '{{ number_format($wth->amount, 2) }}', @js($wth->source_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet'))"
                                                         title="Reject Request & Refund Balance" aria-label="Reject Request"
@@ -327,8 +365,8 @@
 
     </div>
 
-    <div id="payoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center overflow-y-auto bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="payoutModalTitle">
-        <div class="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-2xl space-y-4 overflow-y-auto rounded-3xl border border-sky-500/50 bg-[#042718] p-4 shadow-2xl sm:p-6">
+    <div id="payoutModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="payoutModalTitle">
+        <div class="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-2xl space-y-4 overflow-y-auto rounded-3xl border border-sky-400/60 bg-[#031b12] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.8)] sm:p-6" style="background-color:#031b12; opacity:1;">
             <div class="flex items-center justify-between">
                 <h3 id="payoutModalTitle" class="text-lg font-black text-white">BSC USDT bulk payout</h3><button type="button"
                     onclick="closePayoutModal()" class="text-neutral-400">✕</button>

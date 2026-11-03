@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -149,7 +150,7 @@ class UserController extends Controller
             ->sum('amount');
 
         $totalRoiIncome = Transaction::where('user_id', $user->id)
-            ->whereIn('type', ['roi_income', 'daily_roi', 'investment_roi'])
+            ->whereIn('type', ['roi_income', 'daily_roi', 'fixed_package_roi', 'investment_roi'])
             ->sum('amount');
 
         $totalRewardIncome = Transaction::where('user_id', $user->id)
@@ -199,7 +200,7 @@ class UserController extends Controller
     public function addFund(Request $request, User $user): RedirectResponse
     {
         $request->validate([
-            'wallet_type' => 'required|in:deposit_wallet,earning_wallet',
+            'wallet_type' => 'required|in:deposit_wallet,earning_wallet,shopping_wallet',
             'action' => 'nullable|in:add,deduct',
             'amount' => 'required|numeric|min:0.01',
             'remark' => 'nullable|string|max:255',
@@ -211,21 +212,31 @@ class UserController extends Controller
         $userRemark = $request->input('remark');
         $remark = $userRemark ? "{$userRemark} (Processed by Admin)" : 'Processed by Admin';
 
-        DB::transaction(function () use ($user, $walletType, $action, $amount, $remark, $userRemark) {
+        DB::transaction(function () use ($user, $walletType, $action, $amount, $remark, $userRemark): void {
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->id);
             if ($action === 'deduct') {
-                $user->decrement($walletType, $amount);
+                if ((float) $lockedUser->{$walletType} < $amount) {
+                    throw ValidationException::withMessages(['amount' => 'Insufficient wallet balance. Available ₹'.number_format((float) $lockedUser->{$walletType}, 2).'.']);
+                }
+                $lockedUser->decrement($walletType, $amount);
                 $trxType = 'admin_debit';
             } else {
-                $user->increment($walletType, $amount);
+                $lockedUser->increment($walletType, $amount);
                 $trxType = 'admin_credit';
             }
+            $lockedUser->refresh();
 
             $trxId = 'ADM-'.strtoupper(Str::random(10));
 
             Transaction::create([
-                'user_id' => $user->id,
+                'user_id' => $lockedUser->id,
                 'amount' => $amount,
-                'wallet_type' => $walletType,
+                'wallet_type' => match ($walletType) {
+                    'deposit_wallet' => 'fund',
+                    default => $walletType,
+                },
+                'trx_type' => $action === 'deduct' ? '-' : '+',
+                'post_balance' => $lockedUser->{$walletType},
                 'type' => $trxType,
                 'description' => "Admin {$action}: {$remark}",
                 'trx_id' => $trxId,
@@ -235,7 +246,7 @@ class UserController extends Controller
             // so it appears seamlessly in the User Panel Add Fund History & Fund Wallet History.
             if ($walletType === 'deposit_wallet' && $action === 'add') {
                 Deposit::create([
-                    'user_id' => $user->id,
+                    'user_id' => $lockedUser->id,
                     'deposit_ref' => 'DEP-'.strtoupper(Str::random(10)),
                     'amount' => $amount,
                     'charge' => 0.00,
@@ -250,7 +261,11 @@ class UserController extends Controller
             }
         });
 
-        $walletLabel = $walletType === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet';
+        $walletLabel = match ($walletType) {
+            'deposit_wallet' => 'Fund Wallet',
+            'shopping_wallet' => 'Shopping Wallet',
+            default => 'Earning Wallet',
+        };
 
         return redirect()->back()->with('success', "₹{$amount} successfully {$action}ed in {$user->name}'s {$walletLabel}. Remark: {$remark}");
     }

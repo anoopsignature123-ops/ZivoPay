@@ -11,15 +11,15 @@
             <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
                 SYSTEM CONTROL
             </span>
-            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">USER INVESTMENTS & DAILY ROI CONTROL</h1>
-            <p class="text-xs text-neutral-400">Monitor active plans and trigger only ROI cycles that have completed their 24-hour interval.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">USER INVESTMENTS & ROI CONTROL</h1>
+            <p class="text-xs text-neutral-400">Monitor Fund Wallet daily ROI and Fixed Package monthly ROI cycles. ROI-on-ROI is paid only to eligible activated uplines after 24 hours.</p>
         </div>
 
         <form action="{{ route('admin.trigger-daily-roi') }}" method="POST">
             @csrf
-            <button type="submit" onclick="return confirm('Process ROI cycles that have completed their 24-hour interval?');"
+            <button type="submit" onclick="return confirm('Process due Fund Wallet daily ROI and Fixed Package monthly ROI cycles?');"
                 class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center gap-2">
-                <i data-lucide="play-circle" class="w-5 h-5"></i> Trigger Daily ROI Payout Now
+                <i data-lucide="play-circle" class="w-5 h-5"></i> Process Due ROI Payouts
             </button>
         </form>
     </div>
@@ -56,7 +56,7 @@
                             <th class="p-3.5">User Details</th>
                             <th class="p-3.5">Plan Name</th>
                             <th class="p-3.5">Invested Amount</th>
-                            <th class="p-3.5">Daily ROI Rate</th>
+                            <th class="p-3.5">ROI Schedule</th>
                             <th class="p-3.5">Progress</th>
                             <th class="p-3.5">Total Returned</th>
                             <th class="p-3.5 text-right">Status</th>
@@ -71,8 +71,8 @@
                                 </td>
                                 <td class="p-3.5 font-bold text-emerald-300">{{ $inv->plan_name }}</td>
                                 <td class="p-3.5 font-mono font-bold text-white">₹{{ number_format($inv->amount, 2) }}</td>
-                                <td class="p-3.5 font-semibold text-emerald-400">{{ $inv->daily_percentage }}% (₹{{ number_format($inv->daily_amount, 2) }}/day)</td>
-                                <td class="p-3.5 font-bold">{{ $inv->days_completed }} / 730 Days</td>
+                                <td class="p-3.5 font-semibold text-emerald-400">{{ $inv->roi_frequency === 'monthly' ? '8% monthly · ₹'.number_format((float) $inv->monthly_amount, 2).'/cycle' : number_format((float) $inv->daily_percentage, 2).'% daily · ₹'.number_format((float) $inv->daily_amount, 2).'/day' }}</td>
+                                <td class="p-3.5 font-bold">{{ $inv->days_completed }} / {{ $inv->roi_frequency === 'monthly' ? 25 : 730 }} {{ $inv->roi_frequency === 'monthly' ? 'cycles' : 'days' }}</td>
                                 <td class="p-3.5 font-mono font-bold text-emerald-300">₹{{ number_format($inv->total_returned, 2) }}</td>
                                 <td class="p-3.5 text-right">
                                     <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase {{ $inv->status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-neutral-800 text-neutral-400' }}">

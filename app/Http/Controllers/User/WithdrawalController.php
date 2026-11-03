@@ -29,7 +29,7 @@ class WithdrawalController extends Controller
             });
         }
 
-        if ($request->filled('status') && in_array($request->input('status'), ['pending', 'approved', 'rejected'], true)) {
+        if ($request->filled('status') && in_array($request->input('status'), ['pending', 'approved', 'completed', 'rejected'], true)) {
             $query->where('status', $request->input('status'));
         }
         if ($request->filled('from_date')) {
@@ -41,7 +41,7 @@ class WithdrawalController extends Controller
 
         $withdrawals = $query->latest('id')->paginate(15)->withQueryString();
         $stats = [
-            'total_approved' => (float) Withdrawal::query()->where('user_id', $user->id)->where('status', 'approved')->sum('final_amount'),
+            'total_approved' => (float) Withdrawal::query()->where('user_id', $user->id)->where('status', 'completed')->sum('final_amount'),
             'total_pending' => (float) Withdrawal::query()->where('user_id', $user->id)->where('status', 'pending')->sum('amount'),
             'total_rejected' => (float) Withdrawal::query()->where('user_id', $user->id)->where('status', 'rejected')->sum('amount'),
             'total_count' => Withdrawal::query()->where('user_id', $user->id)->count(),
@@ -59,17 +59,21 @@ class WithdrawalController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->merge([
-            'usdt_address' => trim((string) $request->input('usdt_address')),
-        ]);
-
         $validated = $request->validate([
             'from_wallet' => ['required', 'string', 'in:earning_wallet,deposit_wallet'],
+            'payout_method' => ['required', 'string', 'in:usdt_bep20,upi,bank'],
             'amount' => ['required', 'numeric', 'min:5', 'decimal:0,2'],
-            'usdt_address' => ['bail', 'required', 'string', 'regex:/\A0x[a-fA-F0-9]{40}\z/'],
+            'usdt_address' => ['required_if:payout_method,usdt_bep20', 'nullable', 'string', 'regex:/\A0x[a-fA-F0-9]{40}\z/'],
+            'upi_id' => ['required_if:payout_method,upi', 'nullable', 'string', 'max:100', 'regex:/\A[a-zA-Z0-9._-]{2,256}@[a-zA-Z0-9.-]{2,64}\z/'],
+            'account_holder' => ['required_if:payout_method,bank', 'nullable', 'string', 'max:120'],
+            'account_number' => ['required_if:payout_method,bank', 'nullable', 'string', 'regex:/\A[0-9]{8,20}\z/'],
+            'ifsc' => ['required_if:payout_method,bank', 'nullable', 'string', 'regex:/\A[A-Za-z]{4}0[A-Za-z0-9]{6}\z/'],
         ], [
             'amount.min' => 'Minimum withdrawal request is ₹5.00.',
             'usdt_address.regex' => 'Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters.',
+            'upi_id.regex' => 'Enter a valid UPI ID, for example name@bank.',
+            'account_number.regex' => 'Enter a valid bank account number (8 to 20 digits).',
+            'ifsc.regex' => 'Enter a valid IFSC code.',
         ]);
 
         if (! $request->user()->isKycApproved()) {
@@ -77,21 +81,36 @@ class WithdrawalController extends Controller
         }
 
         $rate = (float) config('gateway.usd_to_inr_rate', 100);
-        if ($rate <= 0) {
+        if ($validated['payout_method'] === 'usdt_bep20' && $rate <= 0) {
             throw ValidationException::withMessages(['amount' => 'USDT conversion rate is not configured correctly.']);
         }
 
         $grossInr = round((float) $validated['amount'], 2);
         $feeInr = round($grossInr * 0.05, 2);
         $netInr = round($grossInr - $feeInr, 2);
-        $usdtAmount = round($netInr / $rate, 6);
+        $usdtAmount = $validated['payout_method'] === 'usdt_bep20' ? round($netInr / $rate, 6) : null;
         $sourceWallet = $validated['from_wallet'];
 
-        if ($usdtAmount <= 0) {
+        if ($usdtAmount !== null && $usdtAmount <= 0) {
             throw ValidationException::withMessages(['amount' => 'The requested amount is too small to convert to USDT.']);
         }
 
-        DB::transaction(function () use ($request, $grossInr, $feeInr, $netInr, $usdtAmount, $rate, $sourceWallet, $validated): void {
+        $paymentMethod = match ($validated['payout_method']) {
+            'upi' => 'INR UPI',
+            'bank' => 'INR Bank Transfer',
+            default => 'USDT BEP20',
+        };
+        $accountDetails = match ($validated['payout_method']) {
+            'upi' => json_encode(['upi_id' => $validated['upi_id']], JSON_THROW_ON_ERROR),
+            'bank' => json_encode([
+                'account_holder' => $validated['account_holder'],
+                'account_number' => $validated['account_number'],
+                'ifsc' => strtoupper($validated['ifsc']),
+            ], JSON_THROW_ON_ERROR),
+            default => trim((string) $validated['usdt_address']),
+        };
+
+        DB::transaction(function () use ($request, $grossInr, $feeInr, $netInr, $usdtAmount, $rate, $sourceWallet, $paymentMethod, $accountDetails): void {
             $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
             $balance = (float) $user->{$sourceWallet};
 
@@ -114,8 +133,8 @@ class WithdrawalController extends Controller
                 'amount_inr' => $netInr,
                 'conversion_rate' => $rate,
                 'usdt_amount' => $usdtAmount,
-                'payment_method' => 'USDT BEP20',
-                'account_details' => $validated['usdt_address'],
+                'payment_method' => $paymentMethod,
+                'account_details' => $accountDetails,
                 'trx_id' => $trxId,
                 'status' => 'pending',
             ]);
@@ -129,10 +148,10 @@ class WithdrawalController extends Controller
                 'amount' => $grossInr,
                 'charge' => $feeInr,
                 'post_balance' => $user->{$sourceWallet},
-                'description' => 'USDT BEP20 withdrawal request reserved. Net payout: '.number_format($usdtAmount, 6).' USDT.',
+                'description' => $paymentMethod.' withdrawal request reserved. Net payout: '.($usdtAmount !== null ? number_format($usdtAmount, 6).' USDT' : '₹'.number_format($netInr, 2)).'.',
             ]);
         });
 
-        return back()->with('success', 'Withdrawal request submitted. INR has been reserved and the USDT payout is awaiting admin review.');
+        return back()->with('success', 'Withdrawal request submitted. Your wallet amount is reserved and the payout is awaiting admin review.');
     }
 }

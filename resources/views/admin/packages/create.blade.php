@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CONFIGURATION</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">ADD NEW CAPITAL PACKAGE</h1>
-            <p class="text-xs text-neutral-300 mt-1">Define package name, min/max capital limit, daily ROI percentage return, and referral bonus rules.</p>
+            <p class="text-xs text-neutral-300 mt-1">Set the investment amount range. Fixed Package ROI is locked at 8% monthly for 25 cycles.</p>
         </div>
 
         <a href="{{ route('admin.packages.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 border border-emerald-500/30 text-neutral-300 text-xs font-bold hover:text-white transition">
@@ -47,19 +47,8 @@
                     @error('max_amount') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Daily ROI Return Percentage -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Daily ROI Return Rate (%)</label>
-                    <input type="number" step="0.01" name="daily_roi_percentage" value="{{ old('daily_roi_percentage', 0.15) }}" placeholder="0.15" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    <p class="text-[10px] text-neutral-400 mt-1">Daily profit rate (e.g. 0.15% = ₹1.50 per day per ₹1,000).</p>
-                    @error('daily_roi_percentage') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Duration in Days -->
-                <div>
-                    <label class="block text-xs font-bold text-emerald-400 uppercase mb-2">Duration (Days)</label>
-                    <input type="number" name="duration_days" value="{{ old('duration_days', 730) }}" placeholder="730" class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400" required>
-                    @error('duration_days') <span class="text-rose-400 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+                <div class="md:col-span-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm text-emerald-200">
+                    Fixed Package ROI: <strong>8% monthly × 25 cycles</strong>. This system rule is fixed and is not edited per tier.
                 </div>
 
                 <!-- Status -->

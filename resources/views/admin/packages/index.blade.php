@@ -12,7 +12,7 @@
                 <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY CAPITAL PLANS</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">CAPITAL PACKAGE MANAGEMENT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Configure investment tiers, daily ROI returns, and plan duration. ROI-on-ROI commission follows the fixed 30-level schedule.</p>
+            <p class="text-xs text-neutral-300 mt-1">Manage investment amount ranges. Fixed Package ROI is 8% monthly for 25 cycles; eligible ROI-on-ROI follows the 30-level schedule.</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
                     </div>
 
                     <h3 class="text-lg font-black text-white uppercase tracking-tight">{{ $pkg->name }}</h3>
-                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">{{ number_format((float) $pkg->daily_roi_percentage, 2) }}% daily ROI; first payout after 24 hours, then every 24 hours.</p>
+                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">Fixed Package ROI: 8% monthly for 25 cycles.</p>
 
                     <div class="mt-4 p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/20 space-y-2">
                         <div class="flex justify-between items-center text-xs">
@@ -51,12 +51,12 @@
                             <span class="text-emerald-400 font-bold font-mono">₹{{ number_format($pkg->min_amount) }} - ₹{{ number_format($pkg->max_amount) }}</span>
                         </div>
                         <div class="flex justify-between items-center text-xs">
-                            <span class="text-neutral-400 font-medium">Daily ROI Return</span>
-                            <span class="text-emerald-300 font-black font-mono">{{ number_format($pkg->daily_roi_percentage, 2) }}% / day</span>
+                            <span class="text-neutral-400 font-medium">Fixed ROI</span>
+                            <span class="text-emerald-300 font-black font-mono">8% / month</span>
                         </div>
                         <div class="flex justify-between items-center text-xs">
                             <span class="text-neutral-400 font-medium">Duration</span>
-                            <span class="text-white font-bold">{{ $pkg->duration_days }} Days</span>
+                            <span class="text-white font-bold">25 Monthly Cycles</span>
                         </div>
                     </div>
                 </div>

@@ -27,6 +27,9 @@ class DashboardController extends Controller
             $allowedTypes = [
                 'deposit',
                 'shopping_wallet_credit',
+                'daily_roi',
+                'fixed_package_roi',
+                'roi_level_income',
                 'shop_order',
                 'shop_order_refund',
                 'recharge',
@@ -47,7 +50,7 @@ class DashboardController extends Controller
                 ->take(8)
                 ->get()
                 ->map(function ($t) {
-                    $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_roi', 'roi_level_income']);
+                    $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'fixed_package_roi', 'level_roi', 'roi_level_income']);
                     $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
                     return [
@@ -192,6 +195,7 @@ class DashboardController extends Controller
             'p2p_receive' => 'P2P Transfer Received',
             'withdrawal' => 'Wallet Withdrawal',
             'daily_roi' => 'Daily ROI Income',
+            'fixed_package_roi' => 'Fixed Package Monthly ROI',
             'level_roi', 'roi_level_income' => '30-Level ROI-on-ROI Commission',
             default => ucfirst(str_replace('_', ' ', $t->type)),
         };
@@ -240,7 +244,7 @@ class DashboardController extends Controller
                 return $this->errorResponse('Transaction record not found.', 404);
             }
 
-            $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'level_roi', 'roi_level_income']);
+            $isCredit = in_array(strtolower($t->type), ['deposit', 'shopping_wallet_credit', 'shop_order_refund', 'recharge_refund', 'p2p_receive', 'daily_roi', 'fixed_package_roi', 'level_roi', 'roi_level_income']);
             $amountPrefix = $isCredit ? '+ ₹' : '- ₹';
 
             $rechargeDetails = null;

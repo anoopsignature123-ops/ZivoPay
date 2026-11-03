@@ -51,6 +51,24 @@
 
         window.addEventListener('load', hideLoader);
 
+        // Browsers may restore the previous page from the back-forward cache
+        // with its loader and disabled form controls exactly as they were.
+        window.addEventListener('pageshow', function () {
+            hideLoader();
+            document.querySelectorAll('.form-blur-loading').forEach(function (form) {
+                form.classList.remove('form-blur-loading');
+            });
+            document.querySelectorAll('.card-blur-loading').forEach(function (card) {
+                card.classList.remove('card-blur-loading');
+            });
+            document.querySelectorAll('.btn-spinner').forEach(function (spinner) {
+                spinner.remove();
+            });
+            document.querySelectorAll('button, input[type="submit"]').forEach(function (button) {
+                button.style.pointerEvents = '';
+            });
+        });
+
         // Expose loader functions globally
         window.showZivoLoader = showLoader;
         window.hideZivoLoader = hideLoader;

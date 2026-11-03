@@ -413,10 +413,10 @@
         </div>
 
         <!-- 3. CORE 8 METRIC SMALL CARDS (4 CARDS PER ROW IN 2 ROWS) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative z-10">
 
             <!-- Card 1: Deposit Wallet -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
@@ -435,7 +435,7 @@
             </div>
 
             <!-- Card 2: Earning Wallet -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
@@ -454,7 +454,7 @@
             </div>
 
             <!-- Card 3: Withdrawal Wallet -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-400"></i>
@@ -473,7 +473,7 @@
             </div>
 
             <!-- Card 4: Invested Capital -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
@@ -491,7 +491,7 @@
             </div>
 
             <!-- Card 5: Total Income Earned -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
@@ -509,7 +509,7 @@
             </div>
 
             <!-- Card 6: Direct Referrals -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i>
@@ -527,7 +527,7 @@
             </div>
 
             <!-- Card 7: Total Team Network -->
-            <div class="p-4 rounded-2xl zivo-emerald-card space-y-2 flex flex-col justify-between">
+            <div class="p-3.5 rounded-xl zivo-emerald-card space-y-2 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <div class="zivo-icon-box">
                         <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>

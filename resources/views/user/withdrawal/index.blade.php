@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'ZIVO PAY - USDT Withdrawal')
+@section('title', 'ZIVO PAY - Withdrawal')
 
 @section('content')
     <div class="max-w-6xl mx-auto space-y-5 font-sans">
@@ -12,12 +12,12 @@
                 <div class="flex items-center gap-2 mb-1">
                     <span
                         class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
-                        USDT BEP20 PAYOUT
+                        INR / USDT PAYOUT
                     </span>
                     <span class="text-xs text-emerald-400 font-black tracking-[2px] uppercase">MANUAL ADMIN REVIEW</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">USDT WITHDRAWAL</h1>
-                <p class="text-xs text-neutral-300 mt-1">Request an INR amount. After the 5% fee, the net is converted to USDT and sent to your BEP20 address after admin review.</p>
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">WITHDRAW FUNDS</h1>
+                <p class="text-xs text-neutral-300 mt-1">Choose an INR bank/UPI payout or convert your net INR amount to USDT BEP20. KYC approval is required.</p>
             </div>
 
             <div class="grid grid-cols-2 gap-3 shrink-0">
@@ -87,9 +87,9 @@
         @endif
 
         <!-- Withdrawal Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- 1. Total Approved Withdrawn -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- 1. Total Completed Withdrawals -->
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-emerald-400 mb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Net Withdrawn</span>
                     <i data-lucide="check-circle-2" class="w-5 h-5"></i>
@@ -99,7 +99,7 @@
             </div>
 
             <!-- 2. Pending Requests Amount -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-teal-400 mb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Pending Approvals</span>
                     <i data-lucide="clock" class="w-5 h-5"></i>
@@ -110,7 +110,7 @@
             </div>
 
             <!-- 3. Total Rejected Amount -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-rose-400 mb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Rejected Requests</span>
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
@@ -121,7 +121,7 @@
             </div>
 
             <!-- 4. Total Requests Count -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-emerald-400 mb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Payout
                         Transactions</span>
@@ -141,7 +141,7 @@
                     <div class="flex items-center justify-between border-b border-emerald-500/20 pb-4 mb-4">
                         <h2
                             class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
-                            <i data-lucide="send" class="w-5 h-5 text-emerald-400"></i> Submit USDT Payout Request
+                            <i data-lucide="send" class="w-5 h-5 text-emerald-400"></i> Submit Withdrawal Request
                         </h2>
                         <span
                             class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Fast
@@ -163,6 +163,16 @@
                                 <option value="deposit_wallet"
                                     {{ old('from_wallet') === 'deposit_wallet' ? 'selected' : '' }}>Fund Wallet (Available:
                                     ₹{{ number_format($user->deposit_wallet, 2) }})</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Payout Method *</label>
+                            <select id="payoutMethod" name="payout_method" required onchange="togglePayoutFields(this.value)"
+                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                                <option value="usdt_bep20" {{ old('payout_method', 'usdt_bep20') === 'usdt_bep20' ? 'selected' : '' }}>USDT (BEP20)</option>
+                                <option value="upi" {{ old('payout_method') === 'upi' ? 'selected' : '' }}>INR via UPI</option>
+                                <option value="bank" {{ old('payout_method') === 'bank' ? 'selected' : '' }}>INR via Bank Transfer</option>
                             </select>
                         </div>
 
@@ -189,10 +199,34 @@
                                     id="availBalDisplay">₹{{ number_format($user->earning_wallet, 2) }}</strong></p>
                         </div>
 
+                        <div id="upiFields" class="hidden">
+                            <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">UPI ID *</label>
+                            <input type="text" name="upi_id" value="{{ old('upi_id') }}" placeholder="name@bank" autocomplete="off"
+                                class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400 transition">
+                        </div>
+
+                        <div id="bankFields" class="hidden space-y-3">
+                            <div>
+                                <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Account Holder Name *</label>
+                                <input type="text" name="account_holder" value="{{ old('account_holder') }}" autocomplete="name"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs focus:outline-none focus:border-emerald-400 transition">
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Bank Account Number *</label>
+                                <input type="text" name="account_number" value="{{ old('account_number') }}" inputmode="numeric" autocomplete="off"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400 transition">
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">IFSC Code *</label>
+                                <input type="text" name="ifsc" value="{{ old('ifsc') }}" maxlength="11" autocomplete="off"
+                                    class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono uppercase text-xs focus:outline-none focus:border-emerald-400 transition">
+                            </div>
+                        </div>
+
                         <!-- BEP20 Destination -->
-                        <div>
+                        <div id="usdtFields">
                             <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">USDT wallet address (BEP20) *</label>
-                            <input type="text" name="usdt_address" required value="{{ old('usdt_address') }}"
+                            <input type="text" name="usdt_address" value="{{ old('usdt_address') }}"
                                 placeholder="0x… (BNB Smart Chain / BEP20 address)" autocomplete="off" spellcheck="false"
                                 minlength="42" maxlength="42" pattern="0x[a-fA-F0-9]{40}"
                                 title="Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters."
@@ -216,8 +250,8 @@
                                 <strong id="displayNet"
                                     class="text-emerald-400 font-mono font-black text-base">₹0.00</strong>
                             </div>
-                            <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-neutral-300"><span>Estimated payout (USDT):</span><strong id="displayPayoutUsdt" class="font-mono text-white">0.000000 USDT</strong></div>
-                            <p class="text-[10px] text-neutral-400">Rate: ₹1 = {{ number_format(1 / max($conversionRate, 0.0001), 6) }} USDT. Final amount is fixed in your request for admin review.</p>
+                            <div id="usdtEstimate" class="flex justify-between border-t border-emerald-500/20 pt-2 text-neutral-300"><span>Estimated payout (USDT):</span><strong id="displayPayoutUsdt" class="font-mono text-white">0.000000 USDT</strong></div>
+                            <p class="text-[10px] text-neutral-400">INR payouts are sent in rupees. USDT payouts convert the net INR at ₹{{ number_format($conversionRate, 2) }} per USDT. The 5% service fee is shown before you submit.</p>
                         </div>
 
                         @if (!$user->isKycApproved())
@@ -229,7 +263,7 @@
                         @else
                             <button type="submit" @disabled(!$payoutEnabled)
                                 class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition flex items-center justify-center gap-2 shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> Submit USDT Payout Request
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Submit Withdrawal Request
                             </button>
                         @endif
                     </form>
@@ -246,8 +280,8 @@
                             <i data-lucide="shield-check" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <h3 class="text-sm font-black text-white uppercase tracking-wider font-heading">USDT Payout Rules</h3>
-                            <p class="text-[11px] text-neutral-400">Admin reviewed on BNB Smart Chain</p>
+                            <h3 class="text-sm font-black text-white uppercase tracking-wider font-heading">Withdrawal Rules</h3>
+                            <p class="text-[11px] text-neutral-400">KYC approved requests are reviewed by admin</p>
                         </div>
                     </div>
 
@@ -313,8 +347,8 @@
                     <select name="status"
                         class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-semibold focus:outline-none focus:border-emerald-400 transition cursor-pointer">
                         <option value="">All Statuses</option>
-                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved
-                        </option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved · Awaiting payout</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed / Paid</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected
                         </option>
@@ -364,12 +398,12 @@
                             class="bg-[#02180f] text-emerald-400 uppercase text-[10px] font-bold border-b border-emerald-500/30">
                             <tr>
                                 <th class="p-3.5">Trx ID</th>
-                                <th class="p-3.5">Network</th>
-                                <th class="p-3.5">USDT address</th>
+                                <th class="p-3.5">Payout Method</th>
+                                <th class="p-3.5">Recipient Details</th>
                                 <th class="p-3.5">Gross (INR)</th>
                                 <th class="p-3.5">Fee (INR)</th>
                                 <th class="p-3.5">Net (INR)</th>
-                                <th class="p-3.5">Payout (USDT)</th>
+                                <th class="p-3.5">Payout</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Admin Remarks / UTR</th>
                                 <th class="p-3.5 text-right">Date & Time</th>
@@ -377,25 +411,34 @@
                         </thead>
                         <tbody class="divide-y divide-emerald-500/10">
                             @foreach ($withdrawals as $wth)
+                                @php
+                                    $payoutDetails = json_decode((string) $wth->account_details, true);
+                                    $payoutDetails = is_array($payoutDetails) ? $payoutDetails : ['address' => $wth->account_details];
+                                @endphp
                                 <tr class="hover:bg-emerald-500/5 transition">
                                     <td class="p-3.5 font-mono font-bold text-white">{{ $wth->trx_id }}</td>
                                     <td class="p-3.5 font-semibold text-emerald-400">{{ $wth->payment_method }}</td>
-                                    <td class="p-3.5 font-medium text-neutral-200 max-w-xs truncate"
-                                        title="{{ $wth->account_details }}">
-                                        {{ $wth->account_details }}
+                                    <td class="p-3.5 font-medium text-neutral-200 max-w-xs">
+                                        @if (isset($payoutDetails['upi_id']))
+                                            UPI: {{ $payoutDetails['upi_id'] }}
+                                        @elseif (isset($payoutDetails['account_number']))
+                                            {{ $payoutDetails['account_holder'] ?? '' }} · A/C {{ $payoutDetails['account_number'] }} · IFSC {{ $payoutDetails['ifsc'] ?? '' }}
+                                        @else
+                                            <span class="truncate block" title="{{ $wth->account_details }}">{{ $wth->account_details }}</span>
+                                        @endif
                                     </td>
                                     <td class="p-3.5 font-mono font-bold text-white">₹{{ number_format($wth->amount, 2) }}
                                     </td>
                                     <td class="p-3.5 font-mono text-rose-400">-₹{{ number_format($wth->charge, 2) }}</td>
                                     <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">₹{{ number_format((float) $wth->final_amount, 2) }}</td>
-                                    <td class="p-3.5 font-mono font-bold text-white">{{ $wth->usdt_amount !== null ? number_format((float) $wth->usdt_amount, 6).' USDT' : '—' }}</td>
+                                    <td class="p-3.5 font-mono font-bold text-white">{{ $wth->usdt_amount !== null ? number_format((float) $wth->usdt_amount, 6).' USDT' : '₹'.number_format((float) $wth->final_amount, 2).' INR' }}</td>
                                     <td class="p-3.5">
                                         <span
                                             class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase
-                                        {{ $wth->status === 'approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : '' }}
+                                        {{ in_array($wth->status, ['approved', 'completed'], true) ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : '' }}
                                         {{ $wth->status === 'pending' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : '' }}
                                         {{ $wth->status === 'rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40' : '' }}">
-                                            {{ $wth->status }}
+                                            {{ $wth->status === 'completed' ? 'Paid' : $wth->status }}
                                         </span>
                                     </td>
                                     <td class="p-3.5 text-neutral-300 max-w-xs truncate font-mono text-[11px]"
@@ -445,6 +488,21 @@
                 document.getElementById('displayPayoutUsdt').innerText = usdt.toFixed(6) + ' USDT';
             }
 
+            function togglePayoutFields(method) {
+                var isUsdt = method === 'usdt_bep20';
+                var isUpi = method === 'upi';
+                var isBank = method === 'bank';
+                document.getElementById('usdtFields').classList.toggle('hidden', !isUsdt);
+                document.getElementById('upiFields').classList.toggle('hidden', !isUpi);
+                document.getElementById('bankFields').classList.toggle('hidden', !isBank);
+                document.getElementById('usdtEstimate').classList.toggle('hidden', !isUsdt);
+                document.querySelector('[name="usdt_address"]').required = isUsdt;
+                document.querySelector('[name="upi_id"]').required = isUpi;
+                document.querySelector('[name="account_holder"]').required = isBank;
+                document.querySelector('[name="account_number"]').required = isBank;
+                document.querySelector('[name="ifsc"]').required = isBank;
+            }
+
             function updateWalletBalance(walletType) {
                 var bal = walletBalances[walletType] || 0;
                 document.getElementById('availBalDisplay').innerText = '₹' + bal.toFixed(2);
@@ -459,6 +517,7 @@
             }
 
             updateWalletBalance(document.getElementById('fromWallet').value);
+            togglePayoutFields(document.getElementById('payoutMethod').value);
             calculateFee(document.getElementById('wthAmount').value);
         </script>
     @endsection

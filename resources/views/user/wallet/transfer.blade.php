@@ -3,16 +3,16 @@
 @section('title', 'Wallet Transfer & Account Activation - ZIVO PAY')
 
 @section('content')
-    <div class="space-y-6 font-sans">
+    <div class="space-y-4 font-sans">
         <!-- Header & Wallet Overview -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-[#042718] border-2 border-emerald-500/60 shadow-2xl space-y-4">
+        <div class="p-4 sm:p-5 rounded-2xl bg-[#042718] border border-emerald-500/60 shadow-xl space-y-3">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <span
-                        class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-widest border border-emerald-500/40">
+                        class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/40">
                         WALLET MANAGEMENT & ACTIVATION
                     </span>
-                    <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1">INTERNAL WALLET
+                    <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight mt-1">INTERNAL WALLET
                         TRANSFER</h1>
                     <p class="text-xs text-neutral-300 mt-1">Transfer funds instantly from Earning Wallet to Fund Wallet or
                         activate your mandatory ₹3,000 subscription.</p>
@@ -20,50 +20,50 @@
                     </div>
 
             <!-- Wallet Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
                 <!-- 1. Fund Wallet -->
-                <div class="p-5 rounded-2xl bg-[#02180f] border-2 border-emerald-500/40 relative overflow-hidden">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Fund Wallet
                             Balance</span>
-                        <i data-lucide="wallet" class="w-5 h-5 text-emerald-400"></i>
+                        <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
                         </div>
-                    <span class="text-3xl font-black text-white font-mono mt-2 block">₹{{ number_format($user->deposit_wallet, 2) }}</span>
+                    <span class="text-2xl font-black text-white font-mono mt-1 block">₹{{ number_format($user->deposit_wallet, 2) }}</span>
                     <span class="text-[10px] text-neutral-400 mt-1 block">Used for Package Activation & Capital
                         Investments</span>
                     </div>
 
                 <!-- 2. Earning Wallet -->
-                <div class="p-5 rounded-2xl bg-[#02180f] border-2 border-emerald-500/40 relative overflow-hidden">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-bold text-teal-400 uppercase tracking-wider">Earning Wallet
                             Balance</span>
-                        <i data-lucide="coins" class="w-5 h-5 text-teal-400"></i>
+                        <i data-lucide="coins" class="w-4 h-4 text-teal-400"></i>
                         </div>
                     <span
-                        class="text-3xl font-black text-teal-300 font-mono mt-2 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
+                        class="text-2xl font-black text-teal-300 font-mono mt-1 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
                     <span class="text-[10px] text-neutral-400 mt-1 block">Accumulated ROI & Level Referral Bonus</span>
                     </div>
 
                 <!-- 3. Shopping Wallet -->
-                <div class="p-5 rounded-2xl bg-[#02180f] border-2 border-cyan-400/40 relative overflow-hidden">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-cyan-400/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">Shopping Wallet
                             Balance</span>
-                        <i data-lucide="shopping-bag" class="w-5 h-5 text-cyan-300"></i>
+                        <i data-lucide="shopping-bag" class="w-4 h-4 text-cyan-300"></i>
                     </div>
-                    <span class="text-3xl font-black text-white font-mono mt-2 block">₹{{ number_format($user->shopping_wallet, 2) }}</span>
+                    <span class="text-2xl font-black text-white font-mono mt-1 block">₹{{ number_format($user->shopping_wallet, 2) }}</span>
                     <span class="text-[10px] text-neutral-400 mt-1 block">Package activation credit for product orders</span>
                 </div>
 
                 <!-- 4. Account Activation Status -->
                 <div
-                    class="p-5 rounded-2xl bg-[#02180f] border-2 {{ $user->is_subscription_active ? 'border-emerald-500/50' : 'border-rose-500/50' }} relative overflow-hidden">
+                    class="p-3.5 rounded-xl bg-[#02180f] border {{ $user->is_subscription_active ? 'border-emerald-500/50' : 'border-rose-500/50' }} relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider">Subscription
                             Status</span>
                         <i data-lucide="{{ $user->is_subscription_active ? 'check-circle-2' : 'alert-circle' }}"
-                            class="w-5 h-5 {{ $user->is_subscription_active ? 'text-emerald-400' : 'text-rose-400' }}"></i>
+                            class="w-4 h-4 {{ $user->is_subscription_active ? 'text-emerald-400' : 'text-rose-400' }}"></i>
                         </div>
                         <div class="mt-2">
                         @if ($user->is_subscription_active)
@@ -113,27 +113,27 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Section A: Mandatory ₹3,000 Subscription Activation Card -->
-            <div class="p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-xl space-y-4">
-                <div class="flex items-center gap-3 border-b border-emerald-500/20 pb-4">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/40 shadow-lg space-y-3">
+                <div class="flex items-center gap-2.5 border-b border-emerald-500/20 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <h2 class="text-lg font-black text-white uppercase">MANDATORY ₹3,000 ZIVO FAMILY KIT ACTIVATION</h2>
-                        <p class="text-xs text-neutral-400">₹3,000 moves from Fund Wallet to Shopping Wallet when you activate.</p>
+                        <h2 class="text-sm sm:text-base font-black text-white uppercase">MANDATORY ₹3,000 ZIVO FAMILY KIT ACTIVATION</h2>
+                        <p class="text-[11px] text-neutral-400">₹3,000 moves from Fund Wallet to Shopping Wallet when you activate.</p>
                         </div>
                         </div>
 
-                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/30 text-xs space-y-2">
+                <div class="p-3 rounded-xl bg-[#02180f] border border-emerald-500/30 text-[11px] space-y-1.5">
                     <div class="flex items-center justify-between text-neutral-300">
                         <span>Package Price (Zivo Family Kit):</span>
-                        <span class="font-bold text-white text-sm">₹3,000.00</span>
+                        <span class="font-bold text-white text-xs">₹3,000.00</span>
                     </div>
                     <div class="flex items-center justify-between text-neutral-300">
                         <span>Available Fund Wallet Balance:</span>
-                        <span class="font-bold text-emerald-400 text-sm">₹{{ number_format($user->deposit_wallet, 2) }}</span>
+                        <span class="font-bold text-emerald-400 text-xs">₹{{ number_format($user->deposit_wallet, 2) }}</span>
                         </div>
                         <div class="flex items-center justify-between text-neutral-300">
                             <span>Account Activation Status:</span>
@@ -143,7 +143,7 @@
                         </div>
                         </div>
 
-                <p class="text-[11px] text-neutral-400">
+                <p class="text-[10px] leading-relaxed text-neutral-400">
                     <i data-lucide="info" class="w-3.5 h-3.5 inline text-emerald-400"></i>
                     Activating the ₹3,000 Zivo Family Kit credits ₹3,000 to your Shopping Wallet. ROI eligibility begins after each full 24-hour cycle.
                     </p>
@@ -152,7 +152,7 @@
                     <form action="{{ route('user.wallet.subscription.activate') }}" method="POST">
                         @csrf
                         <button type="submit" {{ (float) ($user->deposit_wallet ?? 0) < 3000 ? 'disabled' : '' }}
-                            class="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg {{ (float) ($user->deposit_wallet ?? 0) >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
+                            class="w-full py-2.5 rounded-xl font-black text-[11px] uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg {{ (float) ($user->deposit_wallet ?? 0) >= 3000 ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.01] text-black cursor-pointer' : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed' }}">
                             <i data-lucide="zap" class="w-4 h-4"></i>
                             ACTIVATE ACCOUNT NOW (₹3,000)
                         </button>
@@ -165,7 +165,7 @@
                         @endif
                 @else
                     <div
-                        class="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
+                        class="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold text-center flex items-center justify-center gap-2">
                         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
                         Your ₹3,000 Zivo Family Kit Package is Active! Account Activated.
                     </div>
@@ -173,25 +173,25 @@
                     </div>
 
             <!-- Section B: Internal Wallet Transfer (Bidirectional) -->
-            <div class="p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-xl space-y-4">
-                <div class="flex items-center gap-3 border-b border-emerald-500/20 pb-4">
-                    <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold">
-                        <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
+            <div class="p-4 rounded-2xl bg-[#042718] border border-emerald-500/40 shadow-lg space-y-3">
+                <div class="flex items-center gap-2.5 border-b border-emerald-500/20 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold shrink-0">
+                        <i data-lucide="arrow-right-left" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <h2 class="text-lg font-black text-white uppercase">BIDIRECTIONAL INTERNAL WALLET TRANSFER</h2>
-                        <p class="text-xs text-neutral-400">Transfer funds instantly between Earning Wallet and Fund Wallet.
+                        <h2 class="text-sm sm:text-base font-black text-white uppercase">BIDIRECTIONAL INTERNAL WALLET TRANSFER</h2>
+                        <p class="text-[11px] text-neutral-400">Transfer funds instantly between Earning Wallet and Fund Wallet.
                         </p>
                         </div>
                         </div>
 
-                <form action="{{ route('user.wallet.transfer.store') }}" method="POST" class="space-y-4">
+                <form action="{{ route('user.wallet.transfer.store') }}" method="POST" class="space-y-3">
                     @csrf
                     <div>
                         <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Select
                             Transfer Direction *</label>
                         <select name="direction" id="transferDirection" onchange="updateTransferHint(this.value)"
-                            class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-xs focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+                            class="w-full px-3.5 py-2.5 rounded-lg bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-[11px] focus:outline-none focus:border-emerald-400 transition cursor-pointer">
                             <option value="earning_to_fund" {{ old('direction') === 'earning_to_fund' ? 'selected' : '' }}>
                                 Earning Wallet → Fund Wallet (Available: ₹{{ number_format($user->earning_wallet, 2) }})
                             </option>
@@ -207,13 +207,13 @@
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold">₹</span>
                             <input type="number" step="0.01" min="10" name="amount" placeholder="Minimum ₹10" required
-                                class="w-full pl-9 pr-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/30 text-white font-bold text-sm focus:outline-none focus:border-emerald-400">
+                                class="w-full pl-9 pr-4 py-2.5 rounded-lg bg-[#01140c] border border-emerald-500/30 text-white font-bold text-xs focus:outline-none focus:border-emerald-400">
                             </div>
                         <span class="text-[10px] text-neutral-400 mt-1 block" id="transferBalanceHint">Available Earning
                             Balance: ₹{{ number_format($user->earning_wallet, 2) }}</span>
                         </div>
 
-                    <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/20 text-[11px] text-neutral-300 space-y-1">
+                    <div class="p-3 rounded-lg bg-[#02180f] border border-emerald-500/20 text-[10px] text-neutral-300 space-y-1">
                         <div class="flex justify-between">
                             <span>From:</span>
                             <span class="font-bold text-teal-300" id="fromDisplay">Earning Wallet</span>
@@ -229,7 +229,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
+                        class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-[11px] uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
                         <i data-lucide="send" class="w-4 h-4"></i> EXECUTE INSTANT TRANSFER
                     </button>
                     </form>
@@ -237,45 +237,45 @@
                     </div>
 
         <!-- Section C: Transfer Audit Log -->
-        <div class="bg-[#042718] rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-4">
-                <h3 class="text-base font-black text-white uppercase tracking-wider">WALLET TRANSFER HISTORY</h3>
-                <span class="text-xs text-emerald-400 font-bold">Instant Transfers Log</span>
+        <div class="bg-[#042718] rounded-2xl border border-emerald-500/30 overflow-hidden shadow-xl p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3">
+                <h3 class="text-sm font-black text-white uppercase tracking-wider">WALLET TRANSFER HISTORY</h3>
+                <span class="text-[10px] text-emerald-400 font-bold">Instant Transfers Log</span>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead class="bg-slate-950 text-emerald-400 font-extrabold uppercase tracking-wider border-b border-emerald-500/30">
                         <tr>
-                            <th class="px-5 py-4">Transfer ID</th>
-                            <th class="px-5 py-4">From Wallet</th>
-                            <th class="px-5 py-4">To Wallet</th>
-                            <th class="px-5 py-4">Amount</th>
-                            <th class="px-5 py-4">Date & Time</th>
+                            <th class="px-4 py-2.5">Transfer ID</th>
+                            <th class="px-4 py-2.5">From Wallet</th>
+                            <th class="px-4 py-2.5">To Wallet</th>
+                            <th class="px-4 py-2.5">Amount</th>
+                            <th class="px-4 py-2.5">Date & Time</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-emerald-500/10 text-neutral-200 font-medium">
                         @forelse($transfers as $transfer)
                             <tr class="hover:bg-emerald-500/5 transition">
-                                <td class="px-5 py-4 font-mono text-emerald-300 font-bold">
+                                <td class="px-4 py-2.5 font-mono text-emerald-300 font-bold">
                                     #TRF-{{ $transfer->id }}
                                 </td>
-                                <td class="px-5 py-4">
+                                <td class="px-4 py-2.5">
                                     <span
                                         class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-teal-500/20 text-teal-300 border border-teal-500/40">
                                         {{ $transfer->from_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4">
+                                <td class="px-4 py-2.5">
                                     <span
                                         class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
                                         {{ $transfer->to_wallet === 'deposit_wallet' ? 'Fund Wallet' : 'Earning Wallet' }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 font-bold text-white text-sm">
+                                <td class="px-4 py-2.5 font-bold text-white text-xs">
                                     ₹{{ number_format($transfer->amount, 2) }}
                                 </td>
-                                <td class="px-5 py-4">
+                                <td class="px-4 py-2.5">
                                     <p class="text-white font-bold text-xs">{{ $transfer->created_at->format('d M Y') }}
                                     </p>
                                     <p class="text-[10px] text-neutral-400 font-mono">
@@ -285,9 +285,9 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-8 text-center text-neutral-400">
-                                    <i data-lucide="arrow-right-left" class="w-8 h-8 mx-auto mb-2 text-emerald-500/40"></i>
-                                    <p class="font-bold">No wallet transfer history recorded yet.</p>
+                                <td colspan="5" class="px-4 py-6 text-center text-neutral-400">
+                                    <i data-lucide="arrow-right-left" class="w-6 h-6 mx-auto mb-1.5 text-emerald-500/40"></i>
+                                    <p class="text-[11px] font-bold">No wallet transfer history recorded yet.</p>
                                 </td>
                             </tr>
                         @endforelse

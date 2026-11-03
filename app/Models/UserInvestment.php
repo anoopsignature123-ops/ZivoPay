@@ -15,6 +15,7 @@ class UserInvestment extends Model
         'plan_name',
         'amount',
         'daily_percentage',
+        'roi_frequency',
         'daily_amount',
         'monthly_amount',
         'total_returned',

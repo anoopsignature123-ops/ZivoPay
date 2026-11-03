@@ -82,7 +82,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                No daily ROI payout records found.
+                                No Fund Wallet daily ROI payout records found.
                             </td>
                         </tr>
                     @endforelse

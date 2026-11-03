@@ -21,8 +21,8 @@
     </div>
 
     <!-- Stats Overview Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
             <div class="flex items-center justify-between text-emerald-400 mb-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Approved Funds</span>
                 <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
@@ -31,7 +31,7 @@
             <span class="text-[10px] text-emerald-400 font-semibold mt-1 block">Credited to Fund Wallet</span>
         </div>
 
-        <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+        <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
             <div class="flex items-center justify-between text-amber-400 mb-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Pending Approvals</span>
                 <i data-lucide="clock" class="w-5 h-5 text-amber-400"></i>
@@ -40,7 +40,7 @@
             <span class="text-[10px] text-neutral-400 font-semibold mt-1 block">Verification Queue</span>
         </div>
 
-        <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+        <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
             <div class="flex items-center justify-between text-emerald-400 mb-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Total Transactions</span>
                 <i data-lucide="receipt" class="w-5 h-5 text-emerald-400"></i>

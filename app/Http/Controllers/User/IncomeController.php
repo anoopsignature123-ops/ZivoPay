@@ -45,7 +45,7 @@ class IncomeController extends Controller
         $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
 
         // Income Totals Summary
-        $totalRoi = Transaction::where('user_id', $user->id)->where('type', 'daily_roi')->sum('amount');
+        $totalRoi = Transaction::where('user_id', $user->id)->whereIn('type', ['daily_roi', 'fixed_package_roi'])->sum('amount');
         $totalRoiLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
 
         $achievedRewards = UserReward::where('user_id', $user->id)->get();

@@ -45,7 +45,6 @@ class RoiIncomeService
             });
 
         User::query()
-            ->where('is_subscription_active', true)
             ->where('deposit_wallet', '>=', 1000)
             ->orderBy('id')
             ->chunkById(100, function ($users) use (&$processedCount): void {
@@ -68,7 +67,7 @@ class RoiIncomeService
             }
 
             $user = User::query()->lockForUpdate()->find($investment->user_id);
-            if (! $user || ! $user->isActiveForIncome()) {
+            if (! $user) {
                 return false;
             }
 
@@ -83,10 +82,13 @@ class RoiIncomeService
             }
 
             $lastPayoutAt ??= $investment->activated_at;
-            if ($user->subscription_activated_at && Carbon::parse($user->subscription_activated_at)->gt(Carbon::parse($lastPayoutAt))) {
-                $lastPayoutAt = $user->subscription_activated_at;
+            if (! $lastPayoutAt) {
+                return false;
             }
-            if (! $lastPayoutAt || Carbon::parse($lastPayoutAt)->gt(now()->subDay())) {
+            $dueAt = $investment->roi_frequency === 'monthly'
+                ? Carbon::parse($lastPayoutAt)->addMonthNoOverflow()
+                : Carbon::parse($lastPayoutAt)->addDay();
+            if ($dueAt->isFuture()) {
                 return false;
             }
 
@@ -109,13 +111,15 @@ class RoiIncomeService
             Transaction::create([
                 'user_id' => $user->id,
                 'trx_id' => 'DROI-'.strtoupper(Str::random(10)),
-                'type' => 'daily_roi',
+                'type' => $investment->roi_frequency === 'monthly' ? 'fixed_package_roi' : 'daily_roi',
                 'wallet_type' => 'earning',
                 'trx_type' => '+',
                 'amount' => $dailyAmount,
                 'charge' => 0,
                 'post_balance' => $user->earning_wallet,
-                'description' => "Daily ROI (Day {$investment->days_completed}/{$investment->total_days}) on Capital ₹".number_format((float) $investment->amount, 2),
+                'description' => $investment->roi_frequency === 'monthly'
+                    ? "Fixed Package ROI (Cycle {$investment->days_completed}/{$investment->total_days}) on Capital ₹".number_format((float) $investment->amount, 2)
+                    : "Daily ROI (Day {$investment->days_completed}/{$investment->total_days}) on Capital ₹".number_format((float) $investment->amount, 2),
             ]);
 
             $this->distributeRoiOnRoiMatchingBonus($user, $dailyAmount);
@@ -128,7 +132,7 @@ class RoiIncomeService
     {
         return DB::transaction(function () use ($userId): bool {
             $user = User::query()->lockForUpdate()->find($userId);
-            if (! $user || ! $user->isActiveForIncome() || (float) $user->deposit_wallet < 1000) {
+            if (! $user || (float) $user->deposit_wallet < 1000) {
                 return false;
             }
 
@@ -138,7 +142,13 @@ class RoiIncomeService
                 ->where('trx_id', 'like', 'FWPROFIT-%')
                 ->latest('id')
                 ->value('created_at');
-            $cycleAnchor = $lastFundRoi ?? $user->subscription_activated_at ?? $user->activated_at;
+            $lastFundCredit = Transaction::query()
+                ->where('user_id', $user->id)
+                ->whereIn('wallet_type', ['fund', 'deposit', 'deposit_wallet'])
+                ->where('trx_type', '+')
+                ->latest('id')
+                ->value('created_at');
+            $cycleAnchor = $lastFundRoi ?? $lastFundCredit ?? $user->created_at;
 
             if (! $cycleAnchor || Carbon::parse($cycleAnchor)->gt(now()->subDay())) {
                 return false;
@@ -182,7 +192,8 @@ class RoiIncomeService
                 break;
             }
 
-            if ($sponsor->isActiveForIncome()) {
+            $activatedAt = $sponsor->subscription_activated_at ?? $sponsor->activated_at;
+            if ($sponsor->isActiveForIncome() && $activatedAt && Carbon::parse($activatedAt)->lte(now()->subDay())) {
                 $percentage = $this->roiMatchingPercentage($level);
                 $commission = round($dailyRoiAmount * $percentage / 100, 2);
 

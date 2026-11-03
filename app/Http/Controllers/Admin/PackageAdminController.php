@@ -26,13 +26,11 @@ class PackageAdminController extends Controller
             'name' => 'required|string|max:255|unique:packages,name',
             'min_amount' => 'required|numeric|min:1',
             'max_amount' => 'required|numeric|gte:min_amount',
-            'daily_roi_percentage' => 'required|numeric|min:0.01|max:100',
-            'duration_days' => 'required|integer|min:1',
             'status' => 'required|in:active,inactive',
             'description' => 'nullable|string',
         ]);
 
-        Package::create($validated);
+        Package::create(array_merge($validated, ['daily_roi_percentage' => 8, 'duration_days' => 750]));
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Capital Package created successfully!');
@@ -49,13 +47,11 @@ class PackageAdminController extends Controller
             'name' => 'required|string|max:255|unique:packages,name,'.$package->id,
             'min_amount' => 'required|numeric|min:1',
             'max_amount' => 'required|numeric|gte:min_amount',
-            'daily_roi_percentage' => 'required|numeric|min:0.01|max:100',
-            'duration_days' => 'required|integer|min:1',
             'status' => 'required|in:active,inactive',
             'description' => 'nullable|string',
         ]);
 
-        $package->update($validated);
+        $package->update(array_merge($validated, ['daily_roi_percentage' => 8, 'duration_days' => 750]));
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Capital Package updated successfully!');

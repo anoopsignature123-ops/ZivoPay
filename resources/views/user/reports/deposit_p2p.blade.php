@@ -29,9 +29,9 @@
         </div>
 
         <!-- Stats Overview Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <!-- Approved Deposits -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-emerald-400 mb-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Total Deposits
                         Credited</span>
@@ -42,7 +42,7 @@
             </div>
 
             <!-- P2P Sent -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-amber-400 mb-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Total P2P Sent</span>
                     <i data-lucide="arrow-up-right" class="w-5 h-5 text-amber-400"></i>
@@ -52,7 +52,7 @@
             </div>
 
             <!-- P2P Received -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-teal-300 mb-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Total P2P Received</span>
                     <i data-lucide="arrow-down-right" class="w-5 h-5 text-teal-300"></i>
@@ -63,7 +63,7 @@
             </div>
 
             <!-- Total Records Count -->
-            <div class="p-5 rounded-2xl bg-[#042718] border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-[#042718] border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between text-emerald-400 mb-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Total Transactions</span>
                     <i data-lucide="receipt" class="w-5 h-5 text-emerald-400"></i>

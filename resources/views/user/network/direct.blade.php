@@ -23,22 +23,22 @@
                 </div>
 
         <!-- Stat Cards Summary -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-5 rounded-2xl bg-panel border border-emerald-500/30 shadow-lg">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-xl bg-panel border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase text-neutral-400">Total Direct Referrals</span>
                     <i data-lucide="users" class="w-5 h-5 text-emerald-400"></i>
                 </div>
                 <h3 class="text-2xl font-black text-white mt-2">{{ $stats['total'] }}</h3>
             </div>
-            <div class="p-5 rounded-2xl bg-panel border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-panel border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase text-neutral-400">Active Directs</span>
                     <i data-lucide="user-check" class="w-5 h-5 text-emerald-400"></i>
                 </div>
                 <h3 class="text-2xl font-black text-emerald-400 mt-2">{{ $stats['active'] }}</h3>
             </div>
-            <div class="p-5 rounded-2xl bg-panel border border-emerald-500/30 shadow-lg">
+            <div class="p-3.5 rounded-xl bg-panel border border-emerald-500/30 shadow-lg">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase text-neutral-400">Inactive Directs</span>
                     <i data-lucide="user-x" class="w-5 h-5 text-rose-400"></i>

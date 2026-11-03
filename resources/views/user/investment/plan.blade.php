@@ -14,14 +14,13 @@
                         class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/40">
                         CAPITAL GROWTH TIERS
                     </span>
-                    <span class="text-xs text-emerald-400 font-black tracking-wider uppercase">&bull; 25 MONTHS
-                        RETURNS</span>
+                    <span class="text-xs text-emerald-400 font-black tracking-wider uppercase">&bull; 25 MONTHLY CYCLES</span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-heading">
-                        INVESTMENT TIERS & DAILY PROFIT PLANS
+                        FIXED PACKAGE ROI PLAN
                     </h1>
                     <p class="text-xs text-neutral-300 mt-0.5">
-                        Earn 0.15% to 0.30% Daily Profit for 750 Days (25 Months) + 30-Level Downline Matching Income.
+                        Fixed investments earn 8% of the invested amount monthly for 25 cycles. ROI-on-ROI is a separate eligible upline income.
                     </p>
                     </div>
 
@@ -64,8 +63,7 @@
             class="p-5 sm:p-6 rounded-3xl bg-[#042718] border-2 border-emerald-500/40 shadow-2xl relative">
             <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3 mb-5">
                 <h2 class="text-base font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
-                    <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i> Capital Investment Calculator &
-                    Activation Form
+                    <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i> Fixed Package ROI Calculator & Activation
                     </h2>
                 <span
                     class="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Instant
@@ -115,19 +113,19 @@
                     <!-- Estimated Return Breakdown Box -->
                     <div class="p-3.5 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-neutral-400">Selected Tier Rate:</span>
-                            <strong id="calcRate" class="text-emerald-400 font-bold">0.15% Daily</strong>
+                            <span class="text-neutral-400">Fixed package rate:</span>
+                            <strong id="calcRate" class="text-emerald-400 font-bold">8% monthly · 25 cycles</strong>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-neutral-400">Estimated Daily Profit:</span>
-                            <strong id="calcDaily" class="text-white font-mono">₹0.00 / day</strong>
+                            <span class="text-neutral-400">Estimated payout per monthly cycle:</span>
+                            <strong id="calcDaily" class="text-white font-mono">₹0.00 / cycle</strong>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-neutral-400">Estimated Monthly Profit (30 Days):</span>
+                            <span class="text-neutral-400">Estimated monthly ROI:</span>
                             <strong id="calcMonthly" class="text-emerald-300 font-mono">₹0.00 / month</strong>
                         </div>
                         <div class="flex justify-between border-t border-emerald-500/20 pt-2 text-sm">
-                            <span class="text-white font-bold">Total 25 Months Estimated Profit:</span>
+                            <span class="text-white font-bold">Total ROI across 25 cycles:</span>
                             <strong id="calcTotal" class="text-emerald-400 font-mono font-black text-base">₹0.00</strong>
                         </div>
                     </div>
@@ -148,7 +146,7 @@
         <div class="p-5 sm:p-6 rounded-3xl bg-[#042718] border border-emerald-500/40 shadow-xl space-y-4">
             <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3">
                 <h2 class="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2 font-heading">
-                    <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> My Active Capital Investment Packages
+                    <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> My Fixed Package Investments
                 </h2>
                 <span class="px-2.5 py-1 rounded-full zivo-pill-emerald text-[10px] font-black uppercase">
                     {{ $investments->count() }} Active
@@ -162,8 +160,8 @@
                             <tr>
                                 <th class="p-3">Plan Name</th>
                                 <th class="p-3">Capital Amount</th>
-                                <th class="p-3">Daily ROI</th>
-                                <th class="p-3">Days Completed</th>
+                                <th class="p-3">ROI Schedule</th>
+                                <th class="p-3">Cycles / Days Completed</th>
                                 <th class="p-3">Total Returned</th>
                                 <th class="p-3">Activated At</th>
                                 <th class="p-3 text-right">Status</th>
@@ -175,9 +173,8 @@
                                     <td class="p-3 font-bold text-white">{{ $inv->plan_name }}</td>
                                     <td class="p-3 font-mono font-bold text-emerald-400">
                                         ₹{{ number_format($inv->amount, 2) }}</td>
-                                    <td class="p-3 font-semibold text-emerald-300">{{ $inv->daily_percentage }}%
-                                        (₹{{ number_format($inv->daily_amount, 2) }}/day)</td>
-                                    <td class="p-3 font-mono font-bold text-white">{{ $inv->days_completed }} / 730 Days
+                                    <td class="p-3 font-semibold text-emerald-300">{{ $inv->roi_frequency === 'monthly' ? '8% monthly · ₹'.number_format((float) $inv->monthly_amount, 2).'/cycle' : number_format((float) $inv->daily_percentage, 2).'% daily · ₹'.number_format((float) $inv->daily_amount, 2).'/day' }}</td>
+                                    <td class="p-3 font-mono font-bold text-white">{{ $inv->days_completed }} / {{ $inv->roi_frequency === 'monthly' ? 25 : 730 }} {{ $inv->roi_frequency === 'monthly' ? 'Cycles' : 'Days' }}
                                     </td>
                                     <td class="p-3 font-mono text-emerald-400 font-bold">
                                         ₹{{ number_format($inv->total_returned, 2) }}</td>
@@ -235,40 +232,19 @@
 
                 let rawVal = input.value || "0";
                 let amt = parseFloat(String(rawVal).replace(/,/g, '')) || 0;
-                let rate = 0.15;
-                let rateText = "0.15% Daily (Silver)";
+                let monthly = amt * 0.08;
+                let total25Cycles = monthly * 25;
 
-                if (amt >= 1000000) {
-                    rate = 0.30;
-                    rateText = "0.30% Daily (Diamond)";
-                } else if (amt >= 500000) {
-                    rate = 0.25;
-                    rateText = "0.25% Daily (Platinum)";
-                } else if (amt >= 100000) {
-                    rate = 0.20;
-                    rateText = "0.20% Daily (Gold)";
-                } else if (amt >= 1000) {
-                    rate = 0.15;
-                    rateText = "0.15% Daily (Silver)";
-                } else {
-                    rate = 0.15;
-                    rateText = "0.15% Daily";
-                }
-
-                let daily = amt * (rate / 100);
-                let monthly = daily * 30;
-                let total24Mo = (daily * 750);
-
-                calcRate.innerText = rateText;
-                calcDaily.innerText = '₹' + daily.toLocaleString('en-IN', {
+                calcRate.innerText = "8% monthly · 25 cycles";
+                calcDaily.innerText = '₹' + monthly.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                }) + ' / day';
+                }) + ' / cycle';
                 calcMonthly.innerText = '₹' + monthly.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }) + ' / month';
-                calcTotal.innerText = '₹' + total24Mo.toLocaleString('en-IN', {
+                calcTotal.innerText = '₹' + total25Cycles.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });

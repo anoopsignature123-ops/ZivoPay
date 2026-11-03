@@ -15,7 +15,7 @@
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">INCOME
                         LEDGER & SUMMARY</h1>
-                    <p class="text-xs text-neutral-300 mt-1">Ledger of daily ROI returns, 30-level ROI-on-ROI commissions, and wallet activity.</p>
+                    <p class="text-xs text-neutral-300 mt-1">Ledger of Fund Wallet daily ROI, Fixed Package monthly ROI, 30-level ROI-on-ROI commissions, and wallet activity.</p>
                     </div>
                 <a href="{{ route('user.withdrawal.index') }}"
                     class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center gap-2 shrink-0">
@@ -23,17 +23,16 @@
                 </a>
                 </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <!-- 1. Total Daily ROI -->
-                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Total Daily
-                        ROI</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                <!-- Combined fund-wallet and fixed-package ROI -->
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40">
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Total ROI Income</span>
                     <span class="text-2xl font-black text-white font-mono mt-1 block">₹{{ number_format($totalRoi, 2) }}</span>
-                    <span class="text-[10px] text-neutral-400">0.15% to 0.30% Daily Return</span>
+                    <span class="text-[10px] text-neutral-400">Fund Wallet daily + Fixed Package monthly ROI</span>
                     </div>
 
                 <!-- ROI-on-ROI commission -->
-                <div class="p-4 rounded-2xl bg-[#02180f] border border-emerald-500/40">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40">
                     <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level ROI-on-ROI Commission</span>
                     <span
                         class="text-2xl font-black text-teal-300 font-mono mt-1 block">₹{{ number_format($totalRoiLevelIncome, 2) }}</span>
@@ -41,7 +40,7 @@
                     </div>
 
                 <!-- 4. Earning Wallet -->
-                <div class="p-4 rounded-2xl bg-[#02180f] border-2 border-emerald-400">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border-2 border-emerald-400">
                     <span class="block text-[11px] font-bold text-emerald-300 uppercase tracking-wider">Available Earning
                         Wallet</span>
                     <span class="text-2xl font-black text-white font-mono mt-1 block">₹{{ number_format($user->earning_wallet, 2) }}</span>
@@ -78,6 +77,7 @@
                         <option value="">All Income Types</option>
                         <option value="daily_roi" {{ request('type') === 'daily_roi' ? 'selected' : '' }}>Daily ROI Income
                         </option>
+                        <option value="fixed_package_roi" {{ request('type') === 'fixed_package_roi' ? 'selected' : '' }}>Fixed Package Monthly ROI</option>
                         <option value="roi_level_income" {{ request('type') === 'roi_level_income' ? 'selected' : '' }}>ROI
                             on ROI Level Matching</option>
                         </select>
@@ -163,7 +163,7 @@
                                     <td class="p-3.5">
                                         <span
                                             class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
-                                            {{ strtoupper(str_replace('_', ' ', $trx->type)) }}
+                                            {{ $trx->type === 'fixed_package_roi' ? 'FIXED PACKAGE MONTHLY ROI' : strtoupper(str_replace('_', ' ', $trx->type)) }}
                                         </span>
                                     </td>
                                     <td class="p-3.5 font-mono font-bold text-white">

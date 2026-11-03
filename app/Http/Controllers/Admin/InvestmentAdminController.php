@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\UserInvestment;
 use App\Models\Withdrawal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class InvestmentAdminController extends Controller
 {
@@ -34,12 +36,41 @@ class InvestmentAdminController extends Controller
         Artisan::call('zivo:process-daily-roi');
         $output = Artisan::output();
 
-        return back()->with('success', 'Due 24-hour ROI and 30-level ROI-on-ROI cycles processed. '.$output);
+        return back()->with('success', 'Due Fund Wallet daily ROI, Fixed Package monthly ROI, and eligible 30-level ROI-on-ROI cycles processed. '.$output);
     }
 
-    public function withdrawals(Request $request)
+    public function withdrawals(Request $request): View
     {
-        $query = Withdrawal::with('user');
+        return $this->renderWithdrawals($request, 'all');
+    }
+
+    public function inrWithdrawals(Request $request): View
+    {
+        return $this->renderWithdrawals($request, 'inr');
+    }
+
+    public function usdWithdrawals(Request $request): View
+    {
+        return $this->renderWithdrawals($request, 'usd');
+    }
+
+    public function pendingWithdrawalCounts(): JsonResponse
+    {
+        $counts = Withdrawal::query()
+            ->where('status', 'pending')
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method IN (?, ?) THEN 1 ELSE 0 END), 0) as inr', ['INR UPI', 'INR Bank Transfer'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN 1 ELSE 0 END), 0) as usd', ['USDT BEP20'])
+            ->first();
+
+        return response()->json([
+            'inr' => (int) ($counts?->inr ?? 0),
+            'usd' => (int) ($counts?->usd ?? 0),
+        ]);
+    }
+
+    private function renderWithdrawals(Request $request, string $withdrawalType): View
+    {
+        $query = $this->applyWithdrawalType(Withdrawal::query(), $withdrawalType)->with('user');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -58,20 +89,43 @@ class InvestmentAdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        $withdrawals = $query->orderBy('id', 'desc')->paginate(20);
+        $withdrawals = $query->orderByDesc('id')->paginate(20)->withQueryString();
+
+        $statsRow = $this->applyWithdrawalType(Withdrawal::query(), $withdrawalType)
+            ->selectRaw('COUNT(*) as total_requests')
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending_count")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending_amount")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'approved' THEN final_amount ELSE 0 END), 0) as approved_amount")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN final_amount ELSE 0 END), 0) as completed_amount")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) as rejected_count")
+            ->first();
 
         $stats = [
-            'total_requests' => Withdrawal::count(),
-            'pending_count' => Withdrawal::where('status', 'pending')->count(),
-            'pending_amount' => (float) Withdrawal::where('status', 'pending')->sum('amount'),
-            'approved_amount' => (float) Withdrawal::where('status', 'approved')->sum('final_amount'),
-            'completed_amount' => (float) Withdrawal::where('status', 'completed')->sum('final_amount'),
-            'rejected_count' => Withdrawal::where('status', 'rejected')->count(),
+            'total_requests' => (int) $statsRow->total_requests,
+            'pending_count' => (int) $statsRow->pending_count,
+            'pending_amount' => (float) $statsRow->pending_amount,
+            'approved_amount' => (float) $statsRow->approved_amount,
+            'completed_amount' => (float) $statsRow->completed_amount,
+            'rejected_count' => (int) $statsRow->rejected_count,
         ];
 
         $contractAddress = (string) config('services.usdt.payout_contract_address', '');
+        $withdrawalRoute = match ($withdrawalType) {
+            'inr' => 'admin.withdrawals.inr',
+            'usd' => 'admin.withdrawals.usd',
+            default => 'admin.withdrawals',
+        };
 
-        return view('admin.withdrawal.index', compact('withdrawals', 'stats', 'contractAddress'));
+        return view('admin.withdrawal.index', compact('withdrawals', 'stats', 'contractAddress', 'withdrawalType', 'withdrawalRoute'));
+    }
+
+    private function applyWithdrawalType(Builder $query, string $withdrawalType): Builder
+    {
+        return match ($withdrawalType) {
+            'inr' => $query->whereIn('payment_method', ['INR UPI', 'INR Bank Transfer']),
+            'usd' => $query->where('payment_method', 'USDT BEP20'),
+            default => $query,
+        };
     }
 
     public function updateWithdrawalStatus(Request $request, Withdrawal $withdrawal): RedirectResponse
@@ -109,12 +163,41 @@ class InvestmentAdminController extends Controller
                 'type' => 'withdrawal_refund',
                 'trx_type' => '+',
                 'post_balance' => $user->{$sourceWallet},
-                'description' => 'Rejected USDT BEP20 withdrawal #'.$lockedWithdrawal->trx_id.' refunded to original wallet.',
+                'description' => 'Rejected withdrawal #'.$lockedWithdrawal->trx_id.' refunded to original wallet.',
                 'trx_id' => 'REF-'.strtoupper(Str::random(10)),
             ]);
         });
 
         return back()->with('success', "Withdrawal request #{$withdrawal->trx_id} rejected and refunded to its original wallet.");
+    }
+
+    public function completeManualWithdrawal(Request $request, Withdrawal $withdrawal): RedirectResponse
+    {
+        $validated = $request->validate([
+            'provider_reference' => ['required', 'string', 'max:160'],
+            'admin_remarks' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        DB::transaction(function () use ($withdrawal, $validated): void {
+            $lockedWithdrawal = Withdrawal::query()->lockForUpdate()->findOrFail($withdrawal->id);
+            if (! in_array($lockedWithdrawal->payment_method, ['INR UPI', 'INR Bank Transfer'], true)
+                || ! in_array($lockedWithdrawal->status, ['pending', 'approved'], true)) {
+                throw ValidationException::withMessages(['status' => 'Only pending INR UPI or bank withdrawals can be marked paid here.']);
+            }
+
+            if (Withdrawal::query()->where('provider_reference', $validated['provider_reference'])->where('id', '<>', $lockedWithdrawal->id)->exists()) {
+                throw ValidationException::withMessages(['provider_reference' => 'This UTR/reference is already recorded for another withdrawal.']);
+            }
+
+            $lockedWithdrawal->update([
+                'status' => 'completed',
+                'provider_reference' => $validated['provider_reference'],
+                'admin_remarks' => $validated['admin_remarks'] ?? null,
+                'processed_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', "INR withdrawal #{$withdrawal->trx_id} marked paid.");
     }
 
     public function bulkApproveWithdrawals(Request $request): JsonResponse

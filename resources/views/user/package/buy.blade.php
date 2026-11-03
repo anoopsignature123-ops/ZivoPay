@@ -83,8 +83,8 @@
                         <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                     <div>
-                    <span class="font-bold text-white">ROI eligibility</span>
-                        <p class="text-[10px] text-neutral-400">ROI starts after each eligible investment completes its first 24 hours.</p>
+                        <span class="font-bold text-white">Fixed Package ROI</span>
+                        <p class="text-[10px] text-neutral-400">Separate fixed investments earn 8% monthly for up to 25 cycles.</p>
                     </div>
                     </div>
 
@@ -93,8 +93,8 @@
                         <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-white">24-Hour Idle Wallet Profit</span>
-                        <p class="text-[10px] text-neutral-400">0.15% - 0.30% daily return on Fund Wallet balance >= ₹1,000
+                        <span class="font-bold text-white">Fund Wallet ROI</span>
+                        <p class="text-[10px] text-neutral-400">Daily 0.15%–0.30% ROI on eligible Fund Wallet balance of at least ₹1,000, without activation.
                         </p>
                         </div>
                         </div>
@@ -105,7 +105,7 @@
                     </div>
                     <div>
                         <span class="font-bold text-white">Full Platform Features</span>
-                        <p class="text-[10px] text-neutral-400">Unlocks capital investment packages & 24x7 payouts</p>
+                        <p class="text-[10px] text-neutral-400">Family Kit activation enables 30-level ROI-on-ROI eligibility after 24 hours.</p>
                     </div>
                     </div>
 

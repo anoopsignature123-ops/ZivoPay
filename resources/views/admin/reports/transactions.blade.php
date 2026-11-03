@@ -44,6 +44,7 @@
                     <option value="">All Types</option>
                     <option value="subscription" {{ request('type') == 'subscription' ? 'selected' : '' }}>Subscription Activation</option>
                     <option value="daily_roi" {{ request('type') == 'daily_roi' ? 'selected' : '' }}>Daily ROI Bonus</option>
+                    <option value="fixed_package_roi" {{ request('type') == 'fixed_package_roi' ? 'selected' : '' }}>Fixed Package Monthly ROI</option>
                     <option value="roi_level_income" {{ request('type') == 'roi_level_income' ? 'selected' : '' }}>ROI-on-ROI Commission</option>
                     <option value="admin_credit" {{ request('type') == 'admin_credit' ? 'selected' : '' }}>Admin Credit</option>
                     <option value="admin_deduct" {{ request('type') == 'admin_deduct' ? 'selected' : '' }}>Admin Deduct</option>
