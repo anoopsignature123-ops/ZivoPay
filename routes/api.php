@@ -161,4 +161,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('recharge/fastag', [RechargeController::class, 'fastag']);
     Route::post('recharge/insurance', [RechargeController::class, 'insurance']);
     Route::post('recharge/voucher', [RechargeController::class, 'voucher']);
+    // Route::post('recharge/digital-loan', [RechargeController::class, 'digitalLoan']);
 });

@@ -53,6 +53,7 @@ class RechargeMasterSeeder extends Seeder
             'financial_services' => [
                 ['title' => 'Insurance', 'key' => 'insurance', 'icon' => 'shield', 'status' => 'active', 'is_active' => true, 'sort_order' => 13],
                 ['title' => 'Money Transfer', 'key' => 'money_transfer', 'icon' => 'send', 'status' => 'coming_soon', 'is_active' => false, 'sort_order' => 14],
+                ['title' => 'Digital Loan', 'key' => 'digital_loan', 'icon' => 'credit-card', 'status' => 'coming_soon', 'is_active' => false, 'sort_order' => 15],
             ],
         ];
 

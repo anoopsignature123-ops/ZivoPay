@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -89,22 +90,38 @@ class RechargeService
 
         // 4. Handle Gateway Response & Auto-Refund if Failed
         if (in_array($gatewayStatus, ['success', 'approved'], true)) {
-            $recharge->update([
-                'status' => 'success',
-                'txid' => $response['txid'] ?? null,
-                'opid' => $response['opid'] ?? null,
-                'api_response' => $response,
-            ]);
+            DB::transaction(function () use ($recharge, $response): void {
+                $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
+
+                if (! $lockedRecharge->isPending()) {
+                    return;
+                }
+
+                $lockedRecharge->update([
+                    'status' => 'success',
+                    'txid' => $response['txid'] ?? null,
+                    'opid' => $response['opid'] ?? null,
+                    'api_response' => $response,
+                ]);
+            });
         } elseif (in_array($gatewayStatus, ['failure', 'failed'], true)) {
             // Perform Instant Auto-Refund
             $this->refundRecharge($recharge, 'Gateway execution failed: '.($response['message'] ?? 'Rejected by operator'), $response);
         } else {
-            // Keep pending
-            $recharge->update([
-                'txid' => $response['txid'] ?? null,
-                'opid' => $response['opid'] ?? null,
-                'api_response' => $response,
-            ]);
+            // Keep unresolved provider responses pending for the scheduled status poller.
+            DB::transaction(function () use ($recharge, $response): void {
+                $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
+
+                if (! $lockedRecharge->isPending()) {
+                    return;
+                }
+
+                $lockedRecharge->update([
+                    'txid' => $response['txid'] ?? $lockedRecharge->txid,
+                    'opid' => $response['opid'] ?? $lockedRecharge->opid,
+                    'api_response' => $response,
+                ]);
+            });
         }
 
         return $recharge->fresh();
@@ -115,10 +132,6 @@ class RechargeService
      */
     public function refundRecharge(Recharge $recharge, string $reason = 'Recharge failed - Fund refunded', ?array $apiResponse = null): bool
     {
-        if (in_array($recharge->status, ['refunded', 'success'], true)) {
-            return false;
-        }
-
         return DB::transaction(function () use ($recharge, $reason, $apiResponse) {
             $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
 
@@ -126,8 +139,26 @@ class RechargeService
                 return false;
             }
 
-            $user = $recharge->user;
-            $amount = (float) $recharge->amount;
+            $refundTransactionId = 'REF-'.$lockedRecharge->order_id;
+            $existingRefund = Transaction::where('trx_id', $refundTransactionId)->first();
+
+            if ($existingRefund) {
+                $lockedRecharge->update([
+                    'status' => 'refunded',
+                    'admin_remark' => $reason,
+                    'api_response' => $apiResponse ?? $lockedRecharge->api_response,
+                ]);
+
+                Log::warning('Recharge refund ledger already exists; skipped duplicate wallet credit.', [
+                    'recharge_id' => $lockedRecharge->id,
+                    'order_id' => $lockedRecharge->order_id,
+                ]);
+
+                return false;
+            }
+
+            $user = User::whereKey($lockedRecharge->user_id)->lockForUpdate()->firstOrFail();
+            $amount = (float) $lockedRecharge->amount;
 
             // Refund Fund Wallet Balance
             $user->increment('deposit_wallet', $amount);
@@ -139,14 +170,14 @@ class RechargeService
                 'wallet_type' => 'deposit_wallet',
                 'type' => 'recharge_refund',
                 'description' => "Auto Refund for failed recharge {$recharge->number} (Order: {$recharge->order_id})",
-                'trx_id' => 'REF-'.$recharge->order_id,
+                'trx_id' => $refundTransactionId,
             ]);
 
             // Update Recharge status
             $lockedRecharge->update([
                 'status' => 'refunded',
                 'admin_remark' => $reason,
-                'api_response' => $apiResponse ?? $recharge->api_response,
+                'api_response' => $apiResponse ?? $lockedRecharge->api_response,
             ]);
 
             return true;
@@ -173,17 +204,21 @@ class RechargeService
         $status = strtolower(trim((string) ($params['status'] ?? '')));
 
         if (in_array($status, ['success', 'approved'], true)) {
-            if ($recharge->status === 'refunded') {
-                return false;
-            }
+            return DB::transaction(function () use ($recharge, $params): bool {
+                $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
 
-            $recharge->update([
-                'status' => 'success',
-                'opid' => $params['opid'] ?? $recharge->opid,
-                'api_response' => array_merge($recharge->api_response ?? [], $params),
-            ]);
+                if (! $lockedRecharge->isPending()) {
+                    return false;
+                }
 
-            return true;
+                $lockedRecharge->update([
+                    'status' => 'success',
+                    'opid' => $params['opid'] ?? $lockedRecharge->opid,
+                    'api_response' => array_merge($lockedRecharge->api_response ?? [], $params),
+                ]);
+
+                return true;
+            });
         }
 
         if (in_array($status, ['failure', 'failed', 'reversed'], true)) {
@@ -201,28 +236,45 @@ class RechargeService
      */
     public function syncOrderStatus(Recharge $recharge): Recharge
     {
+        if (! $recharge->isPending()) {
+            return $recharge->fresh();
+        }
+
         $response = $this->a1topupService->checkStatus($recharge->order_id);
-        $status = strtolower((string) ($response['status'] ?? ''));
+        $status = strtolower(trim((string) ($response['status'] ?? '')));
 
-        if (in_array($status, ['success'], true)) {
-            if ($recharge->status === 'refunded') {
-                return $recharge->fresh();
-            }
+        if (in_array($status, ['success', 'successful', 'approved', 'completed'], true)) {
+            DB::transaction(function () use ($recharge, $response): void {
+                $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
 
-            $recharge->update([
-                'status' => 'success',
-                'txid' => $response['txid'] ?? $recharge->txid,
-                'opid' => $response['opid'] ?? $recharge->opid,
-                'api_response' => $response,
-            ]);
-        } elseif (in_array($status, ['failure', 'failed'], true)) {
-            $this->refundRecharge($recharge, 'Live status check: Failed', $response);
+                if (! $lockedRecharge->isPending()) {
+                    return;
+                }
+
+                $lockedRecharge->update([
+                    'status' => 'success',
+                    'txid' => $response['txid'] ?? $lockedRecharge->txid,
+                    'opid' => $response['opid'] ?? $lockedRecharge->opid,
+                    'api_response' => $response,
+                ]);
+            });
+        } elseif (in_array($status, ['failure', 'failed', 'reversed', 'rejected'], true)) {
+            $failureReason = $response['message'] ?? $response['opid'] ?? 'Provider confirmed recharge failure';
+            $this->refundRecharge($recharge, 'A1Topup status check: '.$failureReason, $response);
         } else {
-            $recharge->update([
-                'txid' => $response['txid'] ?? $recharge->txid,
-                'opid' => $response['opid'] ?? $recharge->opid,
-                'api_response' => $response,
-            ]);
+            DB::transaction(function () use ($recharge, $response): void {
+                $lockedRecharge = Recharge::whereKey($recharge->id)->lockForUpdate()->firstOrFail();
+
+                if (! $lockedRecharge->isPending()) {
+                    return;
+                }
+
+                $lockedRecharge->update([
+                    'txid' => $response['txid'] ?? $lockedRecharge->txid,
+                    'opid' => $response['opid'] ?? $lockedRecharge->opid,
+                    'api_response' => $response,
+                ]);
+            });
         }
 
         return $recharge->fresh();

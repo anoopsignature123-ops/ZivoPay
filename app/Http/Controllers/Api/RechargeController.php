@@ -541,6 +541,13 @@ class RechargeController extends Controller
         }
     }
 
+    public function digitalLoan(RechargeRequest $request, RechargeService $rechargeService): JsonResponse
+    {
+        $request->merge(['service_type' => 'digital_loan']);
+
+        return $this->store($request, $rechargeService);
+    }
+
     /**
      * Webhook Callback Endpoint for A1Topup Gateway.
      */
