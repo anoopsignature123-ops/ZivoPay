@@ -163,30 +163,30 @@
                 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
             <span class="nav-text flex-1">All Withdrawal Requests</span>
-            </a> --}}
-            
-            <a class='nav-item {{ request()->routeIs("admin.withdrawals.inr") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-                href='{{ route("admin.withdrawals.inr") }}'>
-                <div
-                    class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <i data-lucide="indian-rupee" class="w-4 h-4"></i>
-                </div>
-                <span class="nav-text flex-1">INR Withdrawals</span>
-                <span id="pendingInrWithdrawalBadge" data-count="{{ $pendingInrWithdrawalCount }}"
-                    class="{{ $pendingInrWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
-                    aria-label="Pending INR withdrawals">{{ $pendingInrWithdrawalCount }}</span>
-            </a>
-            
-            <a class='nav-item {{ request()->routeIs("admin.withdrawals.usd") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
-                href='{{ route("admin.withdrawals.usd") }}'>
-                <div
-                    class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <i data-lucide="coins" class="w-4 h-4"></i>
-                </div>
-                <span class="nav-text flex-1">USD Contract Payouts</span>
-                <span id="pendingUsdWithdrawalBadge" data-count="{{ $pendingUsdWithdrawalCount }}"
-                    class="{{ $pendingUsdWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
-                    aria-label="Pending USD withdrawals">{{ $pendingUsdWithdrawalCount }}</span>
+        </a> --}}
+
+        <a class='nav-item {{ request()->routeIs("admin.withdrawals.inr") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.withdrawals.inr") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text flex-1">INR Withdrawals</span>
+            <span id="pendingInrWithdrawalBadge" data-count="{{ $pendingInrWithdrawalCount }}"
+                class="{{ $pendingInrWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
+                aria-label="Pending INR withdrawals">{{ $pendingInrWithdrawalCount }}</span>
+        </a>
+
+        <a class='nav-item {{ request()->routeIs("admin.withdrawals.usd") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.withdrawals.usd") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="coins" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text flex-1">USD Contract Payouts</span>
+            <span id="pendingUsdWithdrawalBadge" data-count="{{ $pendingUsdWithdrawalCount }}"
+                class="{{ $pendingUsdWithdrawalCount > 0 ? '' : 'hidden' }} min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-black text-white"
+                aria-label="Pending USD withdrawals">{{ $pendingUsdWithdrawalCount }}</span>
         </a>
         <!-- REPORTS & AUDITS -->
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
@@ -271,7 +271,7 @@
         </a>
 
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
-        
+
             <span>E-COMMERCE MANAGEMENT</span>
         </div>
         <a class='nav-item {{ request()->routeIs("admin.shop.categories*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
@@ -292,12 +292,13 @@
         </a>
         <a class='nav-item {{ request()->routeIs("admin.shop.ratings*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.shop.ratings.index") }}'>
-            <div class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-300 flex items-center justify-center border border-amber-500/30 shrink-0">
+            <div
+                class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-300 flex items-center justify-center border border-amber-500/30 shrink-0">
                 <i data-lucide="star" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Product Ratings</span>
         </a>
-        
+
         <a class='nav-item {{ request()->routeIs("admin.shop.orders*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route("admin.shop.orders.index") }}'>
             <div
@@ -321,6 +322,67 @@
                 <i data-lucide="images" class="w-4 h-4"></i>
             </div>
             <span class="nav-text">Home Banners</span>
+        </a>
+
+        <!-- INSURANCE CATALOG MANAGEMENT -->
+        <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
+            INSURANCE MANAGEMENT
+        </div>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.dashboard") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.dashboard") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Dashboard</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.categories*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.categories.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="tags" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Categories</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.companies*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.companies.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="building-2" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Companies</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.products*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.products.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Products</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.product-types*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.product-types.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="shapes" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Product Types</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.applications.*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.applications.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="files" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Applications</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs("admin.insurance.reports.*") ? "active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400" : "" }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route("admin.insurance.reports.index") }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Insurance Reports</span>
         </a>
 
         <!-- ACCOUNT SETTINGS -->

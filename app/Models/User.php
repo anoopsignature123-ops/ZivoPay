@@ -117,6 +117,11 @@ class User extends Authenticatable
         return $this->hasMany(Rating::class);
     }
 
+    public function insuranceApplications(): HasMany
+    {
+        return $this->hasMany(Application::class, 'user_id');
+    }
+
     /**
      * Relationship for user rewards.
      */

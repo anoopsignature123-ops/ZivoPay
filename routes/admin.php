@@ -2,6 +2,13 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositAdminController;
+use App\Http\Controllers\Admin\Insurance\InsuranceApplicationController;
+use App\Http\Controllers\Admin\Insurance\InsuranceCategoryController;
+use App\Http\Controllers\Admin\Insurance\InsuranceCompanyController;
+use App\Http\Controllers\Admin\Insurance\InsuranceDashboardController;
+use App\Http\Controllers\Admin\Insurance\InsuranceProductController;
+use App\Http\Controllers\Admin\Insurance\InsuranceReportController;
+use App\Http\Controllers\Admin\Insurance\ProductTypeController;
 use App\Http\Controllers\Admin\InvestmentAdminController;
 use App\Http\Controllers\Admin\KycAdminController;
 use App\Http\Controllers\Admin\LoginController;
@@ -57,6 +64,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::post('users/{user}/add-fund', [UserController::class, 'addFund'])->name('users.add-fund');
+
+        // Insurance catalog management, separate from customer and MLM panels
+        Route::prefix('insurance')->name('insurance.')->group(function (): void {
+            Route::get('/', InsuranceDashboardController::class)->name('dashboard');
+            Route::get('applications', [InsuranceApplicationController::class, 'index'])->name('applications.index');
+            Route::get('applications/{application}', [InsuranceApplicationController::class, 'show'])->name('applications.show');
+            Route::post('applications/{application}/status', [InsuranceApplicationController::class, 'updateStatus'])->name('applications.status');
+            Route::get('applications/{application}/documents/{document}/preview', [InsuranceApplicationController::class, 'previewDocument'])->name('applications.documents.preview');
+            Route::get('applications/{application}/documents/{document}', [InsuranceApplicationController::class, 'document'])->name('applications.documents.show');
+            Route::get('reports', [InsuranceReportController::class, 'index'])->name('reports.index');
+            Route::get('reports/export', [InsuranceReportController::class, 'export'])->name('reports.export');
+            Route::resource('categories', InsuranceCategoryController::class)->except('show');
+            Route::resource('companies', InsuranceCompanyController::class)->except('show');
+            Route::resource('products', InsuranceProductController::class)->except('show');
+            Route::resource('product-types', ProductTypeController::class)->except('show');
+        });
 
         // User Add Fund Management Routes
         Route::get('deposits/manage', [DepositAdminController::class, 'index'])->name('deposits.index');

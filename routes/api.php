@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Shop\RatingController as ShopRatingController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\UpigatewayPaymentController;
 use App\Http\Controllers\Api\UpigatewayWebhookController;
+use App\Http\Controllers\Insurance\InsuranceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,12 +30,12 @@ use Illuminate\Support\Facades\Route;
 // Public Authentication & Verification Endpoints
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendLink'])
-    ->middleware('throttle:5,1');
+// Route::post('forgot-password', [ForgotPasswordController::class, 'sendLink'])
+// ->middleware('throttle:5,1');
 Route::post('send-otp', [AuthController::class, 'sendOtp']);
 Route::post('login/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
-Route::post('login/verify-otp', [AuthController::class, 'verifyOtp']);
+// Route::post('login/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('login-otp', [AuthController::class, 'verifyOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
 Route::post('login/resend-otp', [AuthController::class, 'resendOtp']);
@@ -47,40 +48,13 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
 // Public Webhook Callback Endpoint for Gateway
 Route::match(['get', 'post'], 'recharge/callback', [RechargeController::class, 'callback']);
-Route::post('webhook/upigateway', UpigatewayWebhookController::class)
-    ->middleware('throttle:120,1')
+Route::post('webhook/upigateway', UpigatewayWebhookController::class)->middleware('throttle:120,1')
     ->name('api.upigateway.webhook');
-Route::post('webhook/ipaymentwallet', IpaymentWalletWebhookController::class)
-    ->middleware('throttle:120,1')
+Route::post('webhook/ipaymentwallet', IpaymentWalletWebhookController::class)->middleware('throttle:120,1')
     ->name('api.ipaymentwallet.webhook');
 
 // Authenticated Sanctum Protected Endpoints
 Route::middleware('auth:sanctum')->group(function () {
-    // E-commerce shop APIs
-    Route::prefix('shop')->group(function (): void {
-        Route::get('categories', [ShopCatalogController::class, 'categories']);
-        Route::get('categories/{category}/products', [ShopCatalogController::class, 'categoryProducts']);
-        Route::get('products/search', [ShopCatalogController::class, 'search']);
-        Route::get('products', [ShopCatalogController::class, 'home']);
-        Route::get('products/{product}', [ShopCatalogController::class, 'show']);
-        Route::post('ratings', [ShopRatingController::class, 'store'])->middleware('throttle:10,1');
-        Route::get('my-cart', [ShopCartController::class, 'show']);
-        Route::post('add-to-cart', [ShopCartController::class, 'addItem'])->middleware('throttle:60,1');
-        Route::post('update-cart', [ShopCartController::class, 'updateItem']);
-        Route::post('remove-from-cart', [ShopCartController::class, 'removeItem']);
-        Route::post('clear-cart', [ShopCartController::class, 'clear']);
-        Route::post('address-get', [ShopAddressController::class, 'index']);
-        Route::post('addresses-store', [ShopAddressController::class, 'store']);
-        Route::post('addresses-update', [ShopAddressController::class, 'update']);
-        Route::post('addresses-delete', [ShopAddressController::class, 'destroy']);
-        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])->middleware('throttle:30,1');
-        Route::post('place/orders', [ShopOrderController::class, 'store'])->middleware('throttle:10,1')->name('api.shop.orders.store');
-        Route::get('orders', [ShopOrderController::class, 'index']);
-        Route::get('orders/{order}', [ShopOrderController::class, 'show']);
-        Route::post('orders-cancel', [ShopOrderController::class, 'cancel'])->middleware('throttle:10,1');
-        Route::post('orders-return', [ShopOrderController::class, 'requestReturn'])->middleware('throttle:10,1');
-    });
-
     // Help & Support Endpoints
     Route::get('support/tickets', [SupportController::class, 'tickets']);
     Route::post('support/tickets', [SupportController::class, 'createTicket']);
@@ -162,4 +136,40 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('recharge/insurance', [RechargeController::class, 'insurance']);
     Route::post('recharge/voucher', [RechargeController::class, 'voucher']);
     // Route::post('recharge/digital-loan', [RechargeController::class, 'digitalLoan']);
+
+    // E-commerce shop APIs
+    Route::prefix('shop')->group(function (): void {
+        Route::get('categories', [ShopCatalogController::class, 'categories']);
+        Route::get('categories/{category}/products', [ShopCatalogController::class, 'categoryProducts']);
+        Route::get('products/search', [ShopCatalogController::class, 'search']);
+        Route::get('products', [ShopCatalogController::class, 'home']);
+        Route::get('products/{product}', [ShopCatalogController::class, 'show']);
+        Route::post('ratings', [ShopRatingController::class, 'store'])->middleware('throttle:10,1');
+        Route::get('my-cart', [ShopCartController::class, 'show']);
+        Route::post('add-to-cart', [ShopCartController::class, 'addItem'])->middleware('throttle:60,1');
+        Route::post('update-cart', [ShopCartController::class, 'updateItem']);
+        Route::post('remove-from-cart', [ShopCartController::class, 'removeItem']);
+        Route::post('clear-cart', [ShopCartController::class, 'clear']);
+        Route::post('address-get', [ShopAddressController::class, 'index']);
+        Route::post('addresses-store', [ShopAddressController::class, 'store']);
+        Route::post('addresses-update', [ShopAddressController::class, 'update']);
+        Route::post('addresses-delete', [ShopAddressController::class, 'destroy']);
+        Route::post('promos-check', [ShopPromoCodeController::class, 'check'])->middleware('throttle:30,1');
+        Route::post('place/orders', [ShopOrderController::class, 'store'])->middleware('throttle:10,1')->name('api.shop.orders.store');
+        Route::get('orders', [ShopOrderController::class, 'index']);
+        Route::get('orders/{order}', [ShopOrderController::class, 'show']);
+        Route::post('orders-cancel', [ShopOrderController::class, 'cancel'])->middleware('throttle:10,1');
+        Route::post('orders-return', [ShopOrderController::class, 'requestReturn'])->middleware('throttle:10,1');
+    });
+
+    // Insurance Api -----------------------------------------------------------------------------------
+    Route::prefix('insurance')->group(function (): void {
+        Route::controller(InsuranceController::class)->group(function (): void {
+            Route::post('categories', 'insuranceCategories');
+            Route::post('categories-company', 'insuranceCategoryCompanies');
+            Route::post('company-products', 'insuranceCategoryProducts');
+            Route::post('product-types', 'insuranceProductTypes');
+            Route::post('application-submission', 'insuranceApplicationSubmission')->middleware('throttle:5,1');
+        });
+    });
 });

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             PackageSeeder::class,
             UserDownlineSeeder::class,
             EmailTemplateSeeder::class,
+            InsuranceDemoSeeder::class,
         ]);
     }
 }
