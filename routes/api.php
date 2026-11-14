@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\IpaymentWalletWebhookController;
+use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RechargeController;
@@ -171,5 +172,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('product-types', 'insuranceProductTypes');
             Route::post('application-submission', 'insuranceApplicationSubmission')->middleware('throttle:5,1');
         });
+    });
+
+    Route::prefix('loans')->controller(LoanController::class)->group(function (): void {
+        Route::post('categories', 'categories');
+        Route::post('application-submission', 'submit')->middleware('throttle:5,1');
+        Route::post('my-applications', 'myApplications');
+        Route::post('application-detail', 'show');
+        Route::post('application-tracking', 'tracking');
     });
 });

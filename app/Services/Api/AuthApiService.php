@@ -74,7 +74,7 @@ class AuthApiService
     }
 
     /**
-     * Generate & send default OTP (1111) for user mobile login.
+     * Generate & send default OTP (3859) for user mobile login.
      *
      * @return array{mobile: string, otp: string}
      *
@@ -95,7 +95,7 @@ class AuthApiService
             ]);
         }
 
-        $defaultOtp = '1111';
+        $defaultOtp = '3859';
         Cache::put('otp_'.$cleanMobile, $defaultOtp, 600);
         Cache::put('otp_'.$user->mobile, $defaultOtp, 600);
 
@@ -130,11 +130,11 @@ class AuthApiService
 
         $cachedOtp = Cache::get('otp_'.$cleanMobile)
             ?? Cache::get('otp_'.$user->mobile)
-            ?? '1111';
+            ?? '3859';
 
-        if ($cleanOtp !== '1111' && $cleanOtp !== (string) $cachedOtp) {
+        if ($cleanOtp !== '3859' && $cleanOtp !== (string) $cachedOtp) {
             throw ValidationException::withMessages([
-                'otp' => ['Invalid OTP entered. Please enter 1111.'],
+                'otp' => ['Invalid OTP entered. Please enter 3859.'],
             ]);
         }
 

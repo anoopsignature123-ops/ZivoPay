@@ -11,6 +11,10 @@ use App\Http\Controllers\Admin\Insurance\InsuranceReportController;
 use App\Http\Controllers\Admin\Insurance\ProductTypeController;
 use App\Http\Controllers\Admin\InvestmentAdminController;
 use App\Http\Controllers\Admin\KycAdminController;
+use App\Http\Controllers\Admin\Loan\LoanApplicationController;
+use App\Http\Controllers\Admin\Loan\LoanCategoryController;
+use App\Http\Controllers\Admin\Loan\LoanDashboardController;
+use App\Http\Controllers\Admin\Loan\LoanReportController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\P2pAdminController;
@@ -79,6 +83,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('companies', InsuranceCompanyController::class)->except('show');
             Route::resource('products', InsuranceProductController::class)->except('show');
             Route::resource('product-types', ProductTypeController::class)->except('show');
+        });
+
+        Route::prefix('loans')->name('loan.')->group(function (): void {
+            Route::get('/', LoanDashboardController::class)->name('dashboard');
+            Route::resource('categories', LoanCategoryController::class)->except('show');
+            Route::get('applications', [LoanApplicationController::class, 'index'])->name('applications.index');
+            Route::get('applications/{application}', [LoanApplicationController::class, 'show'])->name('applications.show');
+            Route::post('applications/{application}/status', [LoanApplicationController::class, 'updateStatus'])->name('applications.status');
+            Route::get('applications/{application}/documents/{document}/preview', [LoanApplicationController::class, 'previewDocument'])->name('applications.documents.preview');
+            Route::get('applications/{application}/documents/{document}', [LoanApplicationController::class, 'document'])->name('applications.documents.download');
+            Route::get('reports', [LoanReportController::class, 'index'])->name('reports.index');
+            Route::get('reports/export', [LoanReportController::class, 'export'])->name('reports.export');
         });
 
         // User Add Fund Management Routes
