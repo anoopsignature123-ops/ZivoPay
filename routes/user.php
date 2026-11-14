@@ -24,6 +24,9 @@ Route::get('app/deposit/upi/{deposit}', [DepositController::class, 'appUpiPaymen
 Route::get('app/deposit/upi/{deposit}/return', [DepositController::class, 'appUpiReturn'])
     ->middleware('throttle:60,1')
     ->name('app.deposit.upi.return');
+Route::get('app/deposit/upi/{deposit}/result', [DepositController::class, 'appUpiResult'])
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('app.deposit.upi.result');
 Route::get('app/deposit/upi/{deposit}/status', [DepositController::class, 'appUpiStatus'])
     ->middleware(['signed', 'throttle:60,1'])
     ->name('app.deposit.upi.status');

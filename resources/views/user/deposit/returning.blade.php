@@ -53,18 +53,23 @@
                     if (result.status === 'approved') {
                         title.textContent = 'Payment successful';
                         message.textContent = appReturn
-                            ? 'Your payment is confirmed. You can return to the app.'
+                            ? 'Your payment is confirmed. Opening your success page…'
                             : 'Your payment is confirmed. Redirecting…';
                         if (appReturn) {
                             const payload = JSON.stringify({ type: 'payment_success', deposit_id: result.deposit_id, deposit_ref: result.deposit_ref, status: result.status });
                             if (window.ReactNativeWebView?.postMessage) window.ReactNativeWebView.postMessage(payload);
                             if (window.webkit?.messageHandlers?.paymentStatus) window.webkit.messageHandlers.paymentStatus.postMessage(payload);
-                        } else {
+                        }
+                        if (successUrl) {
                             window.location.replace(successUrl);
                         }
                         return;
                     }
                     if (result.status === 'rejected') {
+                        if (appReturn && successUrl) {
+                            window.location.replace(successUrl);
+                            return;
+                        }
                         card.classList.add('failed');
                         title.textContent = 'Payment was not confirmed';
                         message.textContent = 'No funds were added. If money was deducted, contact support with this order reference.';

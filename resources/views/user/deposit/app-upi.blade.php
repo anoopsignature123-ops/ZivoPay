@@ -1,127 +1,97 @@
 <!doctype html>
 <html lang="en">
+@php
+    $hasQrImage = $qrUrl && filter_var($qrUrl, FILTER_VALIDATE_URL) && parse_url($qrUrl, PHP_URL_SCHEME) === 'https';
+    $fullScreenCheckout = ! $hasQrImage && filled($checkoutUrl);
+@endphp
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#031a18">
-    <title>UPI payment · ZIVO PAY</title>
+    <meta name="theme-color" content="#f7faf9">
+    <title>Scan to pay · ZIVO PAY</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; padding: 24px; color: #e2e8f0; background: radial-gradient(ellipse at top, #064b39 0, #031a18 48%, #020b0a 100%); font: 15px/1.5 system-ui, sans-serif; }
-        .page { width: min(100%, 1080px); margin: 0 auto; }
-        .header, .card { border: 1px solid rgba(16, 185, 129, .35); border-radius: 20px; background: rgba(3, 26, 24, .88); box-shadow: 0 20px 60px rgba(0, 0, 0, .22); }
-        .header { margin-bottom: 20px; padding: 22px 26px; }
-        .eyebrow { color: #34d399; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-        h1 { margin: 7px 0 2px; color: #fff; font-size: clamp(22px, 4vw, 30px); line-height: 1.2; }
-        .subtle { margin: 0; color: #94a3b8; }
-        .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
-        .card { padding: 22px; }
-        .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .label { color: #34d399; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-        .ref { overflow-wrap: anywhere; margin-top: 4px; color: #fff; font: 13px ui-monospace, monospace; }
-        .badge { padding: 5px 11px; border-radius: 999px; color: #fde68a; background: rgba(245, 158, 11, .14); font-size: 11px; font-weight: 800; text-transform: uppercase; }
-        .amount { margin: 19px 0 14px; color: #fff; font-size: 28px; font-weight: 850; }
-        .qr-wrap { display: grid; min-height: 300px; place-items: center; overflow: hidden; border-radius: 16px; background: #fff; }
-        .qr-image { width: min(100%, 290px); height: 290px; object-fit: contain; }
-        .checkout { width: min(100%, 380px); height: 480px; border: 0; background: #fff; }
-        .open-link { display: block; margin-top: 14px; padding: 12px 16px; border-radius: 12px; color: #032018; background: linear-gradient(90deg, #34d399, #2dd4bf); text-align: center; text-decoration: none; font-weight: 850; }
-        .note { margin: 12px 0 0; color: #94a3b8; font-size: 12px; text-align: center; }
-        .steps { display: grid; gap: 16px; margin: 20px 0; padding: 0; list-style: none; }
-        .steps li { display: flex; gap: 12px; color: #cbd5e1; }
-        .num { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 50%; color: #6ee7b7; background: rgba(16, 185, 129, .14); font-size: 12px; font-weight: 800; }
-        .warning, .status-box { padding: 15px; border-radius: 13px; }
-        .warning { border: 1px solid rgba(245, 158, 11, .28); color: #fde68a; background: rgba(245, 158, 11, .07); font-size: 13px; }
-        .status-box { margin-top: 18px; border: 1px solid rgba(51, 65, 85, .8); background: rgba(2, 6, 23, .55); }
-        .status-box p { margin: 5px 0 0; color: #94a3b8; font-size: 13px; }
-        @media (max-width: 760px) { body { padding: 14px; } .columns { grid-template-columns: 1fr; gap: 14px; } .header, .card { border-radius: 16px; } .header, .card { padding: 18px; } .qr-wrap { min-height: 260px; } .qr-image { width: 250px; height: 250px; } .checkout { height: 450px; } }
+        :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        body { min-height: 100vh; min-height: 100svh; margin: 0; color: #172b25; background: #f7faf9; }
+        .page { display: flex; min-height: 100vh; min-height: 100svh; flex-direction: column; padding: max(18px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom)); }
+        .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(100%, 520px); margin: 0 auto; }
+        .brand { color: #08794d; font-size: 12px; font-weight: 850; letter-spacing: .11em; }
+        .status { flex: 0 0 auto; padding: 6px 11px; border: 1px solid #ead9a4; border-radius: 999px; color: #8a5a00; background: #fff8df; font-size: 11px; font-weight: 800; text-transform: capitalize; }
+        .status[data-status="approved"] { border-color: #b8e8ce; color: #08794d; background: #e9f8ef; }
+        .status[data-status="rejected"] { border-color: #f1c2c6; color: #a21c2a; background: #fff0f1; }
+        main { display: flex; width: min(100%, 520px); flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 14px; margin: 0 auto; padding: 22px 0; }
+        h1 { margin: 0; color: #142b23; font-size: clamp(20px, 5vw, 25px); font-weight: 800; letter-spacing: -.03em; text-align: center; }
+        .amount { color: #08794d; font-size: clamp(28px, 8vw, 38px); font-weight: 850; line-height: 1.1; text-align: center; }
+        .amount small { color: #66766f; font-size: 14px; font-weight: 650; }
+        .qr-panel { display: grid; width: min(100%, 430px); min-height: 280px; flex: 0 1 auto; place-items: center; overflow: hidden; padding: 12px; border: 1px solid #e4ece8; border-radius: 24px; background: #fff; box-shadow: 0 12px 34px rgba(19, 60, 43, .08); }
+        .qr-image, .checkout { display: block; width: min(100%, 390px); height: min(64svh, 390px); min-height: 260px; border: 0; border-radius: 14px; background: #fff; object-fit: contain; }
+        .checkout { width: 100%; height: min(60svh, 480px); min-height: 340px; overflow: hidden; }
+        .message { min-height: 20px; margin: 0; color: #61736b; font-size: 13px; line-height: 1.45; text-align: center; }
+        .open-link { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 0 17px; border: 1px solid #b9dfce; border-radius: 13px; color: #08794d; background: #effaf4; font-size: 13px; font-weight: 750; text-decoration: none; }
+        [hidden] { display: none !important; }
+        .page--checkout { min-height: 100vh; min-height: 100svh; padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+        .page--checkout .top { margin-bottom: 4px; }
+        .page--checkout main { gap: 10px; padding: 8px 0; }
+        .page--checkout .qr-panel { width: min(100%, 460px); min-height: 360px; padding: 8px; }
+        .page--checkout .checkout { width: 100%; height: min(560px, calc(100svh - 210px)); min-height: 360px; border-radius: 14px; }
+        .page--checkout .open-link { display: none; }
+        @media (max-height: 620px) {
+            .page { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+            main { gap: 9px; padding: 12px 0; }
+            .qr-panel { min-height: 220px; padding: 8px; }
+            .qr-image { height: min(55svh, 300px); min-height: 210px; }
+            .checkout { height: min(50svh, 280px); min-height: 220px; }
+            .page--checkout .checkout { height: max(340px, calc(100svh - 210px)); max-height: 440px; min-height: 340px; }
+        }
     </style>
 </head>
 <body>
-    <main class="page">
-        <header class="header">
-            <div class="eyebrow">ZIVO PAY · Secure UPI</div>
-            <h1>Complete your payment</h1>
-            <p class="subtle">Scan the QR code and pay exactly ₹{{ number_format((float) $deposit->amount_inr, 2) }}.</p>
+    <div class="page {{ $fullScreenCheckout ? 'page--checkout' : '' }}">
+        <header class="top">
+            <div class="brand">ZIVO PAY</div>
+            <span class="status" id="paymentStatus" data-status="{{ $deposit->status }}">{{ str($deposit->status)->headline() }}</span>
         </header>
 
-        <div class="columns">
-            <section class="card">
-                <div class="row">
-                    <div><div class="label">Order reference</div><div class="ref">{{ $deposit->deposit_ref }}</div></div>
-                    <span class="badge" id="paymentStatus">{{ $deposit->status }}</span>
-                </div>
-                <div class="amount">₹{{ number_format((float) $deposit->amount_inr, 2) }} <span class="subtle" style="font-size:14px;font-weight:600">INR</span></div>
-                <div class="qr-wrap" id="paymentCheckout" @if ($deposit->status === 'approved') style="display:none" @endif>
-                    @if ($qrUrl && filter_var($qrUrl, FILTER_VALIDATE_URL) && parse_url($qrUrl, PHP_URL_SCHEME) === 'https')
-                        <img id="gatewayQr" class="qr-image" src="{{ $qrUrl }}" alt="UPIGateway payment QR">
-                    @elseif ($checkoutUrl)
-                        <iframe class="checkout" src="{{ $checkoutUrl }}" title="UPIGateway secure payment QR" referrerpolicy="no-referrer" allow="payment *"></iframe>
-                    @else
-                        <p style="padding:20px;color:#64748b;text-align:center">Payment QR is unavailable. Please contact support.</p>
-                    @endif
-                </div>
-                <div id="paymentSuccess" class="status-box" role="status" aria-live="polite" @if ($deposit->status !== 'approved') style="display:none" @endif>
-                    <strong style="color:#a7f3d0">Payment confirmed</strong>
-                    <p>Your payment has been verified and added to your Fund Wallet. You can return to the app.</p>
-                </div>
-                @if ($checkoutUrl)
-                    <a id="openCheckout" class="open-link" href="{{ $checkoutUrl }}" target="_blank" rel="noopener noreferrer" @if ($deposit->status === 'approved') style="display:none" @endif>Open secure UPI checkout ↗</a>
+        <main>
+            <h1>Scan to add funds</h1>
+            <div class="amount">₹{{ number_format((float) $deposit->amount_inr, 2) }} <small>INR</small></div>
+
+            <section class="qr-panel" id="paymentCheckout" aria-label="UPI payment QR code" @if ($deposit->status === 'approved') hidden @endif>
+                @if ($hasQrImage)
+                    <img id="gatewayQr" class="qr-image" src="{{ $qrUrl }}" alt="Scan this UPI QR code to pay" referrerpolicy="no-referrer">
+                @elseif ($checkoutUrl)
+                    <iframe class="checkout" src="{{ $checkoutUrl }}" title="Secure UPI payment QR" referrerpolicy="no-referrer" scrolling="no" allow="payment *"></iframe>
+                @else
+                    <p style="padding:20px;color:#64748b;text-align:center">Payment QR is unavailable. Please contact support.</p>
                 @endif
-                <p class="note" id="paymentMessage" role="status" aria-live="polite">{{ $deposit->status === 'approved' ? 'Payment confirmed. You can return to the app now.' : 'Waiting for gateway confirmation. This page checks automatically.' }}</p>
             </section>
 
-            <aside class="card">
-                <div class="eyebrow">Payment instructions</div>
-                <h2 style="margin:7px 0 0;color:#fff;font-size:21px">How to pay</h2>
-                <ol class="steps">
-                    <li><span class="num">1</span><span>Open any UPI app and scan the QR code.</span></li>
-                    <li><span class="num">2</span><span>Pay the exact amount of <strong style="color:#fff">₹{{ number_format((float) $deposit->amount_inr, 2) }}</strong>.</span></li>
-                    <li><span class="num">3</span><span>Keep this page open while we verify the transaction.</span></li>
-                </ol>
-                <div class="warning">Do not pay again while this order is pending. Wallet funds are added only after gateway confirmation.</div>
-                <div class="status-box"><strong style="color:#fff">Wallet credit after verification</strong><p>₹{{ number_format((float) $deposit->final_amount, 2) }} INR will be added to your Fund Wallet.</p></div>
-            </aside>
-        </div>
-    </main>
+            @if (! $fullScreenCheckout && ! $hasQrImage && $checkoutUrl)
+                <a id="openCheckout" class="open-link" href="{{ $checkoutUrl }}" target="_blank" rel="noopener noreferrer" @if ($deposit->status === 'approved') hidden @endif>Open payment page</a>
+            @endif
+            <p class="message" id="paymentMessage" role="status" aria-live="polite">{{ $deposit->status === 'approved' ? 'Payment confirmed. You can return to the app now.' : 'Waiting for payment confirmation…' }}</p>
+        </main>
+    </div>
+
     <script>
         (() => {
             const statusUrl = {{ Illuminate\Support\Js::from($statusUrl) }};
+            const resultUrl = {{ Illuminate\Support\Js::from($resultUrl) }};
+            const depositId = {{ Illuminate\Support\Js::from($deposit->id) }};
             const status = document.getElementById('paymentStatus');
             const message = document.getElementById('paymentMessage');
             const checkout = document.getElementById('paymentCheckout');
-            const success = document.getElementById('paymentSuccess');
-            const openCheckout = document.getElementById('openCheckout');
             let busy = false;
-            let completionNotified = false;
-
-            const showSuccess = (result) => {
-                status.textContent = 'APPROVED';
-                status.style.color = '#a7f3d0';
-                checkout.style.display = 'none';
-                success.style.display = 'block';
-                if (openCheckout) openCheckout.style.display = 'none';
-                message.textContent = 'Payment confirmed. You can return to the app now.';
-                if (completionNotified) return;
-                completionNotified = true;
-                const payload = JSON.stringify({ type: 'payment_success', deposit_id: result.deposit_id, deposit_ref: result.deposit_ref, status: result.status });
-                if (window.ReactNativeWebView?.postMessage) window.ReactNativeWebView.postMessage(payload);
-                if (window.webkit?.messageHandlers?.paymentStatus) window.webkit.messageHandlers.paymentStatus.postMessage(payload);
-            };
 
             window.addEventListener('message', (event) => {
                 if (event.origin !== window.location.origin
                     || event.source !== document.querySelector('.checkout')?.contentWindow
                     || event.data?.type !== 'upi_returned'
-                    || event.data?.deposit_id !== {{ Illuminate\Support\Js::from($deposit->id) }}) {
+                    || event.data?.deposit_id !== depositId) {
                     return;
                 }
-
                 poll();
             });
-
-            if (status.textContent.trim().toLowerCase() === 'approved') {
-                showSuccess({ deposit_id: {{ Illuminate\Support\Js::from($deposit->id) }}, deposit_ref: {{ Illuminate\Support\Js::from($deposit->deposit_ref) }}, status: 'approved' });
-            }
 
             const poll = async () => {
                 if (busy) return;
@@ -130,24 +100,26 @@
                     const response = await fetch(statusUrl, { headers: { Accept: 'application/json' } });
                     if (!response.ok) throw new Error('status check failed');
                     const result = await response.json();
-                    status.textContent = result.status;
+                    status.textContent = result.status.replaceAll('_', ' ');
+                    status.dataset.status = result.status;
                     if (result.status === 'approved') {
-                        showSuccess(result);
+                        message.textContent = 'Payment confirmed. Opening your success page…';
+                        window.location.replace(resultUrl);
                         return;
                     }
                     if (result.status === 'rejected') {
-                        status.style.color = '#fda4af';
-                        message.textContent = 'Gateway did not confirm this payment. Contact support if money was deducted.';
+                        window.location.replace(resultUrl);
                         return;
                     }
-                    message.textContent = 'Payment is still pending. Checking again automatically…';
+                    message.textContent = 'Waiting for payment confirmation…';
                 } catch (_) {
-                    message.textContent = 'Status check unavailable. Retrying automatically…';
+                    message.textContent = 'Checking payment status…';
                 } finally {
                     busy = false;
                 }
                 window.setTimeout(poll, 5000);
             };
+
             poll();
         })();
     </script>

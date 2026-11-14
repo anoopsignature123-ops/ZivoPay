@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -19,6 +20,66 @@ class PaymentControllerTest extends TestCase
     public function test_unauthenticated_user_cannot_start_a_deposit(): void
     {
         $this->postJson('/api/add-fund', ['currency' => 'INR', 'amount' => 1000])->assertUnauthorized();
+    }
+
+    public function test_gateway_return_ignores_signed_callback_parameters_and_shows_success_only_after_approval(): void
+    {
+        $user = $this->createUser();
+        $deposit = Deposit::query()->create([
+            'user_id' => $user->id,
+            'deposit_ref' => 'DEP-RETURN-TEST',
+            'amount' => 10,
+            'charge' => 0,
+            'final_amount' => 1000,
+            'amount_inr' => 1000,
+            'conversion_rate' => 100,
+            'payment_method' => 'UPIGateway UPI (INR)',
+            'payment_provider' => 'upigateway',
+            'provider_mode' => 'single',
+            'status' => 'approved',
+        ]);
+        $gatewayReturnUrl = URL::temporarySignedRoute(
+            'app.deposit.upi.return',
+            now()->addMinutes(15),
+            ['deposit' => $deposit->id],
+        );
+
+        $callbackResponse = $this->get($gatewayReturnUrl.'&'.http_build_query([
+            'amount' => '1000.00',
+            'client_txn_id' => $deposit->deposit_ref,
+            'createdAt' => '2026-11-14T12:24:24Z',
+            'customer_email' => $user->email,
+            'customer_mobile' => '9876543210',
+            'customer_name' => $user->name,
+            'customer_vpa' => 'customer@upi',
+            'id' => 'gateway-order-1',
+            'p_info' => 'Wallet Deposit',
+            'redirect_url' => 'https://zivopay.net/app/deposit/upi/1/return',
+            'remark' => 'Payment complete',
+            'status' => 'success',
+            'txnAt' => '2026-11-14',
+            'txn_id' => '193538203',
+            'udf1' => (string) $user->id,
+            'udf2' => '',
+            'udf3' => '',
+            'upi_txn_id' => '193538203',
+        ]));
+        $callbackResponse->assertRedirect();
+        $this->assertSame('/app/deposit/upi/'.$deposit->id.'/result', parse_url($callbackResponse->headers->get('Location'), PHP_URL_PATH));
+        $this->get($callbackResponse->headers->get('Location'))
+            ->assertOk()
+            ->assertSee('Payment successful')
+            ->assertSee($deposit->deposit_ref);
+
+        $successUrl = URL::temporarySignedRoute(
+            'app.deposit.upi.result',
+            now()->addMinutes(15),
+            ['deposit' => $deposit->id],
+        );
+        $this->get($successUrl)
+            ->assertOk()
+            ->assertSee('Added to your Fund Wallet')
+            ->assertDontSee('Back to ZIVO PAY');
     }
 
     public function test_add_fund_configuration_only_exposes_public_payment_details(): void
@@ -98,7 +159,10 @@ class PaymentControllerTest extends TestCase
 
         $this->get('/app/deposit/upi/'.$depositId)->assertForbidden();
         $this->get(str_replace('signature=', 'signature=invalid', $webviewUrl))->assertForbidden();
-        $this->get($webviewUrl)->assertOk()->assertSee('Complete your payment');
+        $this->get($webviewUrl)
+            ->assertOk()
+            ->assertSee('Scan to add funds')
+            ->assertSee('window.location.replace(resultUrl)');
         $this->assertSame(0.0, (float) $user->fresh()->deposit_wallet);
         $this->assertDatabaseHas('deposits', ['deposit_ref' => $depositRef, 'status' => 'pending']);
         $this->getJson($webviewStatusUrl)
@@ -114,6 +178,21 @@ class PaymentControllerTest extends TestCase
 
         $this->assertSame(10.0, (float) $user->fresh()->deposit_wallet);
         $this->assertSame(1, Transaction::query()->where('trx_id', $depositRef)->count());
+        $gatewayReturnUrl = URL::temporarySignedRoute(
+            'app.deposit.upi.return',
+            now()->addMinutes(15),
+            ['deposit' => $depositId],
+        );
+        $callbackResponse = $this->get($gatewayReturnUrl.'&'.http_build_query([
+            'client_txn_id' => $depositRef,
+            'status' => 'success',
+            'txn_id' => '193538203',
+        ]));
+        $callbackResponse->assertRedirect();
+        $this->get($callbackResponse->headers->get('Location'))
+            ->assertOk()
+            ->assertSee('Payment successful')
+            ->assertSee($depositRef);
         Http::assertSent(fn (Request $request): bool => $request->url() === 'https://upi.test/api/create_order'
             && $request['amount'] === '1000.00'
             && $request['client_txn_id'] === $depositRef

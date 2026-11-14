@@ -278,6 +278,14 @@ class DepositController extends Controller
             $deposit->refresh();
         }
 
+        if (in_array($deposit->status, ['approved', 'rejected'], true)) {
+            return redirect()->temporarySignedRoute(
+                'app.deposit.upi.result',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            );
+        }
+
         return view('user.deposit.app-upi', [
             'deposit' => $deposit,
             'checkoutUrl' => data_get($deposit->payment_metadata, 'checkout_url'),
@@ -287,22 +295,69 @@ class DepositController extends Controller
                 now()->addHour(),
                 ['deposit' => $deposit->id],
             ),
+            'resultUrl' => URL::temporarySignedRoute(
+                'app.deposit.upi.result',
+                now()->addHour(),
+                ['deposit' => $deposit->id],
+            ),
         ]);
     }
 
-    public function appUpiReturn(Request $request, Deposit $deposit, UpigatewayService $upigateway): View
+    public function appUpiReturn(Request $request, Deposit $deposit, UpigatewayService $upigateway): View|RedirectResponse
     {
+        $gatewayCallbackParameters = [
+            'amount',
+            'client_txn_id',
+            'createdAt',
+            'customer_email',
+            'customer_mobile',
+            'customer_name',
+            'customer_vpa',
+            'id',
+            'p_info',
+            'redirect_url',
+            'remark',
+            'status',
+            'txnAt',
+            'txn_id',
+            'udf1',
+            'udf2',
+            'udf3',
+            'upi_txn_id',
+        ];
         $hasValidSignature = URL::hasValidSignature(
             $request,
             true,
-            static fn (string $parameter): bool => $parameter !== 'expires',
+            $gatewayCallbackParameters,
         );
 
-        abort_unless($hasValidSignature, 403);
+        if (! $hasValidSignature) {
+            Log::warning('UPIGateway return URL signature validation failed.', [
+                'deposit_id' => $deposit->id,
+                'route' => $request->route()?->getName(),
+                'query_parameter_names' => array_keys($request->query()),
+                'ignored_gateway_parameters' => ['client_txn_id', 'txn_id'],
+                'expires' => $request->query('expires'),
+                'signature_present' => $request->filled('signature'),
+                'request_host' => $request->getHost(),
+                'configured_host' => parse_url((string) config('app.url'), PHP_URL_HOST),
+            ]);
+
+            abort(403);
+        }
+
         abort_unless($deposit->payment_provider === 'upigateway', 404);
         if ($deposit->status === 'pending') {
             $upigateway->verifyAndCredit($deposit->deposit_ref);
             $deposit->refresh();
+        }
+
+        if (in_array($deposit->status, ['approved', 'rejected'], true)) {
+            return redirect()->temporarySignedRoute(
+                'app.deposit.upi.result',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            );
         }
 
         return view('user.deposit.returning', [
@@ -312,7 +367,33 @@ class DepositController extends Controller
                 now()->addMinutes(15),
                 ['deposit' => $deposit->id],
             ),
-            'successUrl' => null,
+            'successUrl' => URL::temporarySignedRoute(
+                'app.deposit.upi.result',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            ),
+            'appReturn' => true,
+        ]);
+    }
+
+    public function appUpiResult(Deposit $deposit, UpigatewayService $upigateway): View|RedirectResponse
+    {
+        abort_unless($deposit->payment_provider === 'upigateway', 404);
+        if ($deposit->status === 'pending') {
+            $upigateway->verifyAndCredit($deposit->deposit_ref);
+            $deposit->refresh();
+        }
+
+        if ($deposit->status === 'pending') {
+            return redirect()->temporarySignedRoute(
+                'app.deposit.upi.return',
+                now()->addMinutes(15),
+                ['deposit' => $deposit->id],
+            );
+        }
+
+        return view('user.deposit.app-upi-result', [
+            'deposit' => $deposit,
             'appReturn' => true,
         ]);
     }
