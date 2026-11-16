@@ -13,7 +13,7 @@ class LoanDashboardController extends Controller
     {
         $counts = LoanApplication::query()->selectRaw('status, COUNT(*) as aggregate')->groupBy('status')->pluck('aggregate', 'status');
         $statusCounts = collect(LoanApplication::STATUSES)->mapWithKeys(fn (string $status) => [$status => (int) ($counts[$status] ?? 0)]);
-        $recentApplications = LoanApplication::query()->with(['user:id,name', 'category:id,name'])->latest()->limit(8)->get();
+        $recentApplications = LoanApplication::query()->with(['user:id,name,referral_code', 'category:id,name'])->latest()->limit(8)->get();
 
         return view('admin.loan.dashboard', [
             'statusCounts' => $statusCounts,

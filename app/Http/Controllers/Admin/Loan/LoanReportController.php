@@ -21,7 +21,7 @@ class LoanReportController extends Controller
         $byCategory = (clone $query)->selectRaw('loan_category_id, COUNT(*) as applications, COALESCE(SUM(loan_amount), 0) as requested_amount')
             ->with('category:id,name')->groupBy('loan_category_id')->orderByDesc('applications')->get();
         $byStatus = (clone $query)->selectRaw('status, COUNT(*) as applications, COALESCE(SUM(loan_amount), 0) as requested_amount')->groupBy('status')->orderBy('status')->get();
-        $applications = (clone $query)->with(['user:id,name,email,mobile', 'category:id,name'])
+        $applications = (clone $query)->with(['user:id,name,email,mobile,referral_code', 'category:id,name'])
             ->latest('created_at')->paginate(20)->withQueryString();
 
         return view('admin.loan.reports.index', [
@@ -38,15 +38,15 @@ class LoanReportController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $filters = $this->filters($request);
-        $query = $this->query($filters)->with(['category:id,name', 'user:id,name,email,mobile'])->latest('created_at');
+        $query = $this->query($filters)->with(['category:id,name', 'user:id,name,email,mobile,referral_code'])->latest('created_at');
 
         return response()->streamDownload(function () use ($query): void {
             $output = fopen('php://output', 'w');
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, ['Application number', 'Applicant', 'User', 'User ID', 'Mobile', 'Email', 'Category', 'Loan amount', 'Tenure years', 'Lender', 'Status', 'Submitted at']);
+            fputcsv($output, ['Application number', 'Applicant', 'User', 'Referral ID', 'Mobile', 'Email', 'Category', 'Loan amount', 'Tenure years', 'Lender', 'Status', 'Submitted at']);
             $query->chunkById(500, function ($applications) use ($output): void {
                 foreach ($applications as $application) {
-                    fputcsv($output, [$application->application_number, $application->applicant_name, $application->user?->name, $application->user_id, $application->mobile, $application->email, $application->category?->name, $application->loan_amount, $application->tenure_years, $application->preferred_lender, $application->status, $application->submitted_at?->toDateTimeString() ?: $application->created_at?->toDateTimeString()]);
+                    fputcsv($output, [$application->application_number, $application->applicant_name, $application->user?->name, $application->user?->referral_code, $application->mobile, $application->email, $application->category?->name, $application->loan_amount, $application->tenure_years, $application->preferred_lender, $application->status, $application->submitted_at?->toDateTimeString() ?: $application->created_at?->toDateTimeString()]);
                 }
             });
             fclose($output);

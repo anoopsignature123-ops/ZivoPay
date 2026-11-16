@@ -26,7 +26,7 @@ class LoanApplicationController extends Controller
             'category_id' => ['nullable', 'integer', 'exists:loan_categories,id'], 'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
         ]);
-        $applications = $this->query($filters)->with(['user:id,name,email,mobile', 'category:id,name'])->latest('created_at')->paginate(15)->withQueryString();
+        $applications = $this->query($filters)->with(['user:id,name,email,mobile,referral_code', 'category:id,name'])->latest('created_at')->paginate(15)->withQueryString();
         $counts = LoanApplication::query()->selectRaw('status, COUNT(*) as aggregate')->groupBy('status')->pluck('aggregate', 'status');
         $stats = collect(LoanApplication::STATUSES)->mapWithKeys(fn (string $status) => [$status => (int) ($counts[$status] ?? 0)]);
 
@@ -38,7 +38,7 @@ class LoanApplicationController extends Controller
 
     public function show(LoanApplication $application): View
     {
-        $application->load(['user:id,name,email,mobile', 'category', 'documents', 'statusHistories.changedBy:id,name']);
+        $application->load(['user:id,name,email,mobile,referral_code', 'category', 'documents', 'statusHistories.changedBy:id,name']);
 
         return view('admin.loan.applications.show', compact('application'));
     }

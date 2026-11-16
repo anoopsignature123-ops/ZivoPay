@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
 @php
-    $statusLabels = ['submitted' => 'Submitted', 'under_review' => 'Under review', 'approved' => 'Approved', 'rejected' => 'Rejected', 'disbursed' => 'Disbursed', 'completed' => 'Completed'];
-    $statusStyles = ['submitted' => 'text-sky-200 bg-sky-300/10 border-sky-300/15', 'under_review' => 'text-amber-200 bg-amber-300/10 border-amber-300/15', 'approved' => 'text-emerald-200 bg-emerald-300/10 border-emerald-300/15', 'rejected' => 'text-rose-200 bg-rose-300/10 border-rose-300/15', 'disbursed' => 'text-violet-200 bg-violet-300/10 border-violet-300/15', 'completed' => 'text-teal-200 bg-teal-300/10 border-teal-300/15'];
+$statusLabels = ['submitted' => 'Submitted', 'under_review' => 'Under review', 'approved' => 'Approved', 'rejected' => 'Rejected', 'disbursed' => 'Disbursed', 'completed' => 'Completed'];
+$statusStyles = ['submitted' => 'text-sky-200 bg-sky-300/10 border-sky-300/15', 'under_review' => 'text-amber-200 bg-amber-300/10 border-amber-300/15', 'approved' => 'text-emerald-200 bg-emerald-300/10 border-emerald-300/15', 'rejected' => 'text-rose-200 bg-rose-300/10 border-rose-300/15', 'disbursed' => 'text-violet-200 bg-violet-300/10 border-violet-300/15', 'completed' => 'text-teal-200 bg-teal-300/10 border-teal-300/15'];
 @endphp
 
 @section('title', 'Loan Applications - ZIVO PAY')
@@ -112,49 +112,49 @@
                                                 {{ $application->applicant_name ?: 'Unknown applicant' }}
                                             </p>
                                             <p class="mt-0.5 text-xs text-emerald-300">Submitted by:
-                                                {{ $application->user?->name ?? ($application->user_id ? 'User #' . $application->user_id : 'Unlinked user') }}
-                                                · ID {{ $application->user_id ?? '—' }}
-                                            </p>
-                                            <p class="mt-0.5 text-xs text-neutral-500">{{ $application->mobile }} ·
-                                                {{ $application->email ?: 'No email' }}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-4 text-neutral-200">
-                                            {{ $application->category?->name ?? 'Category unavailable' }}
-                                        </td>
-                                        <td class="px-4 py-4">
-                                            <p class="font-semibold text-neutral-200">
-                                                ₹{{ number_format((float) $application->loan_amount, 2) }}</p>
-                                            <p class="mt-0.5 text-xs text-neutral-500">{{ $application->tenure_years }} years ·
-                                                {{ $application->preferred_lender }}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-4"><span
-                                                class="rounded-full border px-2.5 py-1 text-[11px] font-bold {{ $statusStyles[$application->status] ?? 'border-slate-300/15 bg-slate-300/10 text-slate-200' }}">{{ $statusLabels[$application->status] ?? str($application->status)->headline() }}</span>
-                                        </td>
-                                        <td class="px-4 py-4 text-xs text-neutral-300">
-                                            {{ ($application->submitted_at ?? $application->created_at)?->format('d M Y, h:i A') ?? '—' }}
-                                        </td>
-                                        <td class="px-5 py-4 text-right"><a href="{{ route('admin.loan.applications.show', $application) }}"
-                                                class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-emerald-300/15 px-3 text-xs font-bold text-emerald-200 hover:bg-emerald-300/10"><i
-                                                    data-lucide="eye" class="h-4 w-4"></i> Review</a></td>
-                                    </tr>
+                                                {{ $application->user?->name ?? 'Unlinked user' }}
+                                                · ( {{ $application->user?->referral_code ?? '—' }} )
+                                                </p>
+                                                <p class="mt-0.5 text-xs text-neutral-500">{{ $application->mobile }} ·
+                                                    {{ $application->email ?: 'No email' }}
+                                                </p>
+                                                </td>
+                                                <td class="px-4 py-4 text-neutral-200">
+                                                    {{ $application->category?->name ?? 'Category unavailable' }}
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <p class="font-semibold text-neutral-200">
+                                                        ₹{{ number_format((float) $application->loan_amount, 2) }}</p>
+                                                    <p class="mt-0.5 text-xs text-neutral-500">{{ $application->tenure_years }} years ·
+                                                        {{ $application->preferred_lender }}
+                                                    </p>
+                                                </td>
+                                                <td class="px-4 py-4"><span
+                                                        class="rounded-full border px-2.5 py-1 text-[11px] font-bold {{ $statusStyles[$application->status] ?? 'border-slate-300/15 bg-slate-300/10 text-slate-200' }}">{{ $statusLabels[$application->status] ?? str($application->status)->headline() }}</span>
+                                                </td>
+                                                <td class="px-4 py-4 text-xs text-neutral-300">
+                                                    {{ ($application->submitted_at ?? $application->created_at)?->format('d M Y, h:i A') ?? '—' }}
+                                                </td>
+                                                <td class="px-5 py-4 text-right"><a href="{{ route('admin.loan.applications.show', $application) }}"
+                                                        class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-emerald-300/15 px-3 text-xs font-bold text-emerald-200 hover:bg-emerald-300/10"><i
+                                                            data-lucide="eye" class="h-4 w-4"></i> Review</a></td>
+                                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="7" class="px-5 py-16 text-center"><span
-                                                class="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-emerald-300/15 bg-emerald-300/[.05] text-emerald-200"><i
-                                                    data-lucide="inbox" class="h-5 w-5"></i></span>
-                                            <p class="mt-3 font-bold text-white">No loan applications found</p>
-                                            <p class="mt-1 text-sm text-neutral-400">Try changing the filters. Mobile submissions will
-                                                appear here.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                            </table>
-                            </div>
-                            @if($applications->hasPages())
-                            <div class="border-t border-emerald-300/10 px-5 py-4">{{ $applications->links() }}</div>@endif
-                            </section>
-                            </main>
+                                                    <tr>
+                                                        <td colspan="7" class="px-5 py-16 text-center"><span
+                                                                class="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-emerald-300/15 bg-emerald-300/[.05] text-emerald-200"><i
+                                                                    data-lucide="inbox" class="h-5 w-5"></i></span>
+                                                            <p class="mt-3 font-bold text-white">No loan applications found</p>
+                                                            <p class="mt-1 text-sm text-neutral-400">Try changing the filters. Mobile submissions will
+                                                                appear here.</p>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                                </tbody>
+                                                </table>
+                                                </div>
+                                                @if($applications->hasPages())
+                                                <div class="border-t border-emerald-300/10 px-5 py-4">{{ $applications->links() }}</div>@endif
+                                                </section>
+                                                </main>
 @endsection
