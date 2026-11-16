@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -162,6 +164,51 @@ class AuthApiTest extends TestCase
 
         $responseMobile->assertStatus(200)
             ->assertJsonPath('success', true);
+    }
+
+    public function test_new_mobile_login_revokes_the_previous_device_token_and_returns_401_for_it(): void
+    {
+        $role = Role::query()->create(['name' => 'Member', 'slug' => 'member']);
+        $user = User::factory()->create([
+            'role_id' => $role->id,
+            'mobile' => '9988776655',
+            'email' => 'single-device@example.com',
+            'referral_code' => 'ZIVO-DEVICE-1',
+            'password' => Hash::make('password123'),
+        ]);
+        $firstDeviceToken = $user->createToken('mobile_app_auth_token')->plainTextToken;
+
+        $passwordLogin = $this->postJson('/api/login', [
+            'login_id' => $user->mobile,
+            'password' => 'password123',
+        ])->assertOk();
+        $secondDeviceToken = $passwordLogin->json('data.token');
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        Auth::forgetGuards();
+        $this->withHeader('Authorization', 'Bearer '.$firstDeviceToken)
+            ->getJson('/api/user')
+            ->assertUnauthorized();
+        Auth::forgetGuards();
+        $this->withHeader('Authorization', 'Bearer '.$secondDeviceToken)
+            ->getJson('/api/user')
+            ->assertOk();
+
+        $otpLogin = $this->postJson('/api/verify-otp', [
+            'mobile' => $user->mobile,
+            'otp' => '3859',
+        ])->assertOk();
+        $thirdDeviceToken = $otpLogin->json('data.token');
+
+        Auth::forgetGuards();
+        $this->withHeader('Authorization', 'Bearer '.$secondDeviceToken)
+            ->getJson('/api/user')
+            ->assertUnauthorized();
+        Auth::forgetGuards();
+        $this->withHeader('Authorization', 'Bearer '.$thirdDeviceToken)
+            ->getJson('/api/user')
+            ->assertOk();
+        $this->assertSame(1, $user->tokens()->count());
     }
 
     /**

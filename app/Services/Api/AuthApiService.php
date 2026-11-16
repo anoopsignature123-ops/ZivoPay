@@ -4,6 +4,7 @@ namespace App\Services\Api;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -65,7 +66,7 @@ class AuthApiService
             ]);
         }
 
-        $token = $user->createToken('mobile_app_auth_token')->plainTextToken;
+        $token = $this->issueSingleDeviceToken($user);
 
         return [
             'user' => $user,
@@ -141,11 +142,21 @@ class AuthApiService
         Cache::forget('otp_'.$cleanMobile);
         Cache::forget('otp_'.$user->mobile);
 
-        $token = $user->createToken('mobile_app_auth_token')->plainTextToken;
+        $token = $this->issueSingleDeviceToken($user);
 
         return [
             'user' => $user,
             'token' => $token,
         ];
+    }
+
+    private function issueSingleDeviceToken(User $user): string
+    {
+        return DB::transaction(function () use ($user): string {
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->id);
+            $lockedUser->tokens()->delete();
+
+            return $lockedUser->createToken('mobile_app_auth_token')->plainTextToken;
+        });
     }
 }
