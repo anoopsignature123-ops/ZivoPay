@@ -135,7 +135,7 @@ class AuthApiService
 
         if ($cleanOtp !== '3859' && $cleanOtp !== (string) $cachedOtp) {
             throw ValidationException::withMessages([
-                'otp' => ['Invalid OTP entered. Please enter 3859.'],
+                'otp' => ['Invalid OTP entered.'],
             ]);
         }
 

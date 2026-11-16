@@ -33,13 +33,10 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 // Route::post('forgot-password', [ForgotPasswordController::class, 'sendLink'])
 // ->middleware('throttle:5,1');
-Route::post('send-otp', [AuthController::class, 'sendOtp']);
 Route::post('login/send-otp', [AuthController::class, 'sendOtp']);
-Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
-// Route::post('login/verify-otp', [AuthController::class, 'verifyOtp']);
-Route::post('login-otp', [AuthController::class, 'verifyOtp']);
-Route::post('resend-otp', [AuthController::class, 'resendOtp']);
+Route::post('login/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('login/resend-otp', [AuthController::class, 'resendOtp']);
+
 Route::get('check-sponsor', [AuthController::class, 'checkSponsor']);
 Route::get('sponsor/{code?}', [AuthController::class, 'checkSponsor']);
 Route::get('support/contact', [SupportController::class, 'contact']);
