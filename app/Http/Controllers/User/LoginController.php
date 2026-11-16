@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Services\LoginAuditRecorder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,15 +24,15 @@ class LoginController extends Controller
         return view('user.auth.login');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request, LoginAuditRecorder $loginAuditRecorder): RedirectResponse
     {
         $request->validate([
-            'mobile'   => 'required|digits_between:10,15',
+            'mobile' => 'required|digits_between:10,15',
             'password' => 'required',
         ], [
-            'mobile.required'        => 'Mobile number is required.',
-            'mobile.digits_between'  => 'Enter a valid mobile number.',
-            'password.required'      => 'Password is required.',
+            'mobile.required' => 'Mobile number is required.',
+            'mobile.digits_between' => 'Enter a valid mobile number.',
+            'password.required' => 'Password is required.',
         ]);
 
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password], $request->remember)) {
@@ -44,6 +45,7 @@ class LoginController extends Controller
             }
 
             $request->session()->regenerate();
+            $loginAuditRecorder->recordSuccessfulLogin($user, $request, 'member_web', 'password');
 
             return redirect()->route('user.dashboard')->with('success', 'Welcome back, '.$user->name);
         }

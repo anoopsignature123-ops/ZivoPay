@@ -112,6 +112,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function loginAudits(): HasMany
+    {
+        return $this->hasMany(LoginAudit::class);
+    }
+
     public function shopRatings(): HasMany
     {
         return $this->hasMany(Rating::class);

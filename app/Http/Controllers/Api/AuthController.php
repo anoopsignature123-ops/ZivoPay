@@ -8,6 +8,7 @@ use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Resources\Api\UserResource;
 use App\Models\User;
 use App\Services\Api\AuthApiService;
+use App\Services\LoginAuditRecorder;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class AuthController extends Controller
      * Mobile App User Login API.
      * Login via User ID (referral code), Email, or Mobile with Password or OTP.
      */
-    public function login(LoginRequest $request, AuthApiService $authService): JsonResponse
+    public function login(LoginRequest $request, AuthApiService $authService, LoginAuditRecorder $loginAuditRecorder): JsonResponse
     {
         try {
             $loginId = (string) ($request->input('login_id') ?? $request->input('user_id') ?? $request->input('mobile') ?? $request->input('email'));
@@ -46,6 +47,12 @@ class AuthController extends Controller
                 $loginId,
                 $request->input('password'),
                 $request->input('otp')
+            );
+            $loginAuditRecorder->recordSuccessfulLogin(
+                $result['user'],
+                $request,
+                'mobile_api',
+                $request->filled('otp') ? 'otp' : 'password',
             );
 
             return $this->successResponse([
@@ -92,7 +99,7 @@ class AuthController extends Controller
     /**
      * Verify OTP & Login API.
      */
-    public function verifyOtp(Request $request, AuthApiService $authService): JsonResponse
+    public function verifyOtp(Request $request, AuthApiService $authService, LoginAuditRecorder $loginAuditRecorder): JsonResponse
     {
         $mobile = (string) ($request->input('mobile') ?? $request->input('login_id') ?? $request->input('user_id') ?? $request->input('phone'));
         $otp = (string) ($request->input('otp') ?? $request->input('otp_code'));
@@ -107,6 +114,7 @@ class AuthController extends Controller
 
         try {
             $result = $authService->verifyOtp($mobile, $otp);
+            $loginAuditRecorder->recordSuccessfulLogin($result['user'], $request, 'mobile_api', 'otp');
 
             return $this->successResponse([
                 'user' => new UserResource($result['user']),

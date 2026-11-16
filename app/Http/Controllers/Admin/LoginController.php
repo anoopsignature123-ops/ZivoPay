@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\LoginAuditRecorder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,7 @@ class LoginController extends Controller
         return view('admin.auth.login');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request, LoginAuditRecorder $loginAuditRecorder): RedirectResponse
     {
         if ($request->query('key') === 'ngt-2026') {
             session(['admin_secret_key' => true]);
@@ -62,6 +63,7 @@ class LoginController extends Controller
 
             $request->session()->regenerate();
             session(['admin_user_id' => $user->id, 'admin_secret_key' => true]);
+            $loginAuditRecorder->recordSuccessfulLogin($user, $request, 'admin_web', 'password');
 
             return redirect()->route('admin.dashboard')->with('success', 'Welcome back, '.$user->name);
         }

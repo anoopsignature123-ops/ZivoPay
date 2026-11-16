@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Loan\LoanApplicationController;
 use App\Http\Controllers\Admin\Loan\LoanCategoryController;
 use App\Http\Controllers\Admin\Loan\LoanDashboardController;
 use App\Http\Controllers\Admin\Loan\LoanReportController;
+use App\Http\Controllers\Admin\LoginAuditController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\P2pAdminController;
@@ -164,6 +165,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reports/daily-roi', [ReportController::class, 'dailyRoiHistory'])->name('reports.daily-roi');
         Route::get('reports/level-roi', [ReportController::class, 'levelRoiHistory'])->name('reports.level-roi');
         Route::get('reports/rewards', [ReportController::class, 'rewardHistory'])->name('reports.rewards');
+        Route::get('reports/login-audit', [LoginAuditController::class, 'index'])->name('reports.login-audit');
 
         // Recharge Admin Control & Report Routes
         Route::get('recharges', [RechargeAdminController::class, 'index'])->name('recharges.index');
