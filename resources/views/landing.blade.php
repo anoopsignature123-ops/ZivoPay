@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZivoPay – Evening. One Zivo Pay.</title>
+    <title>Zivo Pay – Evening. One Zivo Pay.</title>
     <meta name="description"
-      content="ZivoPay – India's fastest recharge & bill payment platform. Mobile recharge, DTH, Credit Card, Electricity, Gas, Water and more." />
+      content="Zivo Pay – India's fastest recharge & bill payment platform. Mobile recharge, DTH, Credit Card, Electricity, Gas, Water and more." />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap"
       rel="stylesheet" />
@@ -1817,7 +1817,7 @@
     <nav class="nav" id="nav">
       <div class="container">
         <div class="nav-row">
-                <a href="#home" class="nav-logo"><img src="{{ asset('web/assets/images/logo.png') }}" alt="ZivoPay" /></a>
+                <a href="#home" class="nav-logo"><img src="{{ asset('web/assets/images/logo.png') }}" alt="Zivo Pay" /></a>
                 <ul class="nav-links">
                   <li><a href="#services">Services</a></li>
                   <li><a href="#how-it-works">How It Works</a></li>
@@ -1837,7 +1837,7 @@
     <!-- ── MOBILE MENU ───────────────────────────────────────────── -->
     <div class="mmenu" id="mmenu">
       <div class="mm-head">
-        <img src="{{ asset('web/assets/images/logo.png') }}" alt="ZivoPay" />
+        <img src="{{ asset('web/assets/images/logo.png') }}" alt="Zivo Pay" />
         <div class="mm-x" onclick="closeMenu()"><i class="fas fa-times"></i></div>
       </div>
       <div class="mm-body">
@@ -1871,7 +1871,7 @@
                       </h1>
                       <p class="hero-desc">
                         From mobile recharge to electricity bills — pay everything instantly with
-                        <strong>ZivoPay</strong>. Secure, lightning-fast, packed with exclusive cashback.
+                        <strong>Zivo Pay</strong>. Secure, lightning-fast, packed with exclusive cashback.
                       </p>
                       <div class="hero-btns">
                         <a href="#services" class="btn-solid"><i class="fas fa-th-large"></i> Explore Services</a>
@@ -1903,7 +1903,7 @@
                         <div class="ph-header">
                           <div class="ph-hi">Welcome back!</div>
                           <div class="ph-bal">₹ 1,240.50</div>
-                          <div class="ph-sub">ZivoPay Wallet Balance</div>
+                        <div class="ph-sub">Zivo Pay Wallet Balance</div>
                         </div>
                         <div class="ph-grid">
                           <div class="ph-ic"><i class="fas fa-mobile-alt"></i><span>Mobile</span></div>
@@ -2156,7 +2156,7 @@
     <section class="features" id="features">
       <div class="container">
         <div data-aos="fade-up">
-                <div style="text-align:center"><span class="chip"><i class="fas fa-star"></i> Why ZivoPay</span>
+                <div style="text-align:center"><span class="chip"><i class="fas fa-star"></i> Why Zivo Pay</span>
                 </div>
                 <h2 class="ttl">Built for <span>Speed, Security &amp; Savings</span></h2>
                 <p class="sub">Everything designed to make your payment experience effortless</p>
@@ -2296,13 +2296,13 @@
               Reviews</span>
           </div>
           <h2 class="ttl">What Our <span>Users Say</span></h2>
-          <p class="sub">Over 10 million happy customers trust ZivoPay every day</p>
+        <p class="sub">Over 10 million happy customers trust Zivo Pay every day</p>
             </div>
             <div class="testi-grid">
               <div class="tc" data-aos="fade-up" data-aos-delay="0">
                 <div class="tc-q">"</div>
                 <div class="tc-stars">★★★★★</div>
-                <p class="tc-txt">I've been using ZivoPay for 2 years. Electricity bill, mobile recharge, DTH —
+                <p class="tc-txt">I've been using Zivo Pay for 2 years. Electricity bill, mobile recharge, DTH —
                   everything
                   done in seconds. Cashback offers are amazing!</p>
                 <div class="tc-auth"><img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Rajesh" />
@@ -2328,7 +2328,7 @@
                     <div class="tc" data-aos="fade-up" data-aos-delay="180">
                       <div class="tc-q">"</div>
                       <div class="tc-stars">★★★★★</div>
-                    <p class="tc-txt">ZivoPay saved me so much time. All house bills — gas, water, internet — managed
+                    <p class="tc-txt">Zivo Pay saved me so much time. All house bills — gas, water, internet — managed
                       from one
                       place. Customer support is very quick!</p>
                     <div class="tc-auth"><img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Amit" />
@@ -2341,7 +2341,7 @@
                     <div class="tc" data-aos="fade-up" data-aos-delay="0">
                       <div class="tc-q">"</div>
                       <div class="tc-stars">★★★★★</div>
-                    <p class="tc-txt">I recharge Jio and pay electricity bills every month through ZivoPay. Never had a
+                    <p class="tc-txt">I recharge Jio and pay electricity bills every month through Zivo Pay. Never had a
                       failed
                       transaction. Cashback is credited instantly!</p>
                     <div class="tc-auth"><img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Sneha" />
@@ -2354,7 +2354,7 @@
                     <div class="tc" data-aos="fade-up" data-aos-delay="90">
                       <div class="tc-q">"</div>
                       <div class="tc-stars">★★★★★</div>
-                    <p class="tc-txt">FASTag and insurance premium through ZivoPay is super convenient. Offers are
+                    <p class="tc-txt">FASTag and insurance premium through Zivo Pay is super convenient. Offers are
                       unbeatable and
                       transactions always instant!</p>
                     <div class="tc-auth"><img src="https://randomuser.me/api/portraits/men/55.jpg" alt="Suresh" />
@@ -2419,7 +2419,7 @@
                   <div class="sec-c" data-aos="fade-up" data-aos-delay="160">
                     <div class="sec-ico"><i class="fas fa-certificate"></i></div>
                     <h3>RBI Regulated</h3>
-                    <p>ZivoPay is fully regulated and licensed by the Reserve Bank of India.</p>
+                    <p>Zivo Pay is fully regulated and licensed by the Reserve Bank of India.</p>
                   </div>
                 </div>
                 </div>
@@ -2433,7 +2433,7 @@
                     <div class="chip" style="background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3)">
                       <i class="fas fa-mobile-alt"></i>&nbsp;Download Now
                     </div>
-                    <h2 class="app-h">Get the <span>ZivoPay App</span><br>and Pay Smarter</h2>
+                    <h2 class="app-h">Get the <span>Zivo Pay App</span><br>and Pay Smarter</h2>
                     <p class="app-p">Available on Android &amp; iOS. Experience the fastest, most secure recharge and
                       bill
                       payment
@@ -2455,12 +2455,12 @@
                         </div>
                         <div class="app-right">
                     <div class="app-img"><img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&q=85"
-                        alt="ZivoPay App" /></div>
+                        alt="Zivo Pay App" /></div>
                     <div class="qr-row">
                       <div class="qr-box"><img
                           src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=https://zivopay.com&color=007a30&bgcolor=ffffff"
                           alt="QR" /></div>
-                      <p>Scan to<br>Download<br>ZivoPay App</p>
+                    <p>Scan to<br>Download<br>Zivo Pay App</p>
                     </div>
                     </div>
                     </div>
@@ -2472,10 +2472,9 @@
       <div class="container">
         <div class="footer-grid">
           <div class="fb">
-            <img src="{{ asset('web/assets/images/logo.png') }}" alt="ZivoPay" />
-                    <p>India's most trusted recharge &amp; bill payment platform. Pay smarter, save more — Evening. One
-                      Zivo
-                      Pay.
+            <img src="{{ asset('web/assets/images/logo.png') }}" alt="Zivo Pay" />
+            <p>India's most trusted recharge &amp; bill payment platform. Pay smarter, save more — Evening,
+                ZIVO PAY is operated by ZIVO E-COMMERCE & FINANCIAL SERVICES.
                     </p>
                     <div class="socials">
                         <a href="https://www.facebook.com/zivopay5/" class="soc" aria-label="Facebook" target="_blank"
@@ -2526,7 +2525,7 @@
                 </div>
                 </div>
                 <div class="foot-bot">
-                  <p>© 2026 <span>ZivoPay</span>. All Rights Reserved. | RBI Licensed Payment Aggregator</p>
+                <p>© 2026 <span>Zivo Pay</span>. All Rights Reserved. | RBI Licensed Payment Aggregator</p>
                   <div class="foot-badges">
                     <span class="foot-b"><i class="fas fa-lock"></i> SSL Secured</span>
                     <span class="foot-b">PCI DSS</span>

@@ -8,18 +8,29 @@ use App\Models\P2pTransfer;
 use App\Models\Transaction;
 use App\Models\UserInvestment;
 use App\Models\UserReward;
+use App\Services\RoiIncomeService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, RoiIncomeService $roiIncomeService)
     {
         $user = Auth::user();
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateFundRoiIds = $roiIncomeService->duplicateFundRoiTransactionIds([(int) $user->id], $through);
+        $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through, (int) $user->id);
 
         $query = Transaction::where('user_id', $user->id)
             ->whereNotIn('type', ['level_income', 'direct_bonus', 'subscription_level', 'direct_reward', 'team_reward']);
+        if ($duplicateFundRoiIds !== []) {
+            $query->whereNotIn('id', $duplicateFundRoiIds);
+        }
+        if ($duplicateCommissionIds !== []) {
+            $query->whereNotIn('id', $duplicateCommissionIds);
+        }
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -45,8 +56,17 @@ class IncomeController extends Controller
         $transactions = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
 
         // Income Totals Summary
-        $totalRoi = Transaction::where('user_id', $user->id)->whereIn('type', ['daily_roi', 'fixed_package_roi'])->sum('amount');
-        $totalRoiLevelIncome = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
+        $totalRoiQuery = Transaction::where('user_id', $user->id)->whereIn('type', ['daily_roi', 'fixed_package_roi']);
+        if ($duplicateFundRoiIds !== []) {
+            $totalRoiQuery->whereNotIn('id', $duplicateFundRoiIds);
+        }
+        $totalRoi = $totalRoiQuery->sum('amount');
+
+        $totalRoiLevelQuery = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
+        if ($duplicateCommissionIds !== []) {
+            $totalRoiLevelQuery->whereNotIn('id', $duplicateCommissionIds);
+        }
+        $totalRoiLevelIncome = $totalRoiLevelQuery->sum('amount');
 
         $achievedRewards = UserReward::where('user_id', $user->id)->get();
 
@@ -305,10 +325,15 @@ class IncomeController extends Controller
         return view('user.reports.investment_history', compact('user', 'investments', 'totalAmount'));
     }
 
-    public function dailyRoiIncome(Request $request)
+    public function dailyRoiIncome(Request $request, RoiIncomeService $roiIncomeService)
     {
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->where('type', 'daily_roi');
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateFundRoiIds = $roiIncomeService->duplicateFundRoiTransactionIds([(int) $user->id], $through);
+        if ($duplicateFundRoiIds !== []) {
+            $query->whereNotIn('id', $duplicateFundRoiIds);
+        }
 
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
@@ -332,7 +357,7 @@ class IncomeController extends Controller
         return view('user.income.roi', compact('user', 'transactions', 'totalAmount'));
     }
 
-    public function fundWalletRoiIncome(Request $request)
+    public function fundWalletRoiIncome(Request $request, RoiIncomeService $roiIncomeService)
     {
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)
@@ -341,6 +366,11 @@ class IncomeController extends Controller
                 $q->where('trx_id', 'like', 'FWPROFIT%')
                     ->orWhere('description', 'like', '%Fund Wallet%');
             });
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateFundRoiIds = $roiIncomeService->duplicateFundRoiTransactionIds([(int) $user->id], $through);
+        if ($duplicateFundRoiIds !== []) {
+            $query->whereNotIn('id', $duplicateFundRoiIds);
+        }
 
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
@@ -400,10 +430,15 @@ class IncomeController extends Controller
         return view('user.income.roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
     }
 
-    public function levelRoiIncome(Request $request)
+    public function levelRoiIncome(Request $request, RoiIncomeService $roiIncomeService)
     {
         $user = Auth::user();
         $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through, (int) $user->id);
+        if ($duplicateCommissionIds !== []) {
+            $query->whereNotIn('id', $duplicateCommissionIds);
+        }
 
         $reportTitle = 'ROI-on-ROI Matching Commission (50% across 30 levels)';
         if ($request->query('type') === 'fund') {

@@ -7,8 +7,10 @@ use App\Models\Deposit;
 use App\Models\P2pTransfer;
 use App\Models\Transaction;
 use App\Models\UserReward;
+use App\Services\RoiIncomeService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
@@ -269,7 +271,7 @@ class ReportController extends Controller
         return view('admin.reports.subscriptions', compact('subscriptions', 'totalAmount'));
     }
 
-    public function roiHistory(Request $request)
+    public function roiHistory(Request $request, RoiIncomeService $roiIncomeService)
     {
         // Fund Wallet ROI Payouts — transactions with FWPROFIT- prefix
         $query = Transaction::with(['user'])
@@ -293,6 +295,13 @@ class ReportController extends Controller
         }
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $matchingUserIds = (clone $query)->select('user_id')->distinct()->pluck('user_id')->all();
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateRoiIds = $roiIncomeService->duplicateFundRoiTransactionIds($matchingUserIds, $through);
+        if ($duplicateRoiIds !== []) {
+            $query->whereNotIn('id', $duplicateRoiIds);
         }
 
         $rois = $query->orderBy('id', 'desc')->paginate(20);
@@ -336,7 +345,7 @@ class ReportController extends Controller
         return view('admin.reports.daily_roi', compact('rois', 'totalAmount'));
     }
 
-    public function levelRoiHistory(Request $request)
+    public function levelRoiHistory(Request $request, RoiIncomeService $roiIncomeService)
     {
         $query = Transaction::with(['user', 'fromUser'])
             ->whereIn('type', ['level_roi', 'roi_level_income']);
@@ -358,6 +367,12 @@ class ReportController extends Controller
         }
         if ($request->filled('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through);
+        if ($duplicateCommissionIds !== []) {
+            $query->whereNotIn('id', $duplicateCommissionIds);
         }
 
         $levelRois = $query->orderBy('id', 'desc')->paginate(20);

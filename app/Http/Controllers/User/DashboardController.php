@@ -4,13 +4,15 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\RoiIncomeService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(RoiIncomeService $roiIncomeService): View
     {
         /** @var User $user */
         $user = Auth::user();
@@ -46,7 +48,17 @@ class DashboardController extends Controller
         $totalInvested = $user->investments()->where('status', 'active')->sum('amount');
         $totalWithdrawals = $user->withdrawals()->where('status', 'approved')->sum('amount');
         $activeInvestments = $user->investments()->where('status', 'active')->latest()->take(5)->get();
-        $recentTransactions = $user->transactions()->latest()->take(5)->get();
+        $reportThrough = Carbon::now()->endOfDay();
+        $duplicateFundRoiIds = $roiIncomeService->duplicateFundRoiTransactionIds([(int) $user->id], $reportThrough);
+        $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($reportThrough, (int) $user->id);
+        $recentTransactionsQuery = $user->transactions();
+        if ($duplicateFundRoiIds !== []) {
+            $recentTransactionsQuery->whereNotIn('id', $duplicateFundRoiIds);
+        }
+        if ($duplicateCommissionIds !== []) {
+            $recentTransactionsQuery->whereNotIn('id', $duplicateCommissionIds);
+        }
+        $recentTransactions = $recentTransactionsQuery->latest()->take(5)->get();
 
         // Comprehensive Income Breakdown (Today & Total)
         $todayFundRoi = $user->transactions()
@@ -55,6 +67,7 @@ class DashboardController extends Controller
                 $q->where('trx_id', 'like', 'FWPROFIT%')
                     ->orWhere('description', 'like', '%Fund Wallet%');
             })
+            ->when($duplicateFundRoiIds !== [], fn ($query) => $query->whereNotIn('id', $duplicateFundRoiIds))
             ->whereDate('created_at', now())
             ->sum('amount');
 
@@ -64,6 +77,7 @@ class DashboardController extends Controller
                 $q->where('trx_id', 'like', 'FWPROFIT%')
                     ->orWhere('description', 'like', '%Fund Wallet%');
             })
+            ->when($duplicateFundRoiIds !== [], fn ($query) => $query->whereNotIn('id', $duplicateFundRoiIds))
             ->sum('amount');
 
         $todayInvestmentRoi = $user->transactions()
@@ -88,8 +102,16 @@ class DashboardController extends Controller
         $todayRoi = $todayFundRoi + $todayInvestmentRoi;
         $totalRoiIncome = $totalFundRoi + $totalInvestmentRoi;
 
-        $todayLevelRoi = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->whereDate('created_at', now())->sum('amount');
-        $totalLevelRoiIncome = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income'])->sum('amount');
+        $todayLevelRoi = $user->transactions()
+            ->whereIn('type', ['level_roi', 'roi_level_income'])
+            ->when($duplicateCommissionIds !== [], fn ($query) => $query->whereNotIn('id', $duplicateCommissionIds))
+            ->whereDate('created_at', now())
+            ->sum('amount');
+        $totalLevelRoiQuery = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income']);
+        if ($duplicateCommissionIds !== []) {
+            $totalLevelRoiQuery->whereNotIn('id', $duplicateCommissionIds);
+        }
+        $totalLevelRoiIncome = $totalLevelRoiQuery->sum('amount');
 
         $todayTransfer = $user->transactions()->where('type', 'wallet_transfer')->whereDate('created_at', now())->sum('amount');
         $totalTransfer = $user->transactions()->where('type', 'wallet_transfer')->sum('amount');
