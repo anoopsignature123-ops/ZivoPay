@@ -103,20 +103,32 @@ class DashboardController extends Controller
         $totalRoiIncome = $totalFundRoi + $totalInvestmentRoi;
 
         $todayLevelRoi = $user->transactions()
-            ->whereIn('type', ['level_roi', 'roi_level_income'])
-            ->when($duplicateCommissionIds !== [], fn ($query) => $query->whereNotIn('id', $duplicateCommissionIds))
+            ->whereIn('type', ['level_roi', 'roi_level_income', 'family_kit_level_income'])
+            ->when($duplicateCommissionIds !== [], function ($query) use ($duplicateCommissionIds): void {
+                $query->where(function ($commissionQuery) use ($duplicateCommissionIds): void {
+                    $commissionQuery->where('type', 'family_kit_level_income')
+                        ->orWhereNotIn('id', $duplicateCommissionIds);
+                });
+            })
             ->whereDate('created_at', now())
             ->sum('amount');
-        $totalLevelRoiQuery = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income']);
+        $totalLevelRoiQuery = $user->transactions()->whereIn('type', ['level_roi', 'roi_level_income', 'family_kit_level_income']);
         if ($duplicateCommissionIds !== []) {
-            $totalLevelRoiQuery->whereNotIn('id', $duplicateCommissionIds);
+            $totalLevelRoiQuery->where(function ($commissionQuery) use ($duplicateCommissionIds): void {
+                $commissionQuery->where('type', 'family_kit_level_income')
+                    ->orWhereNotIn('id', $duplicateCommissionIds);
+            });
         }
         $totalLevelRoiIncome = $totalLevelRoiQuery->sum('amount');
 
         $todayTransfer = $user->transactions()->where('type', 'wallet_transfer')->whereDate('created_at', now())->sum('amount');
         $totalTransfer = $user->transactions()->where('type', 'wallet_transfer')->sum('amount');
 
-        $totalIncomeEarned = $totalRoiIncome + $totalLevelRoiIncome;
+        $totalActivationCredit = $user->transactions()
+            ->where('type', 'shopping_wallet_credit')
+            ->where('description', 'like', '%activation%')
+            ->sum('amount');
+        $totalIncomeEarned = $totalRoiIncome + $totalLevelRoiIncome + $totalActivationCredit;
 
         // Sponsor Info
         $sponsor = User::where('referral_code', $user->sponsor_code)->first();
@@ -151,6 +163,7 @@ class DashboardController extends Controller
             'totalInvestmentRoi',
             'todayLevelRoi',
             'totalLevelRoiIncome',
+            'totalActivationCredit',
             'todayTransfer',
             'totalTransfer',
             'totalIncomeEarned'

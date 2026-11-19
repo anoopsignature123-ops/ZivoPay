@@ -244,7 +244,8 @@ class ReportController extends Controller
     public function subscriptionHistory(Request $request)
     {
         $query = Transaction::with(['user', 'fromUser'])
-            ->where('type', 'subscription');
+            ->where('type', 'shopping_wallet_credit')
+            ->where('description', 'like', '%activation%');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -269,6 +270,42 @@ class ReportController extends Controller
         $totalAmount = (clone $query)->sum('amount');
 
         return view('admin.reports.subscriptions', compact('subscriptions', 'totalAmount'));
+    }
+
+    public function activationCommissionHistory(Request $request)
+    {
+        $query = Transaction::with(['user', 'fromUser'])
+            ->where('type', 'family_kit_level_income');
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search): void {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('fromUser', function ($fromUserQuery) use ($search): void {
+                        $fromUserQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $commissions = $query->orderByDesc('id')->paginate(20)->withQueryString();
+        $totalAmount = (clone $query)->sum('amount');
+
+        return view('admin.reports.activation_commissions', compact('commissions', 'totalAmount'));
     }
 
     public function roiHistory(Request $request, RoiIncomeService $roiIncomeService)
@@ -348,7 +385,7 @@ class ReportController extends Controller
     public function levelRoiHistory(Request $request, RoiIncomeService $roiIncomeService)
     {
         $query = Transaction::with(['user', 'fromUser'])
-            ->whereIn('type', ['level_roi', 'roi_level_income']);
+            ->whereIn('type', ['level_roi', 'roi_level_income', 'family_kit_level_income']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -372,7 +409,10 @@ class ReportController extends Controller
         $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
         $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through);
         if ($duplicateCommissionIds !== []) {
-            $query->whereNotIn('id', $duplicateCommissionIds);
+            $query->where(function ($commissionQuery) use ($duplicateCommissionIds): void {
+                $commissionQuery->where('type', 'family_kit_level_income')
+                    ->orWhereNotIn('id', $duplicateCommissionIds);
+            });
         }
 
         $levelRois = $query->orderBy('id', 'desc')->paginate(20);

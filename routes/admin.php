@@ -161,6 +161,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reports/transactions', [ReportController::class, 'transactionHistory'])->name('reports.transactions');
         Route::get('reports/p2p', [P2pAdminController::class, 'index'])->name('reports.p2p');
         Route::get('reports/subscriptions', [ReportController::class, 'subscriptionHistory'])->name('reports.subscriptions');
+        Route::get('reports/activation-commissions', [ReportController::class, 'activationCommissionHistory'])->name('reports.activation-commissions');
         Route::get('reports/roi', [ReportController::class, 'roiHistory'])->name('reports.roi');
         Route::get('reports/daily-roi', [ReportController::class, 'dailyRoiHistory'])->name('reports.daily-roi');
         Route::get('reports/level-roi', [ReportController::class, 'levelRoiHistory'])->name('reports.level-roi');

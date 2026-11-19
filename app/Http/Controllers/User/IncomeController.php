@@ -62,11 +62,19 @@ class IncomeController extends Controller
         }
         $totalRoi = $totalRoiQuery->sum('amount');
 
-        $totalRoiLevelQuery = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
+        $totalRoiLevelQuery = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income', 'family_kit_level_income']);
         if ($duplicateCommissionIds !== []) {
-            $totalRoiLevelQuery->whereNotIn('id', $duplicateCommissionIds);
+            $totalRoiLevelQuery->where(function ($commissionQuery) use ($duplicateCommissionIds): void {
+                $commissionQuery->where('type', 'family_kit_level_income')
+                    ->orWhereNotIn('id', $duplicateCommissionIds);
+            });
         }
         $totalRoiLevelIncome = $totalRoiLevelQuery->sum('amount');
+
+        $totalActivationCredit = Transaction::where('user_id', $user->id)
+            ->where('type', 'shopping_wallet_credit')
+            ->where('description', 'like', '%activation%')
+            ->sum('amount');
 
         $achievedRewards = UserReward::where('user_id', $user->id)->get();
 
@@ -75,6 +83,7 @@ class IncomeController extends Controller
             'transactions',
             'totalRoi',
             'totalRoiLevelIncome',
+            'totalActivationCredit',
             'achievedRewards'
         ));
     }
@@ -433,14 +442,17 @@ class IncomeController extends Controller
     public function levelRoiIncome(Request $request, RoiIncomeService $roiIncomeService)
     {
         $user = Auth::user();
-        $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income']);
+        $query = Transaction::where('user_id', $user->id)->whereIn('type', ['level_roi', 'roi_level_income', 'family_kit_level_income']);
         $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
         $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through, (int) $user->id);
         if ($duplicateCommissionIds !== []) {
-            $query->whereNotIn('id', $duplicateCommissionIds);
+            $query->where(function ($commissionQuery) use ($duplicateCommissionIds): void {
+                $commissionQuery->where('type', 'family_kit_level_income')
+                    ->orWhereNotIn('id', $duplicateCommissionIds);
+            });
         }
 
-        $reportTitle = 'ROI-on-ROI Matching Commission (50% across 30 levels)';
+        $reportTitle = 'Level and Family Kit Activation Commissions';
         if ($request->query('type') === 'fund') {
             $reportTitle = 'ROI ON LEVEL INCOME (SECONDARY)';
         } elseif ($request->query('type') === 'investment') {
@@ -467,6 +479,74 @@ class IncomeController extends Controller
         $totalAmount = (clone $query)->sum('amount');
 
         return view('user.income.level_roi', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
+    }
+
+    public function activationIncome(Request $request)
+    {
+        $user = Auth::user();
+        $query = Transaction::where('user_id', $user->id)
+            ->where('type', 'shopping_wallet_credit')
+            ->where('description', 'like', '%activation%');
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderByDesc('id')->paginate(20)->withQueryString();
+        $totalAmount = (clone $query)->sum('amount');
+        $reportTitle = '₹3,000 Family Kit Activation Credits';
+
+        return view('user.income.activation', compact('user', 'transactions', 'totalAmount', 'reportTitle'));
+    }
+
+    public function activationCommissionIncome(Request $request, RoiIncomeService $roiIncomeService)
+    {
+        $user = Auth::user();
+        $query = Transaction::with('fromUser')
+            ->where('user_id', $user->id)
+            ->where('type', 'family_kit_level_income');
+        $through = Carbon::parse($request->input('to_date', now()->toDateString()))->endOfDay();
+        $duplicateCommissionIds = $roiIncomeService->duplicateRoiLevelCommissionTransactionIds($through, (int) $user->id);
+
+        if ($duplicateCommissionIds !== []) {
+            $query->whereNotIn('id', $duplicateCommissionIds);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('trx_id', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('fromUser', function ($fromUserQuery) use ($search): void {
+                        $fromUserQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('referral_code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query->orderByDesc('id')->paginate(20)->withQueryString();
+        $totalAmount = (clone $query)->sum('amount');
+
+        return view('user.income.activation_commissions', compact('user', 'transactions', 'totalAmount'));
     }
 
     public function roiIncome(Request $request)

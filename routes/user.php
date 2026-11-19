@@ -111,6 +111,8 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('income/fund-wallet-roi', [IncomeController::class, 'fundWalletRoiIncome'])->name('income.fund-roi');
         Route::get('income/capital-investment-roi', [IncomeController::class, 'capitalInvestmentRoiIncome'])->name('income.investment-roi');
         Route::get('income/level-roi', [IncomeController::class, 'levelRoiIncome'])->name('income.level-roi');
+        Route::get('income/activation', [IncomeController::class, 'activationIncome'])->name('income.activation');
+        Route::get('income/activation-commissions', [IncomeController::class, 'activationCommissionIncome'])->name('income.activation-commissions');
         Route::get('rewards', [RewardController::class, 'index'])->name('rewards.index');
 
         // 24x7 Withdrawal Portal Routes

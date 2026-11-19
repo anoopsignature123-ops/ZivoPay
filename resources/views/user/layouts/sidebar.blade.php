@@ -102,6 +102,23 @@
             <span class="nav-text">Buy Package ₹3,000 (Activate)</span>
         </a>
 
+        <a class='nav-item {{ request()->routeIs('user.income.activation') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route('user.income.activation') }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Activation Income Report</span>
+        </a>
+        <a class='nav-item {{ request()->routeIs('user.income.activation-commissions') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
+            href='{{ route('user.income.activation-commissions') }}'>
+            <div
+                class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <i data-lucide="badge-percent" class="w-4 h-4"></i>
+            </div>
+            <span class="nav-text">Activation Commission Report</span>
+        </a>
+
         <a class='nav-item {{ request()->routeIs('user.reports.package-history') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route('user.reports.package-history') }}'>
             <div
@@ -115,6 +132,8 @@
         <div class="nav-section-title px-5 pt-3 pb-1 mt-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-400">
             FUND INCOME SECTION
         </div>
+
+        
 
         <a class='nav-item {{ request()->routeIs('user.income.fund-roi') ? 'active bg-emerald-500/20 text-white font-bold shadow-lg border-l-4 border-emerald-400' : '' }} flex items-center gap-3 mx-3 my-0.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition'
             href='{{ route('user.income.fund-roi') }}'>

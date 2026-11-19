@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', '50% 30-Level ROI Matching Audit Log - Admin ZIVO PAY')
+@section('title', 'Level and Activation Commission Audit Log - Admin ZIVO PAY')
 
 @section('content')
 <div class="w-full space-y-6 font-sans">
@@ -9,14 +9,14 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">AUDIT LOG</span>
-                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY SECONDARY ROI MATCHING</span>
+                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY LEVEL COMMISSIONS</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">50% ROI-ON-ROI MATCHING LEVEL REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit log of ROI-on-ROI commission across 30 levels: L1 15%, L2 8%, L3–L8 2% each, L9–L16 1% each, L17–L30 0.5% each.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">LEVEL & ACTIVATION COMMISSION REPORT</h1>
+            <p class="text-xs text-neutral-300 mt-1">Audit log of ROI matching and one-time Family Kit activation commissions paid across levels.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
-            <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Total ROI Matching Volume</span>
+            <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Total Commission Volume</span>
             <span class="text-xl sm:text-2xl font-black text-white">₹{{ number_format($totalAmount, 2) }}</span>
         </div>
     </div>
@@ -91,7 +91,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                No 30-level ROI-on-ROI commission records found.
+                                No level or activation commission records found.
                             </td>
                         </tr>
                     @endforelse

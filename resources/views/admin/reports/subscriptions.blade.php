@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Subscription Activations Audit Log - Admin ZIVO PAY')
+@section('title', 'Activation Income Report - Admin ZIVO PAY')
 
 @section('content')
 <div class="w-full space-y-6 font-sans">
@@ -9,10 +9,10 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase border border-emerald-500/40">AUDIT LOG</span>
-                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY SUBSCRIPTIONS</span>
+                <span class="text-xs text-emerald-400 font-black tracking-[3px] uppercase">ZIVO PAY ACTIVATION INCOME</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">SUBSCRIPTION ACTIVATIONS REPORT</h1>
-            <p class="text-xs text-neutral-300 mt-1">Audit trail of mandatory ₹3,000 account activations and Shopping Wallet credits.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white font-heading">₹3,000 ACTIVATION INCOME REPORT</h1>
+            <p class="text-xs text-neutral-300 mt-1">Shopping Wallet credits issued to members when their Zivo Family Kit activation succeeds.</p>
         </div>
 
         <div class="px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-right">
@@ -55,7 +55,7 @@
                     <tr>
                         <th class="px-5 py-4">Transaction ID</th>
                         <th class="px-5 py-4">User Details</th>
-                        <th class="px-5 py-4">From Member</th>
+                        <th class="px-5 py-4">Wallet Type</th>
                         <th class="px-5 py-4">Amount</th>
                         <th class="px-5 py-4">Description</th>
                         <th class="px-5 py-4">Date & Time</th>
@@ -73,14 +73,7 @@
                                     <span class="text-neutral-500 italic">User Deleted</span>
                                 @endif
                             </td>
-                            <td class="px-5 py-4">
-                                @if($sub->fromUser)
-                                    <p class="font-bold text-white">{{ $sub->fromUser->name }}</p>
-                                    <p class="text-[11px] text-neutral-400 font-mono">{{ $sub->fromUser->referral_code }}</p>
-                                @else
-                                    <span class="text-neutral-400 italic">Account Activation</span>
-                                @endif
-                            </td>
+                            <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-teal-500/20 text-teal-300 border border-teal-500/40">Shopping Wallet</span></td>
                             <td class="px-5 py-4 font-bold text-emerald-400 text-sm">₹{{ number_format($sub->amount, 2) }}</td>
                             <td class="px-5 py-4 text-neutral-300 max-w-xs truncate">{{ $sub->description }}</td>
                             <td class="px-5 py-4">
@@ -91,7 +84,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-8 text-center text-neutral-400 font-bold">
-                                No subscription records found.
+                                No activation income records found.
                             </td>
                         </tr>
                     @endforelse

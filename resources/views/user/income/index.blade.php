@@ -15,7 +15,7 @@
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mt-1 font-heading">INCOME
                         LEDGER & SUMMARY</h1>
-                    <p class="text-xs text-neutral-300 mt-1">Ledger of Fund Wallet daily ROI, Fixed Package monthly ROI, 30-level ROI-on-ROI commissions, and wallet activity.</p>
+                    <p class="text-xs text-neutral-300 mt-1">Ledger of ₹3,000 activation credits, ROI, level commissions, and wallet activity.</p>
                     </div>
                 <a href="{{ route('user.withdrawal.index') }}"
                     class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider text-xs hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition flex items-center gap-2 shrink-0">
@@ -23,7 +23,12 @@
                 </a>
                 </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pt-1">
+                <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40">
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Activation Shopping Wallet Credits</span>
+                    <span class="text-2xl font-black text-white font-mono mt-1 block">₹{{ number_format($totalActivationCredit, 2) }}</span>
+                    <span class="text-[10px] text-neutral-400">₹3,000 credit for successful Family Kit activation</span>
+                </div>
                 <!-- Combined fund-wallet and fixed-package ROI -->
                 <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40">
                     <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Total ROI Income</span>
@@ -33,10 +38,10 @@
 
                 <!-- ROI-on-ROI commission -->
                 <div class="p-3.5 rounded-xl bg-[#02180f] border border-emerald-500/40">
-                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">30-Level ROI-on-ROI Commission</span>
+                    <span class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Level & Activation Commissions</span>
                     <span
                         class="text-2xl font-black text-teal-300 font-mono mt-1 block">₹{{ number_format($totalRoiLevelIncome, 2) }}</span>
-                    <span class="text-[10px] text-neutral-400">L1=15%, L2=8%, L3-L8=2%, L9-L16=1%, L17-L30=0.5%</span>
+                    <span class="text-[10px] text-neutral-400">Includes ROI matching and Family Kit activation commissions</span>
                     </div>
 
                 <!-- 4. Earning Wallet -->
@@ -80,6 +85,8 @@
                         <option value="fixed_package_roi" {{ request('type') === 'fixed_package_roi' ? 'selected' : '' }}>Fixed Package Monthly ROI</option>
                         <option value="roi_level_income" {{ request('type') === 'roi_level_income' ? 'selected' : '' }}>ROI
                             on ROI Level Matching</option>
+                        <option value="shopping_wallet_credit" {{ request('type') === 'shopping_wallet_credit' ? 'selected' : '' }}>Activation Wallet Credit</option>
+                        <option value="family_kit_level_income" {{ request('type') === 'family_kit_level_income' ? 'selected' : '' }}>Family Kit Activation Commission</option>
                         </select>
                         </div>
 
