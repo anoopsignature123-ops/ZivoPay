@@ -19,9 +19,12 @@
     <!-- Phone & Sponsor Code -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone *</label>
-            <input type="text" name="mobile" value="{{ old('mobile', $user->mobile ?? '') }}" required placeholder="+1 234 567 890"
+            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone (10 Digits) *</label>
+            <input type="text" name="mobile" value="{{ old('mobile', $user->mobile ?? '') }}" required placeholder="e.g. 9876543210"
+                maxlength="10" pattern="[6-9][0-9]{9}" inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('91') && this.value.length === 12) this.value = this.value.slice(2); this.value = this.value.slice(0, 10);"
                 class="w-full px-4 py-3 rounded-xl bg-bg border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
+            <p class="text-[10px] text-neutral-400 mt-1">10 digits without +91 or country code.</p>
         </div>
 
         <div>

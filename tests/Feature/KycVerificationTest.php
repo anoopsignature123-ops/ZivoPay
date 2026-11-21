@@ -34,20 +34,22 @@ class KycVerificationTest extends TestCase
         $user = User::create([
             'role_id' => $this->userRoleId,
             'name' => 'Unverified Member',
-            'email' => 'unverified@zivopay.com',
-            'referral_code' => 'ZIVO-UNV01',
+            'email' => 'unverified_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
             'kyc_status' => 'unverified',
             'earning_wallet' => 5000.00,
         ]);
 
-        $response = $this->actingAs($user)->post(route('user.withdrawal.store'), [
+        $response = $this->actingAs($user)->from(route('user.withdrawal.index'))->post(route('user.withdrawal.store'), [
             'from_wallet' => 'earning_wallet',
+            'payout_method' => 'bank',
             'amount' => 1000,
-            'payment_method' => 'Bank Transfer',
-            'account_details' => 'Bank: SBI, A/C: 1234567890, IFSC: SBIN0001234',
+            'account_holder' => 'Unverified Member',
+            'account_number' => '123456789012',
+            'ifsc' => 'SBIN0001234',
         ]);
 
-        $response->assertSessionHasErrors(['kyc']);
+        $response->assertSessionHasErrors(['payout']);
         $this->assertDatabaseMissing('withdrawals', [
             'user_id' => $user->id,
             'amount' => 1000,
@@ -61,16 +63,18 @@ class KycVerificationTest extends TestCase
         $user = User::create([
             'role_id' => $this->userRoleId,
             'name' => 'John Doe',
-            'email' => 'johndoe@zivopay.com',
-            'referral_code' => 'ZIVO-KYC01',
+            'email' => 'johndoe_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
             'kyc_status' => 'unverified',
         ]);
 
         $frontFile = UploadedFile::fake()->create('id_front.jpg', 500);
+        $panFile = UploadedFile::fake()->create('id_pan.jpg', 500);
 
         $response = $this->actingAs($user)->post(route('user.kyc.store'), [
             'document_type' => 'aadhaar',
             'document_number' => '123456789012',
+            'pan_number' => 'ABCDE1234F',
             'full_name' => 'John Doe',
             'dob' => '1995-05-15',
             'bank_name' => 'HDFC Bank',
@@ -79,6 +83,7 @@ class KycVerificationTest extends TestCase
             'account_holder' => 'John Doe',
             'upi_id' => 'johndoe@upi',
             'front_image' => $frontFile,
+            'pan_image' => $panFile,
         ]);
 
         $response->assertRedirect(route('user.kyc.index'));
@@ -102,15 +107,15 @@ class KycVerificationTest extends TestCase
         $admin = User::create([
             'role_id' => $this->adminRoleId,
             'name' => 'Super Admin',
-            'email' => 'admin_kyc@zivopay.com',
-            'referral_code' => 'ZIVO-ADM01',
+            'email' => 'admin_kyc_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
         ]);
 
         $user = User::create([
             'role_id' => $this->userRoleId,
             'name' => 'Jane Smith',
-            'email' => 'janesmith@zivopay.com',
-            'referral_code' => 'ZIVO-KYC02',
+            'email' => 'janesmith_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
             'kyc_status' => 'pending',
             'earning_wallet' => 5000.00,
         ]);
@@ -137,11 +142,13 @@ class KycVerificationTest extends TestCase
         $this->assertEquals('approved', $kyc->fresh()->status);
 
         // Approved user places withdrawal
-        $wthResponse = $this->actingAs($user)->post(route('user.withdrawal.store'), [
+        $wthResponse = $this->actingAs($user)->from(route('user.withdrawal.index'))->post(route('user.withdrawal.store'), [
             'from_wallet' => 'earning_wallet',
+            'payout_method' => 'bank',
             'amount' => 1000,
-            'payment_method' => 'Bank Transfer',
-            'account_details' => 'Bank: ICICI, A/C: 1122334455, IFSC: ICIC0001122',
+            'account_holder' => 'Jane Smith',
+            'account_number' => '1122334455',
+            'ifsc' => 'ICIC0001122',
         ]);
 
         $wthResponse->assertRedirect(route('user.withdrawal.index'));
@@ -159,15 +166,15 @@ class KycVerificationTest extends TestCase
         $admin = User::create([
             'role_id' => $this->adminRoleId,
             'name' => 'Super Admin 2',
-            'email' => 'admin_kyc2@zivopay.com',
-            'referral_code' => 'ZIVO-ADM02',
+            'email' => 'admin_kyc2_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
         ]);
 
         $user = User::create([
             'role_id' => $this->userRoleId,
             'name' => 'Test Member',
-            'email' => 'testmember@zivopay.com',
-            'referral_code' => 'ZIVO-KYC03',
+            'email' => 'testmember_'.uniqid().'@zivopay.com',
+            'referral_code' => User::generateReferralCode(),
             'kyc_status' => 'pending',
         ]);
 

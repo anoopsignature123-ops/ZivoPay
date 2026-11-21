@@ -112,13 +112,16 @@
 
                         <!-- Phone -->
                         <div>
-                            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone *</label>
-                            <input type="text" name="mobile" value="{{ old('mobile') }}" required placeholder="e.g. +91 9876543210"
+                            <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5">Mobile Phone (10 Digits without +91) *</label>
+                            <input type="text" name="mobile" value="{{ old('mobile') }}" required placeholder="e.g. 9876543210"
+                                maxlength="10" pattern="[6-9][0-9]{9}" inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('91') && this.value.length === 12) this.value = this.value.slice(2); this.value = this.value.slice(0, 10);"
                                 class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-semibold text-sm focus:outline-none focus:border-emerald-400">
                             @error('mobile')
                                 <p class="text-[11px] text-rose-400 font-bold mt-1">{{ $message }}</p>
                             @enderror
-                            </div>
+                            <p class="text-[10px] text-neutral-400 mt-1">Enter 10-digit mobile number only. Do not add +91 or leading 0.</p>
+                        </div>
 
                         <!-- Password & Confirm Password -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

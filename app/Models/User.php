@@ -26,6 +26,7 @@ class User extends Authenticatable
         'email',
         'mobile',
         'wallet_address',
+        'usdt_address',
         'referral_code',
         'sponsor_code',
         'position',

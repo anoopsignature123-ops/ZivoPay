@@ -73,7 +73,7 @@ class RegisterController extends Controller
             'sponsor_id' => 'nullable|string',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'mobile' => 'required|string|max:20|unique:users,mobile',
+            'mobile' => ['required', 'string', 'regex:/^[6-9][0-9]{9}$/', 'unique:users,mobile'],
             'password' => 'required|string|min:6|confirmed',
         ], [
             'name.required' => 'Please enter member full name.',
@@ -82,6 +82,7 @@ class RegisterController extends Controller
             'email.unique' => 'This email address is already registered in the system.',
             'mobile.required' => 'Please enter mobile phone number.',
             'mobile.unique' => 'This mobile number is already registered in the system.',
+            'mobile.regex' => 'Mobile number must be a valid 10-digit number without +91 or country code.',
             'password.required' => 'Please enter account password.',
             'password.min' => 'Password must be at least 6 characters.',
             'password.confirmed' => 'Password confirmation does not match.',

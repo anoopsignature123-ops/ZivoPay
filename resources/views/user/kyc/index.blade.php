@@ -178,6 +178,18 @@
                                 class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono font-bold focus:outline-none focus:border-emerald-400 transition">
                         </div>
 
+                        <!-- PAN Card Number -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">PAN Card Number *</label>
+                                <span id="panNumValid" class="text-[10px] text-emerald-400 font-bold hidden">✓ Valid PAN</span>
+                            </div>
+                            <input type="text" name="pan_number" id="panNumInput" required maxlength="10"
+                                value="{{ old('pan_number', $kyc->pan_number ?? '') }}" {{ $user->kyc_status === 'pending' ? 'disabled' : '' }}
+                                placeholder="e.g. ABCDE1234F"
+                                class="w-full px-3 py-2 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs font-mono font-bold uppercase focus:outline-none focus:border-emerald-400 transition">
+                        </div>
+
                         <!-- Date of Birth -->
                         <div>
                             <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Date
@@ -274,7 +286,7 @@
                             Images & Live Preview</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                         <!-- Front Image Field -->
                         <div class="p-3.5 rounded-2xl bg-[#02180f] border border-emerald-500/30 space-y-2">
                             <div class="flex items-center justify-between">
@@ -321,7 +333,7 @@
                         <div class="p-3.5 rounded-2xl bg-[#02180f] border border-emerald-500/30 space-y-2">
                             <div class="flex items-center justify-between">
                                 <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Back
-                                    Image / Address Proof (Optional)</label>
+                                    Image (Optional)</label>
                                 <span class="text-[10px] text-neutral-400">Max 5MB</span>
                             </div>
 
@@ -356,6 +368,46 @@
                                     <img id="backLiveImg" src="" alt="Live Back Preview" class="w-full h-full object-contain">
                                 </div>
                                 <p id="backFileName" class="text-[10px] font-mono text-neutral-300 truncate"></p>
+                            </div>
+                        </div>
+
+                        <!-- PAN Card Document Image Field -->
+                        <div class="p-3.5 rounded-2xl bg-[#02180f] border border-emerald-500/30 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider">PAN Card Copy *</label>
+                                <span class="text-[10px] text-neutral-400">Max 5MB</span>
+                            </div>
+
+                            <input type="file" name="pan_image" id="panImageInput" accept="image/*,.pdf" {{ $user->kyc_status === 'pending' ? 'disabled' : '' }}
+                                class="w-full text-xs text-neutral-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-500/20 file:text-emerald-400 hover:file:bg-emerald-500/30 cursor-pointer">
+
+                            <!-- Existing File Preview -->
+                            @if (isset($kyc->pan_image) && $kyc->pan_image)
+                                <div class="space-y-1" id="panExistingPreview">
+                                    <span class="text-[10px] font-bold text-emerald-300 uppercase block">Current Uploaded PAN:</span>
+                                    <div class="relative w-full h-32 rounded-xl overflow-hidden border border-emerald-500/40 bg-black/60 group">
+                                        <img src="{{ asset($kyc->pan_image) }}" alt="PAN Card" class="w-full h-full object-contain">
+                                        <a href="{{ asset($kyc->pan_image) }}" target="_blank"
+                                            class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition gap-1">
+                                            <i data-lucide="external-link" class="w-4 h-4"></i> View Original
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Instant JS Live Preview Box -->
+                            <div id="panLivePreviewBox" class="hidden space-y-2 p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase flex items-center gap-1">
+                                        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Selected File Preview:
+                                    </span>
+                                    <span id="panFileSize" class="text-[10px] text-teal-300 font-mono"></span>
+                                </div>
+                                <div
+                                    class="w-full h-32 rounded-lg overflow-hidden bg-black/80 border border-emerald-500/30 flex items-center justify-center">
+                                    <img id="panLiveImg" src="" alt="Live PAN Preview" class="w-full h-full object-contain">
+                                </div>
+                                <p id="panFileName" class="text-[10px] font-mono text-neutral-300 truncate"></p>
                             </div>
                         </div>
                     </div>
@@ -442,6 +494,32 @@
                 });
             }
 
+            const panInput = document.getElementById('panImageInput');
+            const panBox = document.getElementById('panLivePreviewBox');
+            const panImg = document.getElementById('panLiveImg');
+            const panName = document.getElementById('panFileName');
+            const panSize = document.getElementById('panFileSize');
+            const panExisting = document.getElementById('panExistingPreview');
+
+            if (panInput) {
+                panInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            panImg.src = evt.target.result;
+                            panName.textContent = file.name;
+                            panSize.textContent = (file.size / 1024 > 1024) ?
+                                (file.size / (1024 * 1024)).toFixed(2) + ' MB' :
+                                (file.size / 1024).toFixed(1) + ' KB';
+                            panBox.classList.remove('hidden');
+                            if (panExisting) panExisting.classList.add('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
             // 2. Real-time Field Validations
             const docSelect = document.getElementById('docTypeSelect');
             const docNumInput = document.getElementById('docNumInput');
@@ -502,6 +580,28 @@
 
             if (docNumInput) {
                 docNumInput.addEventListener('input', validateDocNumber);
+            }
+
+            // PAN Card Number Validation
+            const panNumInput = document.getElementById('panNumInput');
+            const panNumValid = document.getElementById('panNumValid');
+            if (panNumInput) {
+                panNumInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                    const isValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(this.value.trim());
+                    if (isValid) {
+                        panNumValid.classList.remove('hidden');
+                        this.classList.add('border-emerald-400');
+                    } else {
+                        panNumValid.classList.add('hidden');
+                        this.classList.remove('border-emerald-400');
+                    }
+                });
+                if (panNumInput.value.trim()) {
+                    if (/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumInput.value.trim())) {
+                        panNumValid.classList.remove('hidden');
+                    }
+                }
             }
 
             // IFSC Code Auto-uppercase & Validation

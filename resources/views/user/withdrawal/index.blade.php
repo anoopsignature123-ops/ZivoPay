@@ -226,7 +226,7 @@
                         <!-- BEP20 Destination -->
                         <div id="usdtFields">
                             <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">USDT wallet address (BEP20) *</label>
-                            <input type="text" name="usdt_address" value="{{ old('usdt_address') }}"
+                            <input type="text" name="usdt_address" value="{{ old('usdt_address', $user->usdt_address ?: $user->wallet_address) }}"
                                 placeholder="0x… (BNB Smart Chain / BEP20 address)" autocomplete="off" spellcheck="false"
                                 minlength="42" maxlength="42" pattern="0x[a-fA-F0-9]{40}"
                                 title="Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters."

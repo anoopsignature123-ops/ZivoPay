@@ -167,6 +167,10 @@
                         <strong class="text-white uppercase font-bold">{{ $kyc->document_type }} - <span class="text-emerald-300 font-mono">{{ $kyc->document_number }}</span></strong>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#01140c] border border-emerald-500/20 flex justify-between items-center">
+                        <span class="text-neutral-400 text-[10px] uppercase font-bold">PAN Card Number:</span>
+                        <strong class="text-emerald-300 font-mono font-bold">{{ $kyc->pan_number ?: 'N/A' }}</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-[#01140c] border border-emerald-500/20 flex justify-between items-center">
                         <span class="text-neutral-400 text-[10px] uppercase font-bold">Name on Document:</span>
                         <strong class="text-white font-bold">{{ $kyc->full_name }}</strong>
                     </div>
@@ -195,7 +199,7 @@
                 <h2 class="text-xs font-black text-emerald-400 uppercase tracking-wider font-heading">Uploaded Document Proof Copies</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Front Copy -->
                 <div class="p-3 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2">
                     <span class="text-[10px] font-bold text-emerald-300 uppercase block">Front Copy of Document</span>
@@ -225,6 +229,22 @@
                         </div>
                     @else
                         <p class="text-xs text-neutral-400 p-4 text-center">No back image copy uploaded.</p>
+                    @endif
+                </div>
+
+                <!-- PAN Card Copy -->
+                <div class="p-3 rounded-xl bg-[#01140c] border border-emerald-500/30 space-y-2">
+                    <span class="text-[10px] font-bold text-emerald-300 uppercase block">PAN Card Document Copy</span>
+                    @if($kyc->pan_image)
+                        <div class="w-full h-48 rounded-lg overflow-hidden bg-black/80 border border-emerald-500/40 relative group">
+                            <img src="{{ asset($kyc->pan_image) }}" alt="PAN Card Copy" class="w-full h-full object-contain">
+                            <a href="{{ asset($kyc->pan_image) }}" target="_blank"
+                                class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition gap-1">
+                                <i data-lucide="external-link" class="w-4 h-4"></i> View Original Document
+                            </a>
+                        </div>
+                    @else
+                        <p class="text-xs text-neutral-400 p-4 text-center">No PAN card copy uploaded.</p>
                     @endif
                 </div>
             </div>

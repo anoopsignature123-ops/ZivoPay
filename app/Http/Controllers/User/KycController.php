@@ -32,6 +32,7 @@ class KycController extends Controller
         $rules = [
             'document_type' => 'required|string|in:aadhaar,pan,passport,voter_id',
             'document_number' => 'required|string|min:4|max:50',
+            'pan_number' => ['required', 'string', 'regex:/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i'],
             'full_name' => 'required|string|min:2|max:100',
             'dob' => 'nullable|date',
             'bank_name' => 'required|string|min:2|max:100',
@@ -39,19 +40,23 @@ class KycController extends Controller
             'ifsc_code' => 'required|string|min:4|max:20',
             'account_holder' => 'required|string|min:2|max:100',
             'upi_id' => 'nullable|string|max:100',
-            'front_image' => $existingKyc ? 'nullable|file|mimes:jpeg,png,jpg,pdf,webp|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf,webp|max:5120',
+            'front_image' => $existingKyc && $existingKyc->front_image ? 'nullable|file|mimes:jpeg,png,jpg,pdf,webp|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf,webp|max:5120',
             'back_image' => 'nullable|file|mimes:jpeg,png,jpg,pdf,webp|max:5120',
+            'pan_image' => $existingKyc && $existingKyc->pan_image ? 'nullable|file|mimes:jpeg,png,jpg,pdf,webp|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf,webp|max:5120',
         ];
 
         $request->validate($rules, [
             'document_type.required' => 'Please select a valid document type.',
             'document_number.required' => 'Document number is required.',
+            'pan_number.required' => 'PAN Card number is required.',
+            'pan_number.regex' => 'Please enter a valid 10-character PAN Card number (e.g. ABCDE1234F).',
             'full_name.required' => 'Full name as per document is required.',
             'bank_name.required' => 'Bank name is required for withdrawal processing.',
             'account_number.required' => 'Bank account number is required.',
             'ifsc_code.required' => 'IFSC Code is required.',
             'account_holder.required' => 'Account holder name is required.',
             'front_image.required' => 'Please upload the front image of your ID document.',
+            'pan_image.required' => 'Please upload an image/copy of your PAN Card.',
         ]);
 
         $uploadPath = public_path('uploads/kyc');
@@ -75,10 +80,19 @@ class KycController extends Controller
             $backImagePath = 'uploads/kyc/'.$backFileName;
         }
 
+        $panImagePath = $existingKyc ? $existingKyc->pan_image : null;
+        if ($request->hasFile('pan_image')) {
+            $panFile = $request->file('pan_image');
+            $panFileName = 'kyc_pan_'.$user->id.'_'.time().'_'.Str::random(6).'.'.$panFile->getClientOriginalExtension();
+            $panFile->move($uploadPath, $panFileName);
+            $panImagePath = 'uploads/kyc/'.$panFileName;
+        }
+
         $kycData = [
             'user_id' => $user->id,
             'document_type' => $request->document_type,
             'document_number' => trim((string) $request->document_number),
+            'pan_number' => strtoupper(trim((string) $request->pan_number)),
             'full_name' => trim((string) $request->full_name),
             'dob' => $request->dob,
             'bank_name' => trim((string) $request->bank_name),
@@ -88,6 +102,7 @@ class KycController extends Controller
             'upi_id' => $request->upi_id ? trim((string) $request->upi_id) : null,
             'front_image' => $frontImagePath,
             'back_image' => $backImagePath,
+            'pan_image' => $panImagePath,
             'status' => 'pending',
             'rejection_reason' => null,
             'reviewed_at' => null,
@@ -100,7 +115,7 @@ class KycController extends Controller
 
         $user->update([
             'kyc_status' => 'pending',
-            'wallet_address' => $request->upi_id ?: $request->account_number,
+            'wallet_address' => $user->wallet_address ?: ($request->upi_id ?: $request->account_number),
         ]);
 
         return redirect()->route('user.kyc.index')->with('success', 'KYC documents and banking details submitted successfully! Your verification status is now pending admin approval.');

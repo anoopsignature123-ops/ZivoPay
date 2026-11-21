@@ -19,8 +19,17 @@ class RegisterRequest extends BaseApiRequest
             $sponsor = trim((string) $sponsor);
         }
 
+        $mobile = $this->input('mobile');
+        if ($mobile !== null) {
+            $mobile = preg_replace('/[^0-9]/', '', (string) $mobile);
+            if (str_starts_with($mobile, '91') && strlen($mobile) === 12) {
+                $mobile = substr($mobile, 2);
+            }
+        }
+
         $this->merge([
             'sponsor_code' => ! empty($sponsor) ? $sponsor : null,
+            'mobile' => $mobile,
         ]);
     }
 
@@ -34,7 +43,7 @@ class RegisterRequest extends BaseApiRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'mobile' => 'required|string|max:20|unique:users,mobile',
+            'mobile' => ['required', 'string', 'regex:/^[6-9][0-9]{9}$/', 'unique:users,mobile'],
             'sponsor_code' => [
                 'nullable',
                 'string',
@@ -62,6 +71,7 @@ class RegisterRequest extends BaseApiRequest
         return [
             'email.unique' => 'This email address is already registered.',
             'mobile.unique' => 'This mobile number is already registered.',
+            'mobile.regex' => 'Mobile number must be a valid 10-digit number without +91 or country code.',
             'sponsor_code.exists' => 'The provided sponsor referral code is invalid.',
         ];
     }

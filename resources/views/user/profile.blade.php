@@ -110,11 +110,11 @@
                 <div class="p-3.5 rounded-2xl bg-black/80 border border-emerald-500/30">
                     <span class="text-neutral-400 block text-[10px] uppercase font-sans font-bold">Withdrawal Wallet
                         Status:</span>
-                    @if ($user->wallet_address)
-                        <strong class="text-emerald-400 font-black text-sm block uppercase truncate" title="{{ $user->wallet_address }}">SAVED &
+                    @if ($user->usdt_address || $user->wallet_address)
+                        <strong class="text-emerald-400 font-black text-sm block uppercase truncate" title="{{ $user->usdt_address ?: $user->wallet_address }}">SAVED &
                                 READY</strong>
                             <span class="text-[10px] text-emerald-400 truncate block">⚡
-                                {{ Str::limit($user->wallet_address, 18) }}</span>
+                                {{ Str::limit($user->usdt_address ?: $user->wallet_address, 18) }}</span>
                     @else
                         <strong class="text-emerald-400 font-black text-sm block uppercase">NOT SET YET</strong>
                         <span class="text-[10px] text-emerald-400 block">Add address below for instant payouts</span>
@@ -191,11 +191,13 @@
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Mobile Number
-                                *</label>
-                            <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="Enter mobile phone number..."
+                            <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Mobile Number (10 Digits) *</label>
+                            <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="10-digit mobile number (e.g. 9876543210)"
+                                maxlength="10" pattern="[6-9][0-9]{9}" inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('91') && this.value.length === 12) this.value = this.value.slice(2); this.value = this.value.slice(0, 10);"
                                 class="w-full px-4 py-2.5 rounded-xl bg-black/80 border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400"
                                 required>
+                            <p class="text-[10px] text-neutral-400">Enter clean 10-digit number without +91 or country code.</p>
                         </div>
 
                         <!-- WITHDRAWAL USDT (BEP20) WALLET ADDRESS -->
@@ -204,16 +206,14 @@
                                 <label class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
                                     💎 USDT (BEP20) WITHDRAWAL ADDRESS
                                 </label>
-                                @if ($user->wallet_address)
+                                @if ($user->usdt_address || $user->wallet_address)
                                     <span class="text-[9px] text-emerald-400 font-mono font-bold">AUTO-FETCH ACTIVE</span>
                                 @endif
                             </div>
-                            <input type="text" name="wallet_address" value="{{ old('wallet_address', $user->wallet_address) }}"
+                            <input type="text" name="usdt_address" value="{{ old('usdt_address', $user->usdt_address ?: $user->wallet_address) }}"
                                 placeholder="Enter USDT BEP20 Wallet Address (0x...)"
                                 class="w-full px-4 py-2.5 rounded-xl bg-black border border-emerald-500/40 text-emerald-300 font-mono text-xs focus:outline-none focus:border-emerald-400">
-                            <p class="text-[10px] text-neutral-400 mt-1">Saved address will automatically auto-fill
-                                whenever
-                                you make a withdrawal request!</p>
+                            <p class="text-[10px] text-neutral-400 mt-1">Saved address will automatically auto-fill whenever you make a withdrawal request!</p>
                         </div>
 
                         <div class="space-y-1">

@@ -101,12 +101,13 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'mobile' => 'required|string|max:20|unique:users,mobile',
+            'mobile' => ['required', 'string', 'regex:/^[6-9][0-9]{9}$/', 'unique:users,mobile'],
             'sponsor_code' => 'required|string',
             'password' => 'required|min:6|confirmed',
         ], [
             'email.unique' => 'This email address is already registered in the system.',
             'mobile.unique' => 'This mobile number is already registered in the system.',
+            'mobile.regex' => 'Mobile number must be a valid 10-digit number without +91 or country code.',
         ]);
 
         $referralCode = User::generateReferralCode();
@@ -286,13 +287,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
-            'mobile' => 'required|string|max:20|unique:users,mobile,'.$user->id,
+            'mobile' => ['required', 'string', 'regex:/^[6-9][0-9]{9}$/', 'unique:users,mobile,'.$user->id],
             'sponsor_code' => 'required|string',
 
             'password' => 'nullable|min:6|confirmed',
         ], [
             'email.unique' => 'This email address is already in use by another user account.',
             'mobile.unique' => 'This mobile number is already in use by another user account.',
+            'mobile.regex' => 'Mobile number must be a valid 10-digit number without +91 or country code.',
         ]);
 
         $data = [

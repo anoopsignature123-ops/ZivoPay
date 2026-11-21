@@ -175,6 +175,9 @@
                                 <td class="px-4 py-3.5">
                                     <p class="font-bold text-white uppercase">{{ $kyc->document_type }}</p>
                                     <p class="text-[11px] font-mono text-emerald-300">{{ $kyc->document_number }}</p>
+                                    @if($kyc->pan_number)
+                                        <p class="text-[10px] text-teal-300 font-mono">PAN: {{ $kyc->pan_number }}</p>
+                                    @endif
                                     <p class="text-[10px] text-neutral-400">Name: {{ $kyc->full_name }}</p>
                                 </td>
                                 <td class="px-4 py-3.5">

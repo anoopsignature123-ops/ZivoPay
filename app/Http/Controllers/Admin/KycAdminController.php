@@ -20,6 +20,7 @@ class KycAdminController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
                     ->orWhere('document_number', 'like', "%{$search}%")
+                    ->orWhere('pan_number', 'like', "%{$search}%")
                     ->orWhere('account_number', 'like', "%{$search}%")
                     ->orWhere('bank_name', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($uq) use ($search) {
