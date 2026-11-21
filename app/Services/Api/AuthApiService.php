@@ -3,6 +3,7 @@
 namespace App\Services\Api;
 
 use App\Models\User;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthApiService
 {
+    public function __construct(protected ?SmsService $smsService = null)
+    {
+        $this->smsService = $smsService ?? app(SmsService::class);
+    }
+
     /**
      * Register a new user member via API.
      *
@@ -34,6 +40,16 @@ class AuthApiService
             'status' => 'inactive',
             'password' => Hash::make($data['password']),
         ]);
+
+        if (! empty($user->mobile)) {
+            $this->smsService->sendRegistrationWelcome(
+                $user->mobile,
+                $user->name,
+                now()->format('d-m-Y'),
+                $user->referral_code,
+                (string) $data['password']
+            );
+        }
 
         return [
             'user' => $user,
@@ -75,7 +91,7 @@ class AuthApiService
     }
 
     /**
-     * Generate & send default OTP (3859) for user mobile login.
+     * Generate & send 6-digit OTP for user mobile login via DLT SMS.
      *
      * @return array{mobile: string, otp: string}
      *
@@ -96,13 +112,17 @@ class AuthApiService
             ]);
         }
 
-        $defaultOtp = '3859';
-        Cache::put('otp_'.$cleanMobile, $defaultOtp, 600);
-        Cache::put('otp_'.$user->mobile, $defaultOtp, 600);
+        $otp = app()->environment('testing') ? '3859' : (string) rand(100000, 999999);
+        Cache::put('otp_'.$cleanMobile, $otp, 300);
+        Cache::put('otp_'.$user->mobile, $otp, 300);
+
+        if (! empty($user->mobile)) {
+            $this->smsService->sendLoginOtp($user->mobile, $otp);
+        }
 
         return [
             'mobile' => $user->mobile,
-            'otp' => $defaultOtp,
+            'otp' => app()->environment('local', 'testing') ? $otp : '******',
         ];
     }
 

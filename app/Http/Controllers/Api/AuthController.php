@@ -72,28 +72,23 @@ class AuthController extends Controller
      */
     public function sendOtp(Request $request, AuthApiService $authService): JsonResponse
     {
-        return $this->errorResponse(
-            'OTP login isn’t available yet. Please log in with your mobile number and password.',
-            501,
-        );
-        // $mobile = (string) ($request->input('mobile') ?? $request->input('login_id') ?? $request->input('user_id') ?? $request->input('phone'));
+        $mobile = (string) ($request->input('mobile') ?? $request->input('login_id') ?? $request->input('user_id') ?? $request->input('phone'));
 
-        // if (empty($mobile)) {
-        //     return $this->errorResponse('Mobile number is required.', 422);
-        // }
+        if (empty($mobile)) {
+            return $this->errorResponse('Mobile number is required.', 422);
+        }
+        try {
+            $result = $authService->sendOtp($mobile);
 
-        // try {
-        //     $result = $authService->sendOtp($mobile);
-
-        //     return $this->successResponse([
-        //         'mobile' => $result['mobile'],
-        //         'otp' => $result['otp'],
-        //     ], 'OTP sent successfully to your mobile number.');
-        // } catch (ValidationException $e) {
-        //     return $this->validationErrorResponse($e->errors(), 'Failed to send OTP.');
-        // } catch (\Exception $e) {
-        //     return $this->errorResponse('Failed to send OTP: '.$e->getMessage(), 500);
-        // }
+            return $this->successResponse([
+                'mobile' => $result['mobile'],
+                'otp' => $result['otp'],
+            ], 'OTP sent successfully to your mobile number.');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e->errors(), 'Failed to send OTP.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to send OTP: '.$e->getMessage(), 500);
+        }
     }
 
     /**
@@ -133,33 +128,24 @@ class AuthController extends Controller
      */
     public function resendOtp(Request $request, AuthApiService $authService): JsonResponse
     {
-        return $this->errorResponse(
-            'OTP login isn’t available yet. Please log in with your mobile number and password.',
-            501,
-        );
+        $mobile = (string) ($request->input('mobile') ?? $request->input('login_id') ?? $request->input('user_id') ?? $request->input('phone'));
 
-        /*
-         * Previous resend implementation, retained for when OTP delivery is enabled:
-         *
-         * $mobile = (string) ($request->input('mobile') ?? $request->input('login_id') ?? $request->input('user_id') ?? $request->input('phone'));
-         *
-         * if (empty($mobile)) {
-         *     return $this->errorResponse('Mobile number is required.', 422);
-         * }
-         *
-         * try {
-         *     $result = $authService->sendOtp($mobile);
-         *
-         *     return $this->successResponse([
-         *         'mobile' => $result['mobile'],
-         *         'otp' => $result['otp'],
-         *     ], 'OTP resent successfully to your mobile number.');
-         * } catch (ValidationException $e) {
-         *     return $this->validationErrorResponse($e->errors(), 'Failed to resend OTP.');
-         * } catch (\Exception $e) {
-         *     return $this->errorResponse('Failed to resend OTP: '.$e->getMessage(), 500);
-         * }
-         */
+        if (empty($mobile)) {
+            return $this->errorResponse('Mobile number is required.', 422);
+        }
+
+        try {
+            $result = $authService->sendOtp($mobile);
+
+            return $this->successResponse([
+                'mobile' => $result['mobile'],
+                'otp' => $result['otp'],
+            ], 'OTP resent successfully to your mobile number.');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e->errors(), 'Failed to resend OTP.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to resend OTP: '.$e->getMessage(), 500);
+        }
     }
 
     /**

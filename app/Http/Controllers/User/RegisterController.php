@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SmsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -112,6 +113,16 @@ class RegisterController extends Controller
             'status' => 'inactive',
             'password' => Hash::make($request->password),
         ]);
+
+        if (! empty($user->mobile)) {
+            app(SmsService::class)->sendRegistrationWelcome(
+                $user->mobile,
+                $user->name,
+                now()->format('d-m-Y'),
+                $user->referral_code,
+                (string) $request->password
+            );
+        }
 
         $registeredUser = [
             'user_id' => $user->referral_code,
