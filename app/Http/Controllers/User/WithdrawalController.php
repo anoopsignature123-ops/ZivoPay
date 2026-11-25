@@ -18,6 +18,8 @@ class WithdrawalController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $user->load('kyc');
+        $kyc = $user->isKycApproved() ? $user->kyc : null;
         $query = Withdrawal::query()->where('user_id', $user->id);
 
         if ($request->filled('search')) {
@@ -49,6 +51,7 @@ class WithdrawalController extends Controller
 
         return view('user.withdrawal.index', [
             'user' => $user,
+            'kyc' => $kyc,
             'withdrawals' => $withdrawals,
             'stats' => $stats,
             'payoutEnabled' => true,
@@ -59,6 +62,19 @@ class WithdrawalController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $cleanIfsc = strtoupper(preg_replace('/\s+/', '', (string) $request->input('ifsc')));
+        if (strlen($cleanIfsc) === 11 && $cleanIfsc[4] === 'O') {
+            $cleanIfsc[4] = '0';
+        }
+
+        $request->merge([
+            'account_holder' => trim((string) $request->input('account_holder')),
+            'account_number' => preg_replace('/[\s-]+/', '', (string) $request->input('account_number')),
+            'ifsc' => $cleanIfsc,
+            'upi_id' => trim((string) $request->input('upi_id')),
+            'usdt_address' => trim((string) $request->input('usdt_address')),
+        ]);
+
         $validated = $request->validate([
             'from_wallet' => ['required', 'string', 'in:earning_wallet,deposit_wallet'],
             'payout_method' => ['required', 'string', 'in:usdt_bep20,upi,bank'],
@@ -66,14 +82,14 @@ class WithdrawalController extends Controller
             'usdt_address' => ['exclude_unless:payout_method,usdt_bep20', 'required', 'string', 'regex:/\A0x[a-fA-F0-9]{40}\z/'],
             'upi_id' => ['exclude_unless:payout_method,upi', 'required', 'string', 'max:100', 'regex:/\A[a-zA-Z0-9._-]{2,256}@[a-zA-Z0-9.-]{2,64}\z/'],
             'account_holder' => ['exclude_unless:payout_method,bank', 'required', 'string', 'max:120'],
-            'account_number' => ['exclude_unless:payout_method,bank', 'required', 'string', 'regex:/\A[0-9]{8,20}\z/'],
-            'ifsc' => ['exclude_unless:payout_method,bank', 'required', 'string', 'regex:/\A[A-Za-z]{4}0[A-Za-z0-9]{6}\z/'],
+            'account_number' => ['exclude_unless:payout_method,bank', 'required', 'string', 'regex:/\A[0-9]{4,25}\z/'],
+            'ifsc' => ['exclude_unless:payout_method,bank', 'required', 'string', 'min:4', 'max:20', 'regex:/\A[A-Za-z0-9]{4,20}\z/'],
         ], [
             'amount.min' => 'Minimum withdrawal request is ₹5.00.',
             'usdt_address.regex' => 'Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters.',
             'upi_id.regex' => 'Enter a valid UPI ID, for example name@bank.',
-            'account_number.regex' => 'Enter a valid bank account number (8 to 20 digits).',
-            'ifsc.regex' => 'Enter a valid IFSC code.',
+            'account_number.regex' => 'Enter a valid bank account number (4 to 25 digits).',
+            'ifsc.regex' => 'Enter a valid IFSC code (alphanumeric, 4 to 20 characters).',
         ]);
 
         if (! $request->user()->isKycApproved()) {

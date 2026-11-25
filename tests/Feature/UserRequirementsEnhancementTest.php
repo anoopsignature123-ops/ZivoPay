@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Kyc;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -112,6 +113,59 @@ class UserRequirementsEnhancementTest extends TestCase
             'user_id' => $user->id,
             'payment_method' => 'INR UPI',
             'amount' => 3000.00,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_approved_kyc_bank_and_upi_details_autofill_on_withdrawal_page(): void
+    {
+        $user = User::create([
+            'role_id' => 2,
+            'name' => 'KYC AutoFill Member',
+            'email' => 'kyc_autofill_'.uniqid().'@test.com',
+            'mobile' => '98'.rand(10000000, 99999999),
+            'referral_code' => User::generateReferralCode(),
+            'kyc_status' => 'approved',
+            'earning_wallet' => 5000,
+        ]);
+
+        Kyc::create([
+            'user_id' => $user->id,
+            'document_type' => 'aadhaar',
+            'document_number' => '123456789012',
+            'pan_number' => 'ABCDE1234F',
+            'full_name' => 'KYC AutoFill Member',
+            'bank_name' => 'State Bank of India',
+            'account_holder' => 'KYC AutoFill Holder',
+            'account_number' => '112233445566',
+            'ifsc_code' => 'SBIN0001234',
+            'upi_id' => 'kycautofill@sbi',
+            'front_image' => 'uploads/kyc/test.jpg',
+            'status' => 'approved',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('user.withdrawal.index'));
+
+        $response->assertOk();
+        $response->assertSee('KYC AutoFill Holder');
+        $response->assertSee('112233445566');
+        $response->assertSee('SBIN0001234');
+        $response->assertSee('kycautofill@sbi');
+
+        $postResponse = $this->actingAs($user)->from(route('user.withdrawal.index'))->post(route('user.withdrawal.store'), [
+            'from_wallet' => 'earning_wallet',
+            'payout_method' => 'bank',
+            'amount' => 1000,
+            'account_holder' => 'KYC AutoFill Holder',
+            'account_number' => '1122 3344 5566',
+            'ifsc' => 'SBIN012494',
+        ]);
+
+        $postResponse->assertSessionHas('success');
+        $this->assertDatabaseHas('withdrawals', [
+            'user_id' => $user->id,
+            'payment_method' => 'INR Bank Transfer',
+            'amount' => 1000.00,
             'status' => 'pending',
         ]);
     }

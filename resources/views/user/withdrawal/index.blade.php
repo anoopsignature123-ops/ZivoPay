@@ -201,25 +201,37 @@
 
                         <div id="upiFields" class="hidden">
                             <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">UPI ID *</label>
-                            <input type="text" name="upi_id" value="{{ old('upi_id') }}" placeholder="name@bank" autocomplete="off"
+                            <input type="text" name="upi_id" value="{{ old('upi_id', $kyc->upi_id ?? '') }}" placeholder="name@bank" autocomplete="off"
                                 class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400 transition">
+                            @error('upi_id')
+                                <p class="mt-1 text-[11px] font-bold text-rose-400">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div id="bankFields" class="hidden space-y-3">
                             <div>
                                 <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Account Holder Name *</label>
-                                <input type="text" name="account_holder" value="{{ old('account_holder') }}" autocomplete="name"
+                                <input type="text" name="account_holder" value="{{ old('account_holder', $kyc->account_holder ?? '') }}" autocomplete="name"
                                     class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white text-xs focus:outline-none focus:border-emerald-400 transition">
+                                @error('account_holder')
+                                    <p class="mt-1 text-[11px] font-bold text-rose-400">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">Bank Account Number *</label>
-                                <input type="text" name="account_number" value="{{ old('account_number') }}" inputmode="numeric" autocomplete="off"
+                                <input type="text" name="account_number" value="{{ old('account_number', $kyc->account_number ?? '') }}" inputmode="numeric" autocomplete="off"
                                     class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400 transition">
+                                @error('account_number')
+                                    <p class="mt-1 text-[11px] font-bold text-rose-400">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">IFSC Code *</label>
-                                <input type="text" name="ifsc" value="{{ old('ifsc') }}" maxlength="11" autocomplete="off"
+                                <input type="text" name="ifsc" value="{{ old('ifsc', $kyc->ifsc_code ?? '') }}" maxlength="11" autocomplete="off"
                                     class="w-full px-4 py-3 rounded-xl bg-[#01140c] border border-emerald-500/40 text-white font-mono uppercase text-xs focus:outline-none focus:border-emerald-400 transition">
+                                @error('ifsc')
+                                    <p class="mt-1 text-[11px] font-bold text-rose-400">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
