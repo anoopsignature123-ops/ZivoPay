@@ -81,4 +81,38 @@ class UserRequirementsEnhancementTest extends TestCase
         $viewResponse->assertOk();
         $viewResponse->assertSee($bep20Address);
     }
+
+    public function test_upi_withdrawal_succeeds_even_when_user_has_non_bep20_wallet_address(): void
+    {
+        $user = User::create([
+            'role_id' => 2,
+            'name' => 'UPI Withdraw Member',
+            'email' => 'upi_'.uniqid().'@test.com',
+            'mobile' => '98'.rand(10000000, 99999999),
+            'referral_code' => User::generateReferralCode(),
+            'kyc_status' => 'approved',
+            'earning_wallet' => 3084.72,
+            'wallet_address' => '9919323203-6@axl',
+        ]);
+
+        $viewResponse = $this->actingAs($user)->get(route('user.withdrawal.index'));
+        $viewResponse->assertOk();
+        $viewResponse->assertDontSee('value="9919323203-6@axl"', false);
+
+        $postResponse = $this->actingAs($user)->from(route('user.withdrawal.index'))->post(route('user.withdrawal.store'), [
+            'from_wallet' => 'earning_wallet',
+            'payout_method' => 'upi',
+            'amount' => 3000,
+            'upi_id' => '9919323203-6@axl',
+            'usdt_address' => '9919323203-6@axl',
+        ]);
+
+        $postResponse->assertSessionHas('success');
+        $this->assertDatabaseHas('withdrawals', [
+            'user_id' => $user->id,
+            'payment_method' => 'INR UPI',
+            'amount' => 3000.00,
+            'status' => 'pending',
+        ]);
+    }
 }

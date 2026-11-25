@@ -224,9 +224,15 @@
                         </div>
 
                         <!-- BEP20 Destination -->
+                        @php
+                            $savedUsdtAddress = $user->usdt_address;
+                            if (! $savedUsdtAddress && is_string($user->wallet_address) && preg_match('/^0x[a-fA-F0-9]{40}$/', trim($user->wallet_address))) {
+                                $savedUsdtAddress = trim($user->wallet_address);
+                            }
+                        @endphp
                         <div id="usdtFields">
                             <label class="mb-1 block text-xs font-bold uppercase text-emerald-400">USDT wallet address (BEP20) *</label>
-                            <input type="text" name="usdt_address" value="{{ old('usdt_address', $user->usdt_address ?: $user->wallet_address) }}"
+                            <input type="text" name="usdt_address" value="{{ old('usdt_address', $savedUsdtAddress) }}"
                                 placeholder="0x… (BNB Smart Chain / BEP20 address)" autocomplete="off" spellcheck="false"
                                 minlength="42" maxlength="42" pattern="0x[a-fA-F0-9]{40}"
                                 title="Enter a valid BEP20 address: 0x followed by exactly 40 hexadecimal characters."
@@ -496,11 +502,27 @@
                 document.getElementById('upiFields').classList.toggle('hidden', !isUpi);
                 document.getElementById('bankFields').classList.toggle('hidden', !isBank);
                 document.getElementById('usdtEstimate').classList.toggle('hidden', !isUsdt);
-                document.querySelector('[name="usdt_address"]').required = isUsdt;
-                document.querySelector('[name="upi_id"]').required = isUpi;
-                document.querySelector('[name="account_holder"]').required = isBank;
-                document.querySelector('[name="account_number"]').required = isBank;
-                document.querySelector('[name="ifsc"]').required = isBank;
+
+                var usdtInput = document.querySelector('[name="usdt_address"]');
+                var upiInput = document.querySelector('[name="upi_id"]');
+                var holderInput = document.querySelector('[name="account_holder"]');
+                var accInput = document.querySelector('[name="account_number"]');
+                var ifscInput = document.querySelector('[name="ifsc"]');
+
+                usdtInput.required = isUsdt;
+                usdtInput.disabled = !isUsdt;
+
+                upiInput.required = isUpi;
+                upiInput.disabled = !isUpi;
+
+                holderInput.required = isBank;
+                holderInput.disabled = !isBank;
+
+                accInput.required = isBank;
+                accInput.disabled = !isBank;
+
+                ifscInput.required = isBank;
+                ifscInput.disabled = !isBank;
             }
 
             function updateWalletBalance(walletType) {
